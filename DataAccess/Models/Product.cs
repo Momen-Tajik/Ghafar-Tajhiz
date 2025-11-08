@@ -16,11 +16,11 @@ namespace DataAccess.Models
         [Required(ErrorMessage = "نام محصول الزامی است")]
         [Display(Name = "نام محصول")]
         [StringLength(100, ErrorMessage = "نام محصول نمی‌تواند بیش از 100 کاراکتر باشد")] 
-        public string ProductName { get; set; }
+        public string ProductName { get; set; } = string.Empty;
 
         [Display(Name = "توضیحات")]
         [DataType(DataType.MultilineText)]
-        public string ProductDescription { get; set; }
+        public string? ProductDescription { get; set; }
 
         [Required(ErrorMessage = "قیمت محصول الزامی است")]
         [Display(Name = "قیمت")]
@@ -34,7 +34,7 @@ namespace DataAccess.Models
 
         [Display(Name = "آدرس تصویر")]
         [Url(ErrorMessage = "آدرس تصویر باید یک URL معتبر باشد")]
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         [Display(Name = "وضعیت موجودی")]
         public bool IsAvailable { get; set; } = true;
@@ -49,7 +49,7 @@ namespace DataAccess.Models
         public int CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
-        public Category Category { get; set; }
+        public Category Category { get; set; } = new Category();
 
 
     }

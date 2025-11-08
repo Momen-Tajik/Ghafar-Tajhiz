@@ -15,13 +15,13 @@ namespace DataAccess.Models
         [Required(ErrorMessage = "نام دسته‌بندی الزامی است")]
         [Display(Name = "نام دسته‌بندی")]
         [StringLength(50, ErrorMessage = "نام دسته‌بندی نمی‌تواند بیش از 50 کاراکتر باشد")]
-        public string CategoryName { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
 
         [Display(Name = "توضیحات")]
         [DataType(DataType.MultilineText)]
-        public string CategoryDescription { get; set; }
+        public string? CategoryDescription { get; set; }
 
-        public List<Product> Products { get; set; }
+        public List<Product>? Products { get; set; }
 
         
         
