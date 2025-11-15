@@ -11,7 +11,7 @@ namespace DataAccess.Repositories.CategoryRepo
 {
     public class CategoryRepository : ICategoryRepository
     {
-        private GhafarTajhizShopDbContext _context;
+        private readonly GhafarTajhizShopDbContext _context;
 
         public CategoryRepository(GhafarTajhizShopDbContext context)
         {
