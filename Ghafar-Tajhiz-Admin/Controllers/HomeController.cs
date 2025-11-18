@@ -17,6 +17,7 @@ namespace Ghafar_Tajhiz_Admin.Controllers
         {
             return View();
         }
+       
 
         public IActionResult Privacy()
         {

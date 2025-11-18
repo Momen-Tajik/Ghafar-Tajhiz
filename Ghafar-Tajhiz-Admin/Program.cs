@@ -1,4 +1,6 @@
+using BusinessLogic.CategoryServices;
 using DataAccess.Data;
+using DataAccess.Repositories.CategoryRepo;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,9 @@ builder.Services.AddDbContext<GhafarTajhizShopDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 
 });
+
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<CategoryService>();
 
 var app = builder.Build();
 
