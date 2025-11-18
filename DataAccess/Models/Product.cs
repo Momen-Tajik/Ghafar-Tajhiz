@@ -33,7 +33,7 @@ namespace DataAccess.Models
         public int StockQuantity { get; set; }
 
         [Display(Name = "آدرس تصویر")]
-        [Url(ErrorMessage = "آدرس تصویر باید یک URL معتبر باشد")]
+        //[Url(ErrorMessage = "آدرس تصویر باید یک URL معتبر باشد")]
         public string? ImageUrl { get; set; }
 
         [Display(Name = "وضعیت موجودی")]
@@ -45,11 +45,11 @@ namespace DataAccess.Models
 
         // دسته‌بندی
         [Required(ErrorMessage = "دسته‌بندی الزامی است")]
-        [Display(Name = "دسته‌بندی")]
         public int CategoryId { get; set; }
 
+        [Display(Name = "دسته‌بندی")]
         [ForeignKey("CategoryId")]
-        public Category Category { get; set; } = new Category();
+        public Category? Category { get; set; }
 
 
     }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories.ProductRepo
 {
-    internal class ProductRepository : IProductRepository
+    public class ProductRepository : IProductRepository
     {
         private readonly GhafarTajhizShopDbContext _context;
 

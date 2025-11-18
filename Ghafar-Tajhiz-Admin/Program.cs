@@ -1,6 +1,8 @@
 using BusinessLogic.CategoryServices;
+using BusinessLogic.ProductServices;
 using DataAccess.Data;
 using DataAccess.Repositories.CategoryRepo;
+using DataAccess.Repositories.ProductRepo;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,9 @@ builder.Services.AddDbContext<GhafarTajhizShopDbContext>(options =>
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<CategoryService>();
+
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ProductService>();
 
 var app = builder.Build();
 
