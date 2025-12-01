@@ -36,7 +36,9 @@ namespace BusinessLogic.ProductServices
 
         [Display(Name = "آدرس تصویر")]
         //[Url(ErrorMessage = "آدرس تصویر باید یک URL معتبر باشد")]
-        public IFormFile ImageUrl {  get; set; }
+        public IFormFile? ImageUrl {  get; set; }
+
+        public string? ImageName { get; set; }
 
         [Display(Name = "وضعیت موجودی")]
         public bool IsAvailable { get; set; } = true;

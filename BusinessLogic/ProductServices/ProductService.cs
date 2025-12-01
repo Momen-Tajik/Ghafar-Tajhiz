@@ -50,8 +50,22 @@ namespace BusinessLogic.ProductServices
             await _productRepo.Add(product);
         }
 
-        public async Task UpdateProduct(Product product)
+        public async Task UpdateProduct(ProductDto productDto)
         {
+            var product = await _productRepo.GetById(productDto.ProductId);
+            product.ProductName = productDto.ProductName;
+            product.ProductDescription = productDto.ProductDescription;
+            product.Price = productDto.Price;
+            product.StockQuantity = productDto.StockQuantity;
+            product.CategoryId = productDto.CategoryId;
+            product.IsAvailable = productDto.IsAvailable;
+            product.Category=productDto.Category;
+
+            if (productDto.ImageUrl != null)
+            {
+                product.ImageUrl = await _fileUploadService.UploadFileAsync(productDto.ImageUrl);
+            }
+
             await _productRepo.Update(product);
         }
 
@@ -64,6 +78,21 @@ namespace BusinessLogic.ProductServices
         {
             await _productRepo.Delete(product);
         }
-
+        public async Task<ProductDto> GetProductDtoById(int id)
+        {
+            var product =await _productRepo.GetById(id);
+            var productDto = new ProductDto()
+            {
+                CategoryId = product.CategoryId,
+                ProductName = product.ProductName,
+                ProductDescription = product.ProductDescription,
+                Price = product.Price,
+                StockQuantity = product.StockQuantity,
+                ProductId = product.ProductId,
+                ImageName = product.ImageUrl,
+                IsAvailable = product.IsAvailable,
+            };
+            return productDto;
+        }
     }
 }

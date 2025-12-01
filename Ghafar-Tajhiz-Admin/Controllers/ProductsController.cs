@@ -82,7 +82,7 @@ namespace Ghafar_Tajhiz_Admin.Controllers
                 return NotFound();
             }
 
-            var product = await _productService.GetProductById(id.Value);
+            var product = await _productService.GetProductDtoById(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -96,7 +96,7 @@ namespace Ghafar_Tajhiz_Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,ProductDescription,Price,StockQuantity,ImageUrl,IsAvailable,CategoryId")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,ProductDescription,Price,StockQuantity,ImageUrl,IsAvailable,CategoryId")] ProductDto product)
         {
             if (id != product.ProductId)
             {
