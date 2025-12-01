@@ -1,4 +1,5 @@
 using BusinessLogic.CategoryServices;
+using BusinessLogic.FileUpload;
 using BusinessLogic.ProductServices;
 using DataAccess.Data;
 using DataAccess.Repositories.CategoryRepo;
@@ -21,6 +22,8 @@ builder.Services.AddScoped<CategoryService>();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ProductService>();
+
+builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 
 var app = builder.Build();
 

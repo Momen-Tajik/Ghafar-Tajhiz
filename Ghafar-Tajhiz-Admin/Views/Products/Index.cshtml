@@ -55,7 +55,7 @@
                 @Html.DisplayFor(modelItem => item.StockQuantity)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ImageUrl)
+                <img src="~/uploads/@item.ImageUrl" width="100px" alt="Alternate Text" />
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.IsAvailable)

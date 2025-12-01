@@ -62,16 +62,16 @@ namespace Ghafar_Tajhiz_Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,ProductName,ProductDescription,Price,StockQuantity,ImageUrl,IsAvailable,CategoryId")] Product product)
+        public async Task<IActionResult> Create([Bind("ProductId,ProductName,ProductDescription,Price,StockQuantity,ImageUrl,IsAvailable,CategoryId")] ProductDto productDto)
         {
             if (ModelState.IsValid)
             {
-                product.CreateDate = DateTime.Now;
-                await _productService.CreateProduct(product);
+                productDto.CreateDate = DateTime.Now;
+                await _productService.CreateProduct(productDto);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(await _categoryService.GetCategories(), "CategoryId", "CategoryName", product.CategoryId);
-            return View(product);
+            ViewData["CategoryId"] = new SelectList(await _categoryService.GetCategories(), "CategoryId", "CategoryName", productDto.CategoryId);
+            return View(productDto);
         }
 
         // GET: Products/Edit/5

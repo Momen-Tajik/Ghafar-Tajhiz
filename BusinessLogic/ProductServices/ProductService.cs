@@ -1,4 +1,5 @@
-﻿using DataAccess.Models;
+﻿using BusinessLogic.FileUpload;
+using DataAccess.Models;
 using DataAccess.Repositories.ProductRepo;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,9 +14,11 @@ namespace BusinessLogic.ProductServices
     public class ProductService
     {
         private readonly IProductRepository _productRepo;
-        public ProductService(IProductRepository productRepo)
+        private readonly IFileUploadService _fileUploadService;
+        public ProductService(IProductRepository productRepo, IFileUploadService fileUploadService)
         {
             _productRepo = productRepo;
+            _fileUploadService = fileUploadService;
         }
 
         public async Task<IEnumerable<Product>> GetProducts() 
@@ -31,8 +34,19 @@ namespace BusinessLogic.ProductServices
             return await _productRepo.GetById(id);
         }
 
-        public async Task CreateProduct(Product product)
+        public async Task CreateProduct(ProductDto productDto)
         {
+            var product = new Product()
+            {
+                ProductName=productDto.ProductName,
+                ProductDescription=productDto.ProductDescription,
+                Price=productDto.Price,
+                StockQuantity=productDto.StockQuantity,
+                CategoryId=productDto.CategoryId,
+                IsAvailable=productDto.IsAvailable,
+                Category=productDto.Category,
+            };
+            product.ImageUrl=await _fileUploadService.UploadFileAsync(productDto.ImageUrl);
             await _productRepo.Add(product);
         }
 
