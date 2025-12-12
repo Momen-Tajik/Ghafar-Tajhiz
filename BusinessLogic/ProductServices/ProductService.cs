@@ -52,6 +52,7 @@ namespace BusinessLogic.ProductServices
 
         public async Task UpdateProduct(ProductDto productDto)
         {
+
             var product = await _productRepo.GetById(productDto.ProductId);
             product.ProductName = productDto.ProductName;
             product.ProductDescription = productDto.ProductDescription;
@@ -60,6 +61,14 @@ namespace BusinessLogic.ProductServices
             product.CategoryId = productDto.CategoryId;
             product.IsAvailable = productDto.IsAvailable;
             product.Category=productDto.Category;
+
+            if (productDto.ImageUrl != null)
+            {
+                if (!string.IsNullOrEmpty(product.ImageUrl))
+                    _fileUploadService.DeleteFile(product.ImageUrl);
+
+                product.ImageUrl = await _fileUploadService.UploadFileAsync(productDto.ImageUrl);
+            }
 
             if (productDto.ImageUrl != null)
             {
@@ -72,12 +81,17 @@ namespace BusinessLogic.ProductServices
         public async Task DeleteProduct(int id)
         {
             var p = await _productRepo.GetById(id);
+
+            if (!string.IsNullOrEmpty(p.ImageUrl))
+                _fileUploadService.DeleteFile(p.ImageUrl);
+
             await _productRepo.Delete(p);
         }
         public async Task DeleteProduct(Product product)
         {
             await _productRepo.Delete(product);
         }
+
         public async Task<ProductDto> GetProductDtoById(int id)
         {
             var product =await _productRepo.GetById(id);

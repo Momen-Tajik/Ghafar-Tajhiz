@@ -31,5 +31,21 @@ namespace BusinessLogic.FileUpload
             }
             return fileName;
         }
+
+        public bool DeleteFile(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                return false;
+
+            var fullPath = Path.Combine(_storagePath, fileName);
+
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+                return true;
+            }
+
+            return false;
+        }
     }
 }

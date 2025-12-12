@@ -10,5 +10,6 @@ namespace BusinessLogic.FileUpload
     public interface IFileUploadService
     {
         Task<string> UploadFileAsync(IFormFile file);
+        bool DeleteFile(string fileName);
     }
 }

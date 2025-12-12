@@ -27,5 +27,21 @@ namespace Ghafar_Tajhiz_Admin.Controllers
             var contentType = "application/octet-stream";
             return PhysicalFile(fullPath, contentType, fileName);
         }
+
+        [HttpDelete("Delete")]
+        public IActionResult DeleteFile(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                return BadRequest("نام فایل ارسال نشده است.");
+
+            var fullPath = Path.Combine(_storagePath, fileName);
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound("File Not Found");
+
+            System.IO.File.Delete(fullPath);
+
+            return Ok("File Deleted Successfully");
+        }
     }
 }
