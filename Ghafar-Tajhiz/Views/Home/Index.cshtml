@@ -1,4 +1,7 @@
-﻿@{
+﻿@using DataAccess.Models
+@model List<Product>  
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -19,3 +22,21 @@
         <img class="headerImage" src="~/asstes/img/ChatGPT Image Oct 12, 2025, 09_56_41 PM.png" alt="آشپزخانه صنعتی">
     </div>
 </header>
+
+<!-- products -->
+<div class="productsContainer">
+
+    @foreach (var item in Model)
+    {
+        <div class="productsItems">
+            <img src="api/FileUpload/GetFile?filename=@item.ImageUrl" width="200px" alt="Alternate Text" />
+            <div class="productsInfo">
+                <h3>@item.ProductName</h3>
+                <p>@item.Price تومان</p>
+                <p>@item.ProductDescription</p>
+                <a href="Product.html" class="btnProduct">افزودن به سبد خرید</a>
+            </div>
+        </div>
+    }
+    
+</div>
