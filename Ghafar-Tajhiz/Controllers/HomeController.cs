@@ -18,7 +18,7 @@ namespace Ghafar_Tajhiz.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult aboutUs()
         {
             return View();
         }

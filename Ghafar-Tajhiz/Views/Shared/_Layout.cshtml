@@ -5,45 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Ghafar_Tajhiz</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Ghafar_Tajhiz.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Ghafar_Tajhiz</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
+
+    <!-- Navbar -->
+    <nav class="nav">
+        <div class="mobilenavbar hidden">
+            <a><i id="mobileNavbarBtn" class="fa fa-bars" aria-hidden="true"></i></a>
+            <a>Tajhizat-Tajik-Logo</a>
+        </div>
+
+        <div class="desktopnavbar" id="desktopnavbar">
+            <a asp-controller="Home" asp-action="Index">صفحه اصلی</a>
+            <a>محصولات</a>
+            <a>ارتباط با ما</a>
+            <a asp-controller="Home" asp-action="aboutUs">درباره ما</a>
+            <a>Tajhizat-Tajik-Logo</a>
+        </div>
+    </nav>
+
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 1404 - Ghafar_Tajhiz - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+
+            <div class="footer-section about">
+                <h3>درباره ما</h3>
+                <p>
+                    ما یک شرکت فناوری پیشرو هستیم که در زمینه طراحی و توسعه سامانه‌های وب و راهکارهای ابری فعالیت می‌کنیم. هدف ما توانمندسازی کسب‌وکارها با استفاده از فناوری‌های نوین است.
+                </p>
+            </div>
+
+            <div class="footer-section links">
+                <h3>لینک‌های مهم</h3>
+                <ul>
+                    <li><a asp-controller="Home" asp-action="Index">صفحه اصلی</a></li>
+                    <li><a href="#">خدمات</a></li>
+                    <li><a href="#">مقالات</a></li>
+                    <li><a href="#">تماس با ما</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section social">
+                <h3>ما را دنبال کنید</h3>
+                <div class="social-icons">
+                    <a><img src="~/asstes/icon/icons8-facebook.svg" alt=""></a>
+                    <a><img src="~/asstes/icon/icons8-whatsapp.svg" alt=""></a>
+                    <a><img src="~/asstes/icon/icons8-instagram.svg" alt=""></a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <p>© ۱۴۰۴ شرکت شما. تمامی حقوق محفوظ است.</p>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="~/js/script.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
