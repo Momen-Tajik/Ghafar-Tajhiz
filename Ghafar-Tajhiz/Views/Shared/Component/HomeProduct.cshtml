@@ -1,0 +1,19 @@
+﻿@using DataAccess.Models
+@model List<Product>
+
+<div class="productsContainer">
+
+    @foreach (var item in Model)
+    {
+        <div class="productsItems">
+            <img src="api/FileUpload/GetFile?filename=@item.ImageUrl" width="200px" alt="Alternate Text" />
+            <div class="productsInfo">
+                <h3>@item.ProductName</h3>
+                <p>@item.Price تومان</p>
+                <p>@item.ProductDescription</p>
+                <a href="Product.html" class="btnProduct">افزودن به سبد خرید</a>
+            </div>
+        </div>
+    }
+
+</div>
