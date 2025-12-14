@@ -27,7 +27,7 @@ namespace BusinessLogic.ProductServices
         }
          public async Task<IEnumerable<Product>> GetProductsWithCategory(Expression<Func<Product, bool>> where=null) 
         {
-            return await _productRepo.GetAll(where).Include(p=>p.Category).ToListAsync();
+            return await _productRepo.GetAll(where).Include(p=>p.Category).OrderByDescending(a=>a.IsAvailable==true).ToListAsync();
         }
         public async Task<Product> GetProductById(int id) 
         {

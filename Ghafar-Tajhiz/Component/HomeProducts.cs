@@ -10,7 +10,7 @@ namespace Ghafar_Tajhiz.Component
         {
             _productService = productService;
         }
-        public async Task<IViewComponentResult> InvokeAsync(string productId)
+        public async Task<IViewComponentResult> InvokeAsync()
         {
             var data = await _productService.GetProductsWithCategory();
             return View("/Views/Shared/Component/HomeProduct.cshtml",data);
