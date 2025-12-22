@@ -1,0 +1,91 @@
+﻿@using BusinessLogic.ProductServices
+@model IEnumerable<ProductDto>
+
+@{
+    ViewData["Title"] = "لیست محصولات";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    string search = ViewBag.Search ?? "";
+}
+
+<!-- Search -->
+<div class="products-search">
+    <form asp-action="ProductList" method="get">
+        <input type="text"
+               name="search"
+               value="@search"
+               placeholder="جستجوی محصول..." />
+
+        <button type="submit" class="btnProduct">
+            جستجو
+        </button>
+    </form>
+</div>
+
+<!-- Products -->
+<div class="productsContainer">
+    @if (!Model.Any())
+    {
+        <div class="products-empty">
+            محصولی یافت نشد
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model)
+        {
+            <div class="productsItems">
+                <img class="productsImage"
+                     src="/api/FileUpload/GetFile?filename=@item.ImageName"
+                     alt="@item.ProductName" />
+
+                <div class="productsInfo">
+                    <h3>@item.ProductName</h3>
+                    <p>@item.Price.ToString("N0") تومان</p>
+
+                    <a asp-controller="Product"
+                       asp-action="Index"
+                       asp-route-id="@item.ProductId"
+                       class="btnProduct">
+                        مشاهده محصول
+                    </a>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<!-- Pagination -->
+@if (totalPages > 1)
+{
+    <div class="pagination">
+        @if (currentPage > 1)
+        {
+            <a asp-action="ProductList"
+               asp-route-page="@(currentPage - 1)"
+               asp-route-search="@search">
+                قبلی
+            </a>
+        }
+
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <a asp-action="ProductList"
+               asp-route-page="@i"
+               asp-route-search="@search"
+               class="@(i == currentPage ? "active" : "")">
+                @i
+            </a>
+        }
+
+        @if (currentPage < totalPages)
+        {
+            <a asp-action="ProductList"
+               asp-route-page="@(currentPage + 1)"
+               asp-route-search="@search">
+                بعدی
+            </a>
+        }
+    </div>
+}

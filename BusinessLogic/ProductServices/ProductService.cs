@@ -2,6 +2,7 @@
 using DataAccess.Models;
 using DataAccess.Repositories.ProductRepo;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -107,6 +108,45 @@ namespace BusinessLogic.ProductServices
                 IsAvailable = product.IsAvailable,
             };
             return productDto;
+        }
+
+        public async Task<PagedProductDto> GetProductPagination(int page, int pageSize, string? search)
+        {
+            var products =  _productRepo.GetAll();
+            if (!search.IsNullOrEmpty())
+            {
+                products = products.Where(p => 
+                                            p.ProductName.Contains(search) ||
+                                            p.ProductDescription.Contains(search) ||
+                                            p.Category.CategoryName.Contains(search));
+            }
+
+            int totalCount=products.Count();
+            int totalPages= (int)Math.Ceiling((double)totalCount/pageSize);
+
+            products=products.Skip((page - 1) * pageSize).Take(pageSize);
+
+            var productDto = await products.Select(p => new ProductDto()
+            {
+                CategoryId = p.CategoryId,
+                ProductName = p.ProductName,
+                ProductDescription = p.ProductDescription,
+                Price = p.Price,
+                StockQuantity = p.StockQuantity,
+                ProductId = p.ProductId,
+                ImageName = p.ImageUrl,
+                IsAvailable = p.IsAvailable,
+                CreateDate = p.CreateDate
+            }).ToListAsync();
+
+            var result = new PagedProductDto()
+            {
+                Page = page,
+                TotalPage = totalPages,
+                Products = productDto
+            };
+
+            return result;
         }
     }
 }

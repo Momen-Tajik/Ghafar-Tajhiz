@@ -15,5 +15,16 @@ namespace Ghafar_Tajhiz.Controllers
             var product=await _productService.GetProductById(id);
             return View(product);
         }
+
+        public async Task<IActionResult> ProductList(int page=1, int pageSize=4, string search=null)
+        {
+            var data=await _productService.GetProductPagination(page, pageSize, search);
+
+            ViewBag.CurrentPage = data.Page;
+            ViewBag.TotalPages = data.TotalPage;
+            ViewBag.Search = search;
+
+            return View(data.Products);
+        }
     }
 }
