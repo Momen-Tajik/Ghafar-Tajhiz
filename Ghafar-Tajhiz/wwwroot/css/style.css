@@ -347,6 +347,8 @@ a {
 
 
 /* Product page */ /* Product page */ /* Product page */ /* Product page */ /* Product page */
+/* Product page */ /* Product page */ /* Product page */ /* Product page */ /* Product page */
+/* Product page */ /* Product page */ /* Product page */ /* Product page */ /* Product page */
 
 .productHeader {
 }
@@ -439,8 +441,11 @@ a {
 }
 
 /* bascket */ /* bascket */ /* bascket */ /* bascket */
+/* bascket */ /* bascket */ /* bascket */ /* bascket */
+/* bascket */ /* bascket */ /* bascket */ /* bascket */
+/* bascket */ /* bascket */ /* bascket */ /* bascket */
 
-/* استایل‌های مخصوص صفحه سبد خرید */
+
 .cart-container {
     max-width: 1200px;
     margin: 40px auto;
@@ -587,6 +592,12 @@ a {
     }
 }
 
+
+
+
+/* Product List – Search */
+/* Product List – Search */
+/* Product List – Search */
 /* Product List – Search */
 .products-search {
     margin: 20px;
@@ -615,6 +626,68 @@ a {
             box-shadow: 0 0 6px rgba(255, 112, 67, 0.3);
         }
 
+    .products-search button {
+        box-shadow: 0 0 6px rgba(255, 112, 67, 0.3);
+        border: solid 1px ;
+        width: 100px;
+        background-color: #FF7043
+    }
+
+/*----Filtering---*/
+/*----Filtering---*/
+/*----Filtering---*/
+/*----Filtering---*/
+.filtering-section {
+    margin: 20px 0;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.filter-title {
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 15px;
+    font-weight: normal;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 25px;
+}
+
+.filter-btn {
+    color: #888;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+    cursor: pointer;
+}
+
+    .filter-btn:hover {
+        color: #555;
+    }
+
+    .filter-btn.active {
+        color: #FF7043;
+        font-weight: bold;
+    }
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+    .filter-buttons {
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        font-size: 14px;
+    }
+}
+
+
+/* Pagination */
+/* Pagination */
+/* Pagination */
 /* Pagination */
 .pagination {
     display: flex;
@@ -639,11 +712,15 @@ a {
         }
 
         /* Active page */
+        /* Active page */
+        /* Active page */
         .pagination a.active {
             background-color: #E64A19;
             cursor: default;
         }
 
+/* Empty state */
+/* Empty state */
 /* Empty state */
 .products-empty {
     text-align: center;

@@ -7,6 +7,7 @@
     int currentPage = ViewBag.CurrentPage ?? 1;
     int totalPages = ViewBag.TotalPages ?? 1;
     string search = ViewBag.Search ?? "";
+    string currentSort = ViewBag.Sort ?? "newest";
 }
 
 <!-- Search -->
@@ -19,11 +20,52 @@
                value="@search"
                placeholder="جستجوی محصول..." />
 
-        <button type="submit" style="width:100px" class="btnProduct">
+        <button type="submit"  class="btnProduct">
             جستجو
         </button>
     </form>
 </div>
+<!-- Filtering -->
+<div class="filtering-section">
+    <div class="filter-title">
+        مرتب‌سازی بر اساس:
+    </div>
+
+    <div class="filter-buttons">
+        <a asp-action="ProductList"
+           asp-route-page="1"
+           asp-route-search="@search"
+           asp-route-sort="bestselling"
+           class="filter-btn @(currentSort == "bestselling" ? "active" : "")">
+            پرفروش‌ترین
+        </a>
+
+        <a asp-action="ProductList"
+           asp-route-page="1"
+           asp-route-search="@search"
+           asp-route-sort="newest"
+           class="filter-btn @(currentSort == "newest" ? "active" : "")">
+            جدیدترین
+        </a>
+
+        <a asp-action="ProductList"
+           asp-route-page="1"
+           asp-route-search="@search"
+           asp-route-sort="highestprice"
+           class="filter-btn @(currentSort == "highestprice" ? "active" : "")">
+            گران‌ترین
+        </a>
+
+        <a asp-action="ProductList"
+           asp-route-page="1"
+           asp-route-search="@search"
+           asp-route-sort="lowestprice"
+           class="filter-btn @(currentSort == "lowestprice" ? "active" : "")">
+            ارزان‌ترین
+        </a>
+    </div>
+</div>
+
 
 <!-- Products -->
 <div class="productsContainer">
@@ -66,7 +108,8 @@
         {
             <a asp-action="ProductList"
                asp-route-page="@(currentPage - 1)"
-               asp-route-search="@search">
+               asp-route-search="@search"
+               asp-route-sort="@ViewBag.Sort">
                 قبلی
             </a>
         }
@@ -76,6 +119,7 @@
             <a asp-action="ProductList"
                asp-route-page="@i"
                asp-route-search="@search"
+               asp-route-sort="@ViewBag.Sort"
                class="@(i == currentPage ? "active" : "")">
                 @i
             </a>
@@ -85,7 +129,8 @@
         {
             <a asp-action="ProductList"
                asp-route-page="@(currentPage + 1)"
-               asp-route-search="@search">
+               asp-route-search="@search"
+               asp-route-sort="@ViewBag.Sort">
                 بعدی
             </a>
         }

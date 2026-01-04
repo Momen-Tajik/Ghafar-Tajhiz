@@ -110,23 +110,58 @@ namespace BusinessLogic.ProductServices
             return productDto;
         }
 
-        public async Task<PagedProductDto> GetProductPagination(int page, int pageSize, string? search)
+        public async Task<PagedProductDto> GetProductPagination(int page, int pageSize, string? search, string sort = "newest")
         {
-            var products =  _productRepo.GetAll();
-            if (!search.IsNullOrEmpty())
+            // ابتدا کوئری پایه را بگیرید
+            var products = _productRepo.GetAll();
+
+            // مرتب‌سازی را اعمال کنید
+            switch (sort.ToLower())
             {
-                products = products.Where(p => 
-                                            p.ProductName.Contains(search) ||
-                                            p.ProductDescription.Contains(search) ||
-                                            p.Category.CategoryName.Contains(search));
+                case "bestselling":
+                    // ترکیبی از تاریخ و موجودی
+                    products = products.OrderByDescending(p => p.CreateDate)
+                                       .ThenByDescending(p => p.StockQuantity);
+                    break;
+
+                case "newest":
+                    products = products.OrderByDescending(p => p.CreateDate);
+                    break;
+
+                case "highestprice":
+                    products = products.OrderByDescending(p => p.Price);
+                    break;
+
+                case "lowestprice":
+                    products = products.OrderBy(p => p.Price);
+                    break;
+
+                default:
+                    products = products.OrderByDescending(p => p.CreateDate);
+                    break;
             }
 
-            int totalCount=products.Count();
-            int totalPages= (int)Math.Ceiling((double)totalCount/pageSize);
+            // جستجو را اعمال کنید
+            if (!search.IsNullOrEmpty())
+            {
+                products = products.Where(p =>
+                    p.ProductName.Contains(search) ||
+                    p.ProductDescription.Contains(search) ||
+                    p.Category.CategoryName.Contains(search));
+            }
 
-            products=products.Skip((page - 1) * pageSize).Take(pageSize);
+            // محاسبه اطلاعات صفحه‌بندی
+            int totalCount = await products.CountAsync();
+            int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
-            var productDto = await products.Select(p => new ProductDto()
+            // اعمال صفحه‌بندی
+            var pagedProducts = await products
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // تبدیل به DTO
+            var productDto = pagedProducts.Select(p => new ProductDto()
             {
                 CategoryId = p.CategoryId,
                 ProductName = p.ProductName,
@@ -137,16 +172,18 @@ namespace BusinessLogic.ProductServices
                 ImageName = p.ImageUrl,
                 IsAvailable = p.IsAvailable,
                 CreateDate = p.CreateDate
-            }).ToListAsync();
+            }).ToList();
 
-            var result = new PagedProductDto()
+            // بازگرداندن نتیجه
+            return new PagedProductDto()
             {
                 Page = page,
                 TotalPage = totalPages,
-                Products = productDto
+                Products = productDto,
+                TotalCount = totalCount
             };
-
-            return result;
         }
+
+
     }
 }
