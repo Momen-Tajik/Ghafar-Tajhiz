@@ -12,13 +12,13 @@ namespace Ghafar_Tajhiz.Controllers
         }
         public async Task<IActionResult> Index(int id)
         {
-            var product=await _productService.GetProductById(id);
+            var product = await _productService.GetProductById(id);
             return View(product);
         }
 
-        public async Task<IActionResult> ProductList(int page=1, int pageSize=8, string search=null, string sort = "newest")
+        public async Task<IActionResult> ProductList(int page = 1, int pageSize = 8, string search = null, string sort = "newest")
         {
-            var data=await _productService.GetProductPagination(page, pageSize, search, sort);
+            var data = await _productService.GetProductPagination(page, pageSize, search, sort);
 
             ViewBag.CurrentPage = data.Page;
             ViewBag.TotalPages = data.TotalPage;
@@ -27,6 +27,6 @@ namespace Ghafar_Tajhiz.Controllers
 
             return View(data.Products);
         }
-       
+
     }
 }

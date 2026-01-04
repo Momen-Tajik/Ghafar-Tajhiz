@@ -22,15 +22,15 @@ namespace BusinessLogic.ProductServices
             _fileUploadService = fileUploadService;
         }
 
-        public async Task<IEnumerable<Product>> GetProducts() 
+        public async Task<IEnumerable<Product>> GetProducts()
         {
             return await _productRepo.GetAll().ToListAsync();
         }
-         public async Task<IEnumerable<Product>> GetProductsWithCategory(Expression<Func<Product, bool>> where=null) 
+        public async Task<IEnumerable<Product>> GetProductsWithCategory(Expression<Func<Product, bool>> where = null)
         {
-            return await _productRepo.GetAll(where).Include(p=>p.Category).OrderByDescending(a=>a.IsAvailable==true).ToListAsync();
+            return await _productRepo.GetAll(where).Include(p => p.Category).OrderByDescending(a => a.IsAvailable == true).ToListAsync();
         }
-        public async Task<Product> GetProductById(int id) 
+        public async Task<Product> GetProductById(int id)
         {
             return await _productRepo.GetById(id);
         }
@@ -39,15 +39,15 @@ namespace BusinessLogic.ProductServices
         {
             var product = new Product()
             {
-                ProductName=productDto.ProductName,
-                ProductDescription=productDto.ProductDescription,
-                Price=productDto.Price,
-                StockQuantity=productDto.StockQuantity,
-                CategoryId=productDto.CategoryId,
-                IsAvailable=productDto.IsAvailable,
-                Category=productDto.Category,
+                ProductName = productDto.ProductName,
+                ProductDescription = productDto.ProductDescription,
+                Price = productDto.Price,
+                StockQuantity = productDto.StockQuantity,
+                CategoryId = productDto.CategoryId,
+                IsAvailable = productDto.IsAvailable,
+                Category = productDto.Category,
             };
-            product.ImageUrl=await _fileUploadService.UploadFileAsync(productDto.ImageUrl);
+            product.ImageUrl = await _fileUploadService.UploadFileAsync(productDto.ImageUrl);
             await _productRepo.Add(product);
         }
 
@@ -61,7 +61,7 @@ namespace BusinessLogic.ProductServices
             product.StockQuantity = productDto.StockQuantity;
             product.CategoryId = productDto.CategoryId;
             product.IsAvailable = productDto.IsAvailable;
-            product.Category=productDto.Category;
+            product.Category = productDto.Category;
 
             if (productDto.ImageUrl != null)
             {
@@ -95,7 +95,7 @@ namespace BusinessLogic.ProductServices
 
         public async Task<ProductDto> GetProductDtoById(int id)
         {
-            var product =await _productRepo.GetById(id);
+            var product = await _productRepo.GetById(id);
             var productDto = new ProductDto()
             {
                 CategoryId = product.CategoryId,
