@@ -2,8 +2,10 @@ using BusinessLogic.CategoryServices;
 using BusinessLogic.FileUpload;
 using BusinessLogic.ProductServices;
 using DataAccess.Data;
+using DataAccess.Models;
 using DataAccess.Repositories.CategoryRepo;
 using DataAccess.Repositories.ProductRepo;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +26,29 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ProductService>();
 
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
+
+
+builder.Services.AddIdentity<User, Role>(options =>
+
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 8;
+    options.Password.RequiredUniqueChars = 0;
+
+    //lockout
+
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
+    options.User.RequireUniqueEmail = true;
+})
+    .AddEntityFrameworkStores<GhafarTajhizShopDbContext>()
+    .AddSignInManager<SignInManager<User>>()
+    .AddDefaultTokenProviders();
+
 
 var app = builder.Build();
 
