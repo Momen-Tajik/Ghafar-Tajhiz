@@ -112,10 +112,10 @@ namespace BusinessLogic.ProductServices
 
         public async Task<PagedProductDto> GetProductPagination(int page, int pageSize, string? search, string sort = "newest")
         {
-            // ابتدا کوئری پایه را بگیرید
+            
             var products = _productRepo.GetAll();
 
-            // مرتب‌سازی را اعمال کنید
+            //Filtering
             switch (sort.ToLower())
             {
                 case "bestselling":
@@ -141,26 +141,27 @@ namespace BusinessLogic.ProductServices
                     break;
             }
 
-            // جستجو را اعمال کنید
+            // Searching
             if (!search.IsNullOrEmpty())
             {
                 products = products.Where(p =>
                     p.ProductName.Contains(search) ||
                     p.ProductDescription.Contains(search) ||
-                    p.Category.CategoryName.Contains(search));
+                    p.Category.CategoryName.Contains(search) ||
+                    p.Price.ToString().Contains(search));
             }
 
-            // محاسبه اطلاعات صفحه‌بندی
+            // Pagination content
             int totalCount = await products.CountAsync();
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
-            // اعمال صفحه‌بندی
+            // Pagination
             var pagedProducts = await products
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            // تبدیل به DTO
+            // Convert to DTO
             var productDto = pagedProducts.Select(p => new ProductDto()
             {
                 CategoryId = p.CategoryId,
@@ -174,7 +175,7 @@ namespace BusinessLogic.ProductServices
                 CreateDate = p.CreateDate
             }).ToList();
 
-            // بازگرداندن نتیجه
+            // Return the result
             return new PagedProductDto()
             {
                 Page = page,
