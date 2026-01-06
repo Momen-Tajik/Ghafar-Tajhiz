@@ -1,30 +1,30 @@
-﻿@model Ghafar_Tajhiz.Models.RegisterDto
+﻿@model Ghafar_Tajhiz.Models.LoginViewModel
 
 @{
-    ViewData["Title"] = "Register";
-    Layout = "_Layout"; 
+    ViewData["Title"] = "Login";
+    Layout = "_Layout";
 }
-
 
 
 <div class="register-container">
     <div class="register-card">
 
         <div class="register-header">
-            <h3>ایجاد حساب کاربری</h3>
+            <h3>ورود به حساب</h3>
         </div>
 
         <div class="register-body">
 
+
             <div asp-validation-summary="All" class="alert alert-danger"></div>
 
-            <form asp-action="Register" method="post">
+            <form asp-action="Login" method="post">
                 @Html.AntiForgeryToken()
 
                 <!-- Phone -->
                 <div class="mb-3">
                     <label asp-for="PhoneNumber" class="form-label">
-                        شماره موبایل 
+                        شماره موبایل
                     </label>
                     <input asp-for="PhoneNumber"
                            class="form-control"
@@ -36,7 +36,7 @@
                 <!-- Password -->
                 <div class="mb-3">
                     <label asp-for="Password" class="form-label">
-                        رمز عبور 
+                        رمز عبور
                     </label>
                     <div class="password-wrapper">
                         <input asp-for="Password"
@@ -48,32 +48,29 @@
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
 
-                <!-- Confirm -->
+                <!-- RememberMe -->
                 <div class="mb-3">
-                    <label asp-for="ConfirmPassword" class="form-label">
-                        تکرار رمز عبور 
+                    <label asp-for="RememberMe" class="form-label">
+                        من را به یاد داشته باش
+                        <input asp-for="RememberMe"
+                               class="terms"
+                               type="checkbox" />
+                        <span asp-validation-for="RememberMe" class="text-danger"></span>
                     </label>
-                    <input asp-for="ConfirmPassword"
-                           class="form-control"
-                           type="password" />
-                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    
+                    
                 </div>
 
                 <!-- Terms -->
-                <div class="mb-3">
-                    <label class="terms">
-                        با <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">قوانین و مقررات</a> موافقم
-                        <input type="checkbox" required />
-                    </label>
-                </div>
+                
 
                 <button type="submit" class="btn-register">
-                    ثبت نام
+                    ورود
                 </button>
 
                 <div class="login-link">
-                    قبلاً ثبت نام کرده‌اید؟
-                    <a asp-action="Login" asp-controller="Account">ورود</a>
+                    ایجاد حساب کاربری
+                    <a asp-action="Register" asp-controller="Account">جدید</a>
                 </div>
             </form>
         </div>

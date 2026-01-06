@@ -1,3 +1,5 @@
+
+/*Navbar*//*Navbar*//*Navbar*/
 var navBtn = document.getElementById("mobileNavbarBtn");
 var desktopNav = document.getElementById("desktopnavbar");
 

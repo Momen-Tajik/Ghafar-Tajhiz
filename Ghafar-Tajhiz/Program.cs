@@ -49,6 +49,16 @@ builder.Services.AddIdentity<User, Role>(options =>
     .AddSignInManager<SignInManager<User>>()
     .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    //cookie setting
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenid";
+    options.SlidingExpiration=true;
+});
+
 
 var app = builder.Build();
 

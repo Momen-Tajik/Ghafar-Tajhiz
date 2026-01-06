@@ -24,7 +24,12 @@ a {
         color: inherit !important;
     }
 
-/* navbar */
+
+/* Navbar */ /* Navbar *//* Navbar */
+/* Navbar *//* Navbar */ /* Navbar */
+/* Navbar */ /* Navbar *//* Navbar */
+
+
 .hidden {
     display: none;
 }
@@ -34,11 +39,41 @@ a {
     color: whitesmoke;
 }
 
+/* دسکتاپ */
 .desktopnavbar {
     display: flex;
     justify-content: right;
+    align-items: center;
 }
 
+    .desktopnavbar a {
+        position: relative;
+        padding: 15px 25px;
+        font-size: 15px;
+    }
+
+        .desktopnavbar a::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 0;
+            height: 3px;
+            background-color: #FF7043;
+            transition: all 0.5s ease;
+            transform: translateX(-50%);
+        }
+
+        .desktopnavbar a:hover::after {
+            width: 100%;
+        }
+
+/* دکمه ورود (سمت مخالف) */
+.login-btn {
+    margin-left: auto; /* باعث می‌شود سمت مخالف باشد */
+}
+
+/* موبایل */
 .mobilenavbar a {
     position: relative;
     padding: 15px 25px;
@@ -61,36 +96,19 @@ a {
         width: 100%;
     }
 
-.desktopnavbar a {
-    position: relative;
-    padding: 15px 25px;
-    font-size: 15px;
-}
-
-    .desktopnavbar a::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        bottom: 0;
-        width: 0;
-        height: 3px;
-        background-color: #FF7043;
-        transition: all 0.5s ease;
-        transform: translateX(-50%);
-    }
-
-    .desktopnavbar a:hover::after {
-        width: 100%;
-    }
-
 @media (max-width:635px) {
     .mobilenavbar {
         display: flex;
         justify-content: space-between;
+        align-items: center;
     }
 
     .desktopnavbar {
         display: none;
+    }
+
+    .login-btn {
+        margin-left: 0; /* موبایل، راست یا چپ می‌توانید تغییر دهید */
     }
 }
 
