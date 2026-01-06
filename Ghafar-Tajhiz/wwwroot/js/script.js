@@ -103,3 +103,11 @@ document.addEventListener('input', function (e) {
         updatePrice();
     }
 });
+
+
+/*Register*//*Register*//*Register*//*Register*/
+
+document.getElementById("togglePassword")?.addEventListener("click", function () {
+    const input = document.getElementById("passwordInput");
+    input.type = input.type === "password" ? "text" : "password";
+});

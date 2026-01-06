@@ -1,0 +1,103 @@
+﻿@model Ghafar_Tajhiz.Models.RegisterDto
+
+@{
+    ViewData["Title"] = "Register";
+    Layout = "_Layout"; 
+}
+
+
+<link rel="stylesheet" href="~/css/register.css" />
+
+<div class="register-container">
+    <div class="register-card">
+
+        <div class="register-header">
+            <h3>ایجاد حساب کاربری</h3>
+        </div>
+
+        <div class="register-body">
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger">
+                لطفاً اطلاعات وارد شده را بررسی کنید
+            </div>
+
+            <form asp-action="Register" method="post">
+                @Html.AntiForgeryToken()
+
+                <!-- Phone -->
+                <div class="mb-3">
+                    <label asp-for="PhoneNumber" class="form-label">
+                        شماره موبایل 
+                    </label>
+                    <input asp-for="PhoneNumber"
+                           class="form-control"
+                           placeholder="09xxxxxxxxx"
+                           dir="ltr" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">
+                        رمز عبور 
+                    </label>
+                    <div class="password-wrapper">
+                        <input asp-for="Password"
+                               class="form-control"
+                               type="password"
+                               id="passwordInput" />
+                        <button type="button" class="toggle-password" id="togglePassword"></button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <!-- Confirm -->
+                <div class="mb-3">
+                    <label asp-for="ConfirmPassword" class="form-label">
+                        تکرار رمز عبور 
+                    </label>
+                    <input asp-for="ConfirmPassword"
+                           class="form-control"
+                           type="password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <!-- Terms -->
+                <div class="mb-3">
+                    <label class="terms">
+                        <input type="checkbox" required />
+                        با <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">قوانین و مقررات</a> موافقم
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-register">
+                    ثبت نام
+                </button>
+
+                <div class="login-link">
+                    قبلاً ثبت نام کرده‌اید؟
+                    <a asp-action="Login" asp-controller="Account">ورود</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal قوانین -->
+<div class="modal fade" id="termsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">قوانین و مقررات</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>شرایط و قوانین استفاده از سامانه قهار تجهیز...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

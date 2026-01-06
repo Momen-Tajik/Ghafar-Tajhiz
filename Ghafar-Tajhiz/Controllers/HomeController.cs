@@ -1,5 +1,6 @@
 using BusinessLogic.ProductServices;
 using Ghafar_Tajhiz.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -27,7 +28,7 @@ namespace Ghafar_Tajhiz.Controllers
 
 
 
-
+        [Authorize]
         public IActionResult aboutUs()
         {
             return View();

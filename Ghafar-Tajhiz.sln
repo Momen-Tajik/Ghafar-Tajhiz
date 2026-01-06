@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ghafar-Tajhiz", "Ghafar-Tajhiz\Ghafar-Tajhiz.csproj", "{71B44EAD-DF73-44EC-AB56-329A98EDC29A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ghafar-Tajhiz", "Ghafar-Tajhiz\Ghafar-Tajhiz.csproj", "{71B44EAD-DF73-44EC-AB56-329A98EDC29A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ghafar-Tajhiz-Admin", "Ghafar-Tajhiz-Admin\Ghafar-Tajhiz-Admin.csproj", "{3CEFF00E-52F2-43C2-82E4-756B92D66C3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ghafar-Tajhiz-Admin", "Ghafar-Tajhiz-Admin\Ghafar-Tajhiz-Admin.csproj", "{3CEFF00E-52F2-43C2-82E4-756B92D66C3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{FF5D2F3E-7365-4F05-B805-E97F9B121FE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\DataAccess.csproj", "{FF5D2F3E-7365-4F05-B805-E97F9B121FE9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogic", "BusinessLogic\BusinessLogic.csproj", "{74053CA4-1859-4189-8070-D508DFA4BE3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogic", "BusinessLogic\BusinessLogic.csproj", "{74053CA4-1859-4189-8070-D508DFA4BE3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

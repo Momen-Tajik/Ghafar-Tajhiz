@@ -729,3 +729,135 @@ a {
     color: #666;
     font-size: 16px;
 }
+
+
+/*Register*//*Register*/
+/*Register*//*Register*/
+/*Register*//*Register*/
+
+
+/* Container */
+.register-container {
+    min-height: 80vh;
+    background-color: #FAFAFA;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "myFont";
+}
+
+/* Card */
+.register-card {
+    width: 100%;
+    max-width: 360px;
+    background-color: #fff;
+    border-radius: 10px;
+    border: 1px solid #e6e6e6;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Header */
+.register-header {
+    padding: 10px 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    background-color: #FF7043;
+    color: #fff;
+    border-radius: 10px 10px 0px 0px;
+}
+
+    .register-header h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+/* Body */
+.register-body {
+    padding: 12px;
+}
+
+/* Labels */
+.form-label {
+    font-weight: 600;
+    margin-bottom: 3px;
+    font-size: 12px;
+    display: block;
+}
+
+/* Inputs */
+.form-control {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 13px;
+    font-family: "myFont";
+    transition: border-color .15s ease;
+}
+
+    .form-control:focus {
+        outline: none;
+        border-color: #FF7043;
+    }
+
+/* Password */
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Terms */
+.terms {
+    font-size: 11px;
+}
+
+    .terms a {
+        color: #FF7043;
+        text-decoration: none;
+    }
+
+/* Button */
+.btn-register {
+    width: 100%;
+    padding: 7px;
+    background-color: #FF7043;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 13px;
+    margin-top: 4px;
+    transition: background-color .15s ease;
+}
+
+    .btn-register:hover {
+        background-color: #E64A19;
+    }
+
+/* Login link */
+.login-link {
+    text-align: center;
+    margin-top: 6px;
+    font-size: 11px;
+}
+
+    .login-link a {
+        color: #FF7043;
+        text-decoration: none;
+    }
+
+/* Validation */
+.text-danger {
+    font-size: 11px;
+}

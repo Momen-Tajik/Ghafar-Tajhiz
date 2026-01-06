@@ -35,7 +35,7 @@ builder.Services.AddIdentity<User, Role>(options =>
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 8;
+    options.Password.RequiredLength = 4;
     options.Password.RequiredUniqueChars = 0;
 
     //lockout
@@ -43,7 +43,7 @@ builder.Services.AddIdentity<User, Role>(options =>
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.AllowedForNewUsers = true;
-    options.User.RequireUniqueEmail = true;
+    options.User.RequireUniqueEmail = false;
 })
     .AddEntityFrameworkStores<GhafarTajhizShopDbContext>()
     .AddSignInManager<SignInManager<User>>()
@@ -64,6 +64,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
