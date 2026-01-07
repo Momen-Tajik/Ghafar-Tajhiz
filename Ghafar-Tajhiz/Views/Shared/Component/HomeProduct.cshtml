@@ -6,12 +6,26 @@
     @foreach (var item in Model)
     {
         <div class="productsItems">
-            <img src="api/FileUpload/GetFile?filename=@item.ImageUrl" width="200px" alt="Alternate Text" />
+            <img class="productsImage"
+                 src="/api/FileUpload/GetFile?filename=@item.ImageUrl"
+                 alt="@item.ProductName" />
+
             <div class="productsInfo">
-                <h3>@item.ProductName </h3>
-                <p>@item.Price تومان</p>
-                <p>@item.ProductDescription</p>
-                <a asp-action="Index" asp-controller="Product" asp-route-id="@item.ProductId" class="btnProduct">افزودن به سبد خرید</a>
+                <div style="display:flex;justify-content:space-between; align-items:center">
+                    <h5>@item.ProductName </h5>
+                    <a class="openModal" data-product-id="@item.ProductId">
+                        <i class="infoBtn fa fa-info-circle"></i>
+                    </a>
+                </div>
+                <p>@item.Price.ToString("N0") تومان</p>
+                
+
+                <a asp-controller="Product"
+                   asp-action="Index"
+                   asp-route-id="@item.ProductId"
+                   class="btnProduct">
+                    مشاهده محصول
+                </a>
             </div>
         </div>
     }

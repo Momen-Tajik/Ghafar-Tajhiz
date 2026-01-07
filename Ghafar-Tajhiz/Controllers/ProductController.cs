@@ -27,6 +27,16 @@ namespace Ghafar_Tajhiz.Controllers
 
             return View(data.Products);
         }
+        public async Task<IActionResult> GetProduct(int id)
+        {
+            
+            var product = await _productService.GetProductById(id);
+            
+            if (product == null)
+                return NotFound();
 
+            return PartialView(product);
+
+        }
     }
 }

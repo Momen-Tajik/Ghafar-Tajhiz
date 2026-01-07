@@ -1,0 +1,28 @@
+﻿@using DataAccess.Models
+@model Product
+
+
+
+
+
+        <!-- Header: تصویر کوچک + نام محصول -->
+        <div class="modal-header">
+            <img src="/api/FileUpload/GetFile?filename=@Model.ImageUrl"
+                 alt="@Model.ProductName"
+                 class="modal-product-img">
+            <h2 class="modal-product-title">@Model.ProductName</h2>
+        </div>
+
+        <!-- توضیحات محصول -->
+        <div class="modal-body" id="modalBody">
+            <p>@Model.ProductDescription</p>
+
+            <div class="modal-meta">
+                <span class="price">قیمت: <strong>@Model.Price.ToString("N0") تومان</strong></span>
+                <span class="stock @(Model.StockQuantity > 0 ? "in-stock" : "out-stock")">
+                    @(Model.StockQuantity > 0 ? $"موجودی: {Model.StockQuantity}" : "ناموجود")
+                </span>
+            </div>
+        </div>
+
+

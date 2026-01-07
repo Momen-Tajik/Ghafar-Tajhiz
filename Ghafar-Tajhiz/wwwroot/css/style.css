@@ -210,6 +210,15 @@ a {
     border-radius: 20px;
 }
 
+.productsInfo .infoBtn {
+    color: #FF7043;
+    font-size:1.5rem;
+
+}
+    .productsInfo .infoBtn:hover {
+        color: #E64A19;
+        font-size: 1.7rem;
+    }
 .productsInfo {
     margin: 10px;
 }
@@ -879,3 +888,135 @@ a {
 .text-danger {
     font-size: 11px;
 }
+
+
+/*Modal*/ /*Modal*/ /*Modal*/ /*Modal*/
+/*Modal*/ /*Modal*/ /*Modal*/ /*Modal*/
+/*Modal*/ /*Modal*/ /*Modal*/ /*Modal*/
+
+/* Modal background */
+/* Modal overlay */
+/* Overlay */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(3px);
+    z-index: 9999;
+}
+
+/* Modal box */
+.modal-content {
+    background: #fff;
+    width: 90%;
+    max-width: 600px;
+    margin: 7vh auto;
+    padding: 20px 25px;
+    border-radius: 12px;
+    position: relative;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    animation: modalFadeIn 0.3s ease;
+}
+
+/* Close button */
+.close {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 24px;
+    color: #888;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .close:hover {
+        color: #333;
+        transform: scale(1.1);
+    }
+
+/* Header: تصویر + نام محصول کنار هم */
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.modal-product-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #eee;
+}
+
+.modal-product-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    color: #222;
+}
+
+/* Body */
+.modal-body p {
+    margin: 10px 0;
+    font-size: 15px;
+    color: #555;
+    line-height: 1.5;
+}
+
+/* Meta info */
+.modal-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    font-weight: 500;
+    font-size: 15px;
+    color: #333;
+}
+
+.stock.in-stock {
+    color: #2a9d8f;
+}
+
+.stock.out-stock {
+    color: #e63946;
+}
+
+/* Animation */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .modal-header {
+        gap: 10px;
+    }
+
+    .modal-product-img {
+        width: 70px;
+        height: 700px;
+    }
+
+    .modal-product-title {
+        font-size: 18px;
+    }
+
+    .modal-meta {
+        font-size: 14px;
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+

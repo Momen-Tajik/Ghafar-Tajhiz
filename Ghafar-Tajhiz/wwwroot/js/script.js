@@ -113,3 +113,46 @@ document.getElementById("togglePassword")?.addEventListener("click", function ()
     const input = document.getElementById("passwordInput");
     input.type = input.type === "password" ? "text" : "password";
 });
+
+/*Modal *//*Modal *//*Modal *//*Modal *//*Modal */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const modal = document.getElementById("modal");
+    const closeBtn = document.querySelector(".close");
+    const modalBody = document.getElementById("modalBody");
+
+    document.querySelectorAll(".openModal").forEach(btn => {
+
+        btn.addEventListener("click", async function () {
+
+            const productId = btn.dataset.productId;
+            console.log("ProductId:", productId);
+
+            modal.style.display = "block";
+            modalBody.innerHTML = document.getElementById("modelBody");
+
+            try {
+                const response = await fetch(`/Product/GetProduct?id=${productId}`);
+
+                if (!response.ok)
+                    throw new Error("Request failed");
+
+                const html = await response.text();
+                modalBody.innerHTML = html;
+            }
+            catch (err) {
+                modalBody.innerHTML = "خطا در دریافت اطلاعات محصول";
+                console.error(err);
+            }
+        });
+
+    });
+
+    closeBtn.onclick = () => modal.style.display = "none";
+
+    window.onclick = e => {
+        if (e.target === modal)
+            modal.style.display = "none";
+    };
+});
