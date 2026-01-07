@@ -53,9 +53,9 @@ namespace DataAccess.Repositories.ProductRepo
             return await _context.Products.FirstOrDefaultAsync(p => p.ProductId == id);
         }
 
-        public async Task Update(Product category)
+        public async Task Update(Product product)
         {
-            _context.Products.Update(category);
+            _context.Products.Update(product);
             await _context.SaveChangesAsync();
         }
     }
