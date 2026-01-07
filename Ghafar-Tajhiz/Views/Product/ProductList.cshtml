@@ -86,11 +86,12 @@
                 <div class="productsInfo">
                     <div style="display:flex;justify-content:space-between; align-items:center">
                         <h5>@item.ProductName </h5>
-                        <a id="btnModal" class="openModal">
-                            <i class="infoBtn fa fa-info-circle" aria-hidden="true"></i>
+                        <a class="openModal" data-product-id="@item.ProductId">
+                            <i class="infoBtn fa fa-info-circle"></i>
                         </a>
                     </div>
                     <p>@item.Price.ToString("N0") تومان</p>
+
 
                     <a asp-controller="Product"
                        asp-action="Index"
