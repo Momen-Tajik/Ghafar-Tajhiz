@@ -9,8 +9,8 @@ namespace DataAccess.Models
 {
     public class User:IdentityUser<int>
     {
-        public string UserNumber {  get; set; }
-        public string City { get; set; }
+        public string? UserNumber {  get; set; }
+        public string? City { get; set; }
         
     }
 }

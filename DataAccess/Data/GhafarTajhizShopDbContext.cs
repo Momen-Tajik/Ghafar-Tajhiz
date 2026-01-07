@@ -17,6 +17,20 @@ namespace DataAccess.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
 
+        public DbSet<Basket> Baskets { get; set; }
+
+        public DbSet<BasketItem> BasketItems { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // جلوگیری از تکرار یک محصول در یک سبد
+            modelBuilder.Entity<BasketItem>()
+                .HasIndex(bi => new { bi.BasketId, bi.ProductId })
+                .IsUnique();
+        }
+
     }
     
 }
