@@ -156,3 +156,37 @@ document.addEventListener("DOMContentLoaded", function () {
             modal.style.display = "none";
     };
 });
+
+
+/*Basket*//*Basket*//*Basket*//*Basket*//*Basket*/
+
+function AddToBasket() {
+    var productId = parseInt(document.getElementById("productId").value);
+    var qty = parseInt(document.getElementById("countInput").value);
+
+    if (isNaN(productId) || isNaN(qty) || qty <= 0) {
+        alert("مقادیر نامعتبر است");
+        return;
+    }
+    var data = {
+        productId: productId,
+        qty: qty
+    };
+
+    
+        fetch('/Order/AddToBasket', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId, qty })
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                if (data.res == false) {
+                    alert(data.msg)
+                }
+
+            })
+            .catch(err => console.error(err.message));
+    
+}

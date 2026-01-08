@@ -12,7 +12,14 @@ namespace Ghafar_Tajhiz.Controllers
         }
         public async Task<IActionResult> Index(int id)
         {
+            if (id <= 0)
+                return BadRequest();
+
             var product = await _productService.GetProductById(id);
+
+            if (product == null)
+                return NotFound();
+
             return View(product);
         }
 

@@ -1,8 +1,12 @@
+using BusinessLogic.BasketItemServices;
+using BusinessLogic.BasketServices;
 using BusinessLogic.CategoryServices;
 using BusinessLogic.FileUpload;
 using BusinessLogic.ProductServices;
 using DataAccess.Data;
 using DataAccess.Models;
+using DataAccess.Repositories.BasketItemRepo;
+using DataAccess.Repositories.BasketRepo;
 using DataAccess.Repositories.CategoryRepo;
 using DataAccess.Repositories.ProductRepo;
 using Microsoft.AspNetCore.Identity;
@@ -26,6 +30,12 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ProductService>();
 
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
+
+builder.Services.AddScoped<IBasketRepository, BasketRepository>();
+builder.Services.AddScoped<BasketService>();
+
+builder.Services.AddScoped<IBasketItemRepository, BasketItemRepository>();
+builder.Services.AddScoped<BasketItemService>();
 
 
 builder.Services.AddIdentity<User, Role>(options =>

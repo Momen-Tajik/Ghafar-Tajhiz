@@ -4,6 +4,8 @@
     ViewData["Title"] = "Index";
 }
 
+
+<input id="productId" type="hidden" name="name" value="@Model.ProductId" />
 <!-- Header -->
 <header class="productHeader">
     <div class="product">
@@ -63,9 +65,9 @@
                     </div>
                 </div>
 
-                @if (Model.IsAvailable && Model.StockQuantity > 0)
+                @if (  Model.StockQuantity > 0)
                 {
-                    <a href="Product.html" class="btnProduct">افزودن به سبد خرید</a>
+                    <a onclick="AddToBasket()"  class="btnProduct">افزودن به سبد خرید</a>
                 }
                 else
                 {
@@ -77,3 +79,5 @@
         </div>
     </div>
 </header>
+
+
