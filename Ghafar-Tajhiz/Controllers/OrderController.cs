@@ -42,5 +42,11 @@ namespace Ghafar_Tajhiz.Controllers
            
         }
 
+
+        public async Task<IActionResult> Basket()
+        {
+            return View();
+        }
+
     }
 }
