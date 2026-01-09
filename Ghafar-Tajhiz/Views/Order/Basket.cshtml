@@ -34,7 +34,7 @@
                 <!-- global totalPrice= 0; -->
                 @foreach (var item in Model)
                 {
-                    <tr>
+                    <tr id="Basket_@item.BasketItemId">
                         <td>
                             <div style="display: flex; align-items: center;">
                                 <img src="/api/FileUpload/GetFile?filename=@item.Product.ImageUrl" alt="@item.Product.ProductName" class="cart-item-image">
@@ -58,7 +58,7 @@
                             </div>
                         </td>
                         <td>
-                            <button class="remove-btn">حذف</button>
+                            <button onclick="RemoveBasketItem(@item.BasketItemId)" class="remove-btn">حذف</button>
                         </td>
                     </tr>
                     //totalPrice = item.Price + totalPrice;

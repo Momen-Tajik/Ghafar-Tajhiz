@@ -1,4 +1,5 @@
 ﻿
+using BusinessLogic.BasketItemServices;
 using BusinessLogic.BasketServices;
 using Ghafar_Tajhiz.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -10,9 +11,11 @@ namespace Ghafar_Tajhiz.Controllers
     public class OrderController : Controller
     {
         private readonly BasketService _basketService;
-        public OrderController(BasketService basketService)
+        private readonly BasketItemService _basketItemService;
+        public OrderController(BasketService basketService, BasketItemService basketItemService)
         {
             _basketService = basketService;
+            _basketItemService = basketItemService;
         }
 
         public IActionResult Index()
@@ -52,5 +55,13 @@ namespace Ghafar_Tajhiz.Controllers
             return View(data);
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveBasketItem([FromBody] RemoveBasketItemDto model)
+        {
+            var res = await _basketItemService.RemoveBasketItem(model.BasketItemId);
+            return Ok(new { res = true });
+
+        }
     }
 }

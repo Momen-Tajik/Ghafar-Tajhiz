@@ -164,10 +164,6 @@ function AddToBasket() {
     var productId = parseInt(document.getElementById("productId").value);
     var qty = parseInt(document.getElementById("countInput").value);
 
-    if (isNaN(productId) || isNaN(qty) || qty <= 0) {
-        alert("مقادیر نامعتبر است");
-        return;
-    }
     var data = {
         productId: productId,
         qty: qty
@@ -192,3 +188,26 @@ function AddToBasket() {
             .catch(err => console.error(err.message));
     
 }
+
+function RemoveBasketItem(id) {
+
+    var data = {
+        BasketItemId:id
+    };
+
+
+    fetch('/Order/RemoveBasketItem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+
+    })
+        .then(res => res.json())
+        .then(data => {
+            const row = document.getElementById("Basket_" + id);
+            row.style.display = "none";
+        })
+        .catch(err => console.error(err.message));
+
+}
+
