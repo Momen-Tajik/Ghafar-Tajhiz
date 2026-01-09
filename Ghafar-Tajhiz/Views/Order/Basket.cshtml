@@ -1,7 +1,92 @@
-﻿
+﻿@using DataAccess.Models
+@model List<BasketItem>
 @{
     ViewData["Title"] = "Basket";
 }
 
-<h1>Basket</h1>
+<!-- bascket --><!-- bascket --><!-- bascket --><!-- bascket -->
+
+<div class="cart-container">
+    <h1 class="cart-header">سبد خرید شما</h1>
+
+    @if (Model.Count() == null)
+    {
+        <!-- در صورت خالی بودن سبد خرید -->
+        <div class="empty-cart">
+            <p>سبد خرید شما خالی است</p>
+            <a href="Index.html" class="continue-shopping">ادامه خرید</a>
+        </div>
+    }
+    else
+    {
+        <!-- در صورت وجود محصول در سبد خرید -->
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>محصول</th>
+                    <th>قیمت</th>
+                    <th>تعداد</th>
+                    <th>جمع</th>
+                    <th>حذف</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- global totalPrice= 0; -->
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center;">
+                                <img src="/api/FileUpload/GetFile?filename=@item.Product.ImageUrl" alt="@item.Product.ProductName" class="cart-item-image">
+                                <span style="margin-right: 15px;">@item.Product.ProductName</span>
+                            </div>
+                        </td>
+                        <td>
+                            @item.Product.Price تومان
+                        </td>
+                        <td>
+                            <div class="quantity-control">
+                                <button class="quantity-btn">-</button>
+                                <input id="countBasketInput" type="number" class="quantity-input" value="@item.Qty" min="1">
+                                <button class="quantity-btn">+</button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="price">
+                                <input id="basePrice" type="hidden" value="@item.Product.Price">
+                                <strong id="basePriceShow">قیمت نهایی:@item.Price </strong>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="remove-btn">حذف</button>
+                        </td>
+                    </tr>
+                    //totalPrice = item.Price + totalPrice;
+                }
+
+
+                <!-- می‌توانید ردیف‌های بیشتری برای محصولات دیگر اضافه کنید -->
+            </tbody>
+        </table>
+
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span>جمع کل:</span>
+                <span>totalPrice تومان</span>
+            </div>
+            <div class="summary-row">
+                <span>هزینه ارسال:</span>
+                <span>رایگان</span>
+            </div>
+            <div class="summary-row summary-total">
+                <span>مبلغ نهایی:</span>
+                <span>21,000,000 تومان</span>
+            </div>
+            <button class="checkout-btn">پرداخت و تکمیل سفارش</button>
+        </div>
+    }
+    <!-- در صورت وجود محصول در سبد خرید -->
+    
+</div>
+
 

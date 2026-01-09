@@ -178,6 +178,8 @@ function AddToBasket() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ productId, qty })
+
+            
         })
             .then(res => res.json())
             .then(data => {
@@ -185,7 +187,7 @@ function AddToBasket() {
                 if (data.res == false) {
                     alert(data.msg)
                 }
-
+                alert("موفق")
             })
             .catch(err => console.error(err.message));
     

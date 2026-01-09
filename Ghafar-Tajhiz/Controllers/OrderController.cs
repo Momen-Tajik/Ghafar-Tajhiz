@@ -45,7 +45,11 @@ namespace Ghafar_Tajhiz.Controllers
 
         public async Task<IActionResult> Basket()
         {
-            return View();
+            var userId=User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var data= await _basketService.GetUserBasket(Convert.ToInt32(userId));
+
+            return View(data);
         }
 
     }

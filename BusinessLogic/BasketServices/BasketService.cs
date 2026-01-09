@@ -57,5 +57,13 @@ namespace BusinessLogic.BasketServices
             }
             return true;
         }
+
+
+        public async Task<List<BasketItem>> GetUserBasket(int userId)
+        {
+            var basketItems=await _basketItemRepository.GetAll(a=>a.Basket.UserId ==userId && a.Basket.Status== BasketStatus.Pending)
+                .Include(a=>a.Basket).Include(a=>a.Product).ToListAsync();
+            return basketItems;
+        }
     }
 }
