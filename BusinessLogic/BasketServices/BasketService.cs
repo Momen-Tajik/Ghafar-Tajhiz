@@ -65,5 +65,21 @@ namespace BusinessLogic.BasketServices
                 .Include(a=>a.Basket).Include(a=>a.Product).ToListAsync();
             return basketItems;
         }
+
+        public async Task<bool> Pay(string mobile, string address, int userId) 
+        {
+            var basket= await _basketRepository.GetAll(a=>a.UserId == userId && a.Status==BasketStatus.Pending).FirstOrDefaultAsync();
+
+            if (basket == null)
+                return false;
+
+            basket.Address = address;
+            basket.PaidDate = DateTime.Now;
+            basket.Status = BasketStatus.Paid;
+            basket.MobileNumber = mobile;
+            
+            await _basketRepository.Update(basket);
+            return true;
+        }
     }
 }

@@ -30,7 +30,7 @@ namespace Ghafar_Tajhiz.Controllers
 
             if (User.FindFirstValue(ClaimTypes.NameIdentifier) == null)
             {
-                return Ok(new { res = false, msg = "yor not login" });
+                return RedirectToAction("Login", "Account");
             }
 
             var result = await _basketService.AddToBasket(
@@ -62,6 +62,12 @@ namespace Ghafar_Tajhiz.Controllers
             var res = await _basketItemService.RemoveBasketItem(model.BasketItemId);
             return Ok(new { res = true });
 
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Pay(PayDto model)
+        {
+            return RedirectToAction("Index","Profile");
         }
     }
 }

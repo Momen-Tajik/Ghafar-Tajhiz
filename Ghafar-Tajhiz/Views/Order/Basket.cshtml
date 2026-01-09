@@ -42,7 +42,7 @@
                             </div>
                         </td>
                         <td>
-                            @item.Product.Price تومان
+                            @item.Product.Price.ToString("N0") تومان
                         </td>
                         <td>
                             <div class="quantity-control">
@@ -54,7 +54,7 @@
                         <td>
                             <div class="price">
                                 <input id="basePrice" type="hidden" value="@item.Product.Price">
-                                <strong id="basePriceShow">قیمت نهایی:@item.Price </strong>
+                                <strong id="basePriceShow">قیمت نهایی:@item.Price.ToString("N0") </strong>
                             </div>
                         </td>
                         <td>
@@ -69,24 +69,44 @@
             </tbody>
         </table>
 
-        <div class="cart-summary">
-            <div class="summary-row">
-                <span>جمع کل:</span>
-                <span>totalPrice تومان</span>
+        <!--این قسمت رو درست کن بعدا -->
+
+        <form asp-action="Pay" asp-controller="Order" method="post">
+
+
+            <div class="cart-summary">
+
+                <div class="summary-row">
+                    <textarea style="width:stretch; direction:rtl; height:100px" class="text-opacity-100" name="address" placeholder="آدرس..."></textarea>
+                </div>
+
+                <div class="summary-row">
+                    <input style="width:stretch; height:50px" type="text" name="mobile" value="" placeholder="09........." />
+                </div>
+
+                <div class="summary-row">
+                    <span>جمع کل:</span>
+                    <span>totalPrice تومان</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>هزینه ارسال:</span>
+                    <span>رایگان</span>
+                </div>
+
+                <div class="summary-row summary-total">
+                    <span>مبلغ نهایی:</span>
+                    <span>21,000,000 تومان</span>
+                </div>
+
+                <button type="submit" class="checkout-btn">پرداخت و تکمیل سفارش</button>
             </div>
-            <div class="summary-row">
-                <span>هزینه ارسال:</span>
-                <span>رایگان</span>
-            </div>
-            <div class="summary-row summary-total">
-                <span>مبلغ نهایی:</span>
-                <span>21,000,000 تومان</span>
-            </div>
-            <button class="checkout-btn">پرداخت و تکمیل سفارش</button>
-        </div>
+        </form>
+
     }
+
     <!-- در صورت وجود محصول در سبد خرید -->
-    
+
 </div>
 
 
