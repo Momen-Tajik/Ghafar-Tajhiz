@@ -1,14 +1,21 @@
-﻿using BusinessLogic.ProductServices;
+﻿using BusinessLogic.BasketServices;
+using BusinessLogic.CommentServices;
+using BusinessLogic.ProductServices;
+using Ghafar_Tajhiz.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Ghafar_Tajhiz.Controllers
 {
     public class ProductController : Controller
     {
         private readonly ProductService _productService;
-        public ProductController(ProductService productService)
+        private readonly CommentService _commentService;
+        public ProductController(ProductService productService, CommentService commentService)
         {
             _productService = productService;
+            _commentService = commentService;
         }
         public async Task<IActionResult> Index(int id)
         {
@@ -43,6 +50,18 @@ namespace Ghafar_Tajhiz.Controllers
                 return NotFound();
 
             return PartialView(product);
+
+        }
+
+
+        public async Task<IActionResult> AddProductComment(AddCommentDto model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
+             await _commentService.CreateComment(model.text,model.productId,Convert.ToInt32(userId),model.userName);
+
+            return RedirectToAction("Index","Home");
 
         }
     }

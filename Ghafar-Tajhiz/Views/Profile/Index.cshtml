@@ -1,7 +1,36 @@
-﻿
+﻿@using DataAccess.Models
+@model List<Basket>
+
 @{
     ViewData["Title"] = "Index";
 }
+@foreach (var item in Model)
+{
+      
+    <h1>#@item.BasketId</h1>
+    @if (item.Status == DataAccess.Enums.BasketStatus.Paid )
+    {
+        <h1>پرداخت شده</h1>
+    }
+    else if (item.Status == DataAccess.Enums.BasketStatus.Shipped)
+    {
+        <h1>ارسال شده</h1>
+    }
+    else if (item.Status == DataAccess.Enums.BasketStatus.Cancelled)
+    {
+        <h1>لغو شده</h1>
+    }
+    
+    <h1>@item.PaidDate</h1>
+    <h1>@item.MobileNumber</h1>
+    <h1>@item.Address</h1>
 
-<h1>Index</h1>
+    foreach(var basketItem in item.BasketItems)
+    {
+        <h3>@basketItem.Product.ProductName --- @basketItem.Price</h3>
+    }
+
+
+
+}
 

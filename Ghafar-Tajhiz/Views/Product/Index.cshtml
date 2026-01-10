@@ -81,3 +81,49 @@
 </header>
 
 
+<h3>
+    نظرات
+</h3>
+<div class="comment-container">
+    <form asp-action="AddProductComment" asp-controller="Product" method="post">
+        <input type="hidden" name="productId" value="@Model.ProductId" />
+        <div class="comment-items">
+            <div class="comment-text">
+
+                <input type="text" name="userName" value="" placeholder="نام" />
+
+                <textarea required name="text" placeholder="ثبت نظر جدید">
+
+                </textarea>
+
+                <button type="submit" class="btnProduct btn-success">ثبت</button>
+            </div>
+        </div>
+    </form>
+
+    <div style="width:100%;height:200px;background-color:bisque">
+
+        <h2> @(Model.Comment.Count())</h2>
+    @foreach (var item in Model.Comment)
+    {
+        <div class="comment-items">
+            <div class="comment-title">
+                <span>
+                    @item.UserName
+                </span>
+                <span>
+                    @item.Created
+                </span>
+            </div>
+
+            <div class="comment-text">
+                <p>
+                    @item.Text
+                </p>
+            </div>
+        </div>
+    }
+    </div>
+</div>
+
+

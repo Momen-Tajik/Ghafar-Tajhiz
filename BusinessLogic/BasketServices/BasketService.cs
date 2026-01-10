@@ -81,5 +81,12 @@ namespace BusinessLogic.BasketServices
             await _basketRepository.Update(basket);
             return true;
         }
+
+        public async Task<List<Basket>> GetUserBskets(int userId)
+        {
+            var baskets = await _basketRepository.GetAll(a => a.UserId == userId && a.Status != BasketStatus.Pending)
+                .Include(a => a.BasketItems).ThenInclude(a => a.Product).AsNoTracking().ToListAsync();
+            return baskets;
+        }
     }
 }

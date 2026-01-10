@@ -43,6 +43,8 @@ namespace DataAccess.Models
         [DataType(DataType.DateTime)]
         public DateTime CreateDate { get; set; } = DateTime.Now;
 
+
+
         // دسته‌بندی
         [Required(ErrorMessage = "دسته‌بندی الزامی است")]
         public int CategoryId { get; set; }
@@ -50,6 +52,9 @@ namespace DataAccess.Models
         [Display(Name = "دسته‌بندی")]
         [ForeignKey("CategoryId")]
         public Category? Category { get; set; }
+
+
+        public ICollection<Comment> Comment { get; set; } = new List<Comment>();
 
 
     }

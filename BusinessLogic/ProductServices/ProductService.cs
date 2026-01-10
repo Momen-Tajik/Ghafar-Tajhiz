@@ -16,6 +16,7 @@ namespace BusinessLogic.ProductServices
     {
         private readonly IProductRepository _productRepo;
         private readonly IFileUploadService _fileUploadService;
+
         public ProductService(IProductRepository productRepo, IFileUploadService fileUploadService)
         {
             _productRepo = productRepo;
@@ -184,7 +185,6 @@ namespace BusinessLogic.ProductServices
                 TotalCount = totalCount
             };
         }
-
 
     }
 }

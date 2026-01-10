@@ -1,6 +1,7 @@
 using BusinessLogic.BasketItemServices;
 using BusinessLogic.BasketServices;
 using BusinessLogic.CategoryServices;
+using BusinessLogic.CommentServices;
 using BusinessLogic.FileUpload;
 using BusinessLogic.ProductServices;
 using DataAccess.Data;
@@ -8,6 +9,7 @@ using DataAccess.Models;
 using DataAccess.Repositories.BasketItemRepo;
 using DataAccess.Repositories.BasketRepo;
 using DataAccess.Repositories.CategoryRepo;
+using DataAccess.Repositories.CommentRepo;
 using DataAccess.Repositories.ProductRepo;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +38,9 @@ builder.Services.AddScoped<BasketService>();
 
 builder.Services.AddScoped<IBasketItemRepository, BasketItemRepository>();
 builder.Services.AddScoped<BasketItemService>();
+
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<CommentService>();
 
 
 builder.Services.AddIdentity<User, Role>(options =>
