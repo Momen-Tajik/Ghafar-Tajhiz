@@ -19,6 +19,7 @@
 
                 <div class="features">
                     <ul>
+                        <li>@* @Model.Category.CategoryName *@</li>
                         <li>ظرفیت استثنایی پخت ۱۸ تکه جوجه در هر بار، راندمان تولید شما را تا ۴۰٪ افزایش می‌دهد</li>
                         <li>سیستم پخت ۳۶۰ درجه و کنترل دمای دیجیتال، کیفیت یکسان هر بار پخت را تضمین می‌کند</li>
                         <li>کاهش ۳۰٪ در مصرف انرژی و ۵۰٪ در نیروی انسانی مورد نیاز برای بخش کباب</li>
@@ -101,7 +102,7 @@
         </div>
     </form>
 
-    <div style="width:100%;height:200px;background-color:bisque">
+    <div style="margin:20px; width:100%;height:auto;background-color:bisque">
 
         <h2> @(Model.Comment.Count())</h2>
     @foreach (var item in Model.Comment)
