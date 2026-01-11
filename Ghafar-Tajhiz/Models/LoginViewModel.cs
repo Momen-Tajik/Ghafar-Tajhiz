@@ -4,6 +4,12 @@ namespace Ghafar_Tajhiz.Models
 {
     public class LoginViewModel
     {
+
+        [Required(ErrorMessage = "نام کاربری الزامی است")]
+        [StringLength(15, MinimumLength = 3, ErrorMessage = "کلمه عبور باید بین 6 تا 100 کاراکتر باشد")]
+        [Display(Name = "نام کاربری")]
+        public string UserName { get; set; }
+
         [Required(ErrorMessage = "شماره تلفن الزامی است")]
         [Phone(ErrorMessage = "لطفاً شماره تلفن معتبر وارد کنید")]
         [Display(Name = "شماره تلفن")]

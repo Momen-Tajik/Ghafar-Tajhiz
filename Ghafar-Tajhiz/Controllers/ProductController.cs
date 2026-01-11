@@ -2,6 +2,7 @@
 using BusinessLogic.CommentServices;
 using BusinessLogic.ProductServices;
 using Ghafar_Tajhiz.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -53,7 +54,8 @@ namespace Ghafar_Tajhiz.Controllers
 
         }
 
-
+        [HttpPost]
+        [Authorize]
         public async Task<IActionResult> AddProductComment(AddCommentDto model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

@@ -1,7 +1,9 @@
+using BusinessLogic.BasketServices;
 using BusinessLogic.CategoryServices;
 using BusinessLogic.FileUpload;
 using BusinessLogic.ProductServices;
 using DataAccess.Data;
+using DataAccess.Repositories.BasketRepo;
 using DataAccess.Repositories.CategoryRepo;
 using DataAccess.Repositories.ProductRepo;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +26,9 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ProductService>();
 
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
+
+builder.Services.AddScoped<IBasketRepository, BasketRepository>();
+builder.Services.AddScoped<BasketService>();
 
 var app = builder.Build();
 

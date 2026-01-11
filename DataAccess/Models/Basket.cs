@@ -16,15 +16,15 @@ namespace DataAccess.Models
 
         public DateTime Created { get; set; } = DateTime.Now;
 
-        public DateTime? PaidDate { get; set; }
+        public DateTime PaidDate { get; set; }
 
-        public int? UserId { get; set; }
+        public int UserId { get; set; }
 
         [MaxLength(500)]
-        public string? Address { get; set; }
+        public string Address { get; set; }
 
         [MaxLength(20)]
-        public string? MobileNumber { get; set; }
+        public string MobileNumber { get; set; }
 
         [Display(Name = "وضعیت سبد")]
         [Required]
@@ -33,6 +33,6 @@ namespace DataAccess.Models
         [ForeignKey(nameof(UserId))]
         public User? User { get; set; }
 
-        public ICollection<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
+        public ICollection<BasketItem>? BasketItems { get; set; } 
     }
 }

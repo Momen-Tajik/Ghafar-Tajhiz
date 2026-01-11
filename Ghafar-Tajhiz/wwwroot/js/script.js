@@ -116,6 +116,7 @@ document.getElementById("togglePassword")?.addEventListener("click", function ()
 
 /*Modal *//*Modal *//*Modal *//*Modal *//*Modal */
 
+//Product Information Modal
 document.addEventListener("DOMContentLoaded", function () {
 
     const modal = document.getElementById("modal");
@@ -156,6 +157,42 @@ document.addEventListener("DOMContentLoaded", function () {
             modal.style.display = "none";
     };
 });
+
+//Term Modal  errrrrror
+
+//document.addEventListener("DOMContentLoaded", function () {
+
+//    const modal = document.getElementById("termsModal");
+//    const closeBtn = document.querySelector(".close");
+//    const modalBody = document.getElementById("termModalBody");
+
+//    document.querySelectorAll(".openModal").forEach(btn => {
+
+//        btn.addEventListener("click", async function () {
+
+
+//            modal.style.display = "block";
+//            modalBody.innerHTML = "قوانینننننننن";
+
+//            try {
+
+//                modalBody.innerHTML = "قوانینننننننن";
+//            }
+//            catch (err) {
+//                modalBody.innerHTML = "خطا در دریافت اطلاعات محصول";
+//                console.error(err);
+//            }
+//        });
+
+//    });
+
+//    closeBtn.onclick = () => modal.style.display = "none";
+
+//    window.onclick = e => {
+//        if (e.target === modal)
+//            modal.style.display = "none";
+//    };
+//});
 
 
 /*Basket*//*Basket*//*Basket*//*Basket*//*Basket*/

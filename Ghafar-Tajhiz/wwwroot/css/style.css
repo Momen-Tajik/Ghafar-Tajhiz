@@ -776,7 +776,7 @@ a {
 /* Card */
 .register-card {
     width: 100%;
-    max-width: 360px;
+    max-width: 390px;
     background-color: #fff;
     border-radius: 10px;
     border: 1px solid #e6e6e6;
@@ -847,7 +847,7 @@ a {
 
 /* Terms */
 .terms {
-    font-size: 11px;
+    font-size: 13px;
 }
 
     .terms a {
@@ -875,8 +875,8 @@ a {
 /* Login link */
 .login-link {
     text-align: center;
-    margin-top: 6px;
-    font-size: 11px;
+    margin-top: 8px;
+    font-size: 13px;
 }
 
     .login-link a {

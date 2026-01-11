@@ -4,6 +4,12 @@ namespace Ghafar_Tajhiz.Models
 {
     public class RegisterDto
     {
+
+
+        [StringLength(15, MinimumLength = 3, ErrorMessage = "کلمه عبور باید بین 6 تا 100 کاراکتر باشد")]
+        [Display(Name = "نام کاربری")]
+        public string? UserName { get; set; }
+
         [Required(ErrorMessage = "شماره تلفن الزامی است")]
         [RegularExpression(@"^09[0-9]{9}$", ErrorMessage = "فرمت شماره موبایل نامعتبر است")]
         [Display(Name = "شماره تلفن")]

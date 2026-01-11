@@ -16,15 +16,23 @@
 
         <div class="register-body">
 
-            <div asp-validation-summary="All" class="alert alert-danger"></div>
-
             <form asp-action="Register" method="post">
                 @Html.AntiForgeryToken()
 
+                <!-- UserName -->
+                <div class="mb-3">
+                    <label asp-for="UserName" class="form-label">
+                    </label>
+                    <input asp-for="UserName"
+                           class="form-control"
+                           placeholder="Ali_Mohamadi"
+                           dir="ltr" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+                
                 <!-- Phone -->
                 <div class="mb-3">
                     <label asp-for="PhoneNumber" class="form-label">
-                        شماره موبایل 
                     </label>
                     <input asp-for="PhoneNumber"
                            class="form-control"
@@ -36,14 +44,14 @@
                 <!-- Password -->
                 <div class="mb-3">
                     <label asp-for="Password" class="form-label">
-                        رمز عبور 
                     </label>
                     <div class="password-wrapper">
+                        <button dir="ltr" type="button" class="toggle-password" id="togglePassword"></button>
                         <input asp-for="Password"
                                class="form-control"
                                type="password"
-                               id="passwordInput" />
-                        <button type="button" class="toggle-password" id="togglePassword"></button>
+                               id="passwordInput"
+                               dir="ltr" />
                     </div>
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
@@ -51,18 +59,20 @@
                 <!-- Confirm -->
                 <div class="mb-3">
                     <label asp-for="ConfirmPassword" class="form-label">
-                        تکرار رمز عبور 
                     </label>
                     <input asp-for="ConfirmPassword"
                            class="form-control"
-                           type="password" />
+                           type="password"
+                           dir="ltr" />
                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                 </div>
+
+
 
                 <!-- Terms -->
                 <div class="mb-3">
                     <label class="terms">
-                        با <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">قوانین و مقررات</a> موافقم
+                        با <a class="openModal" data-bs-toggle="modal" data-bs-target="#termsModal">قوانین و مقررات</a> موافقم
                         <input type="checkbox" required />
                     </label>
                 </div>
@@ -96,5 +106,13 @@
 </div>
 
 
+@* <!-- Modal -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span id="closeModal" class="close">&times;</span>
 
+        <div id="modalBody">
+        </div>
+    </div>
+</div> *@
 

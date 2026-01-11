@@ -9,12 +9,12 @@
 <div class="cart-container">
     <h1 class="cart-header">سبد خرید شما</h1>
 
-    @if (Model.Count() == null)
+    @if (!Model.Any() )
     {
         <!-- در صورت خالی بودن سبد خرید -->
         <div class="empty-cart">
             <p>سبد خرید شما خالی است</p>
-            <a href="Index.html" class="continue-shopping">ادامه خرید</a>
+            <a class="continue-shopping">ادامه خرید</a>
         </div>
     }
     else
