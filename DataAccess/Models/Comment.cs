@@ -21,9 +21,6 @@ namespace DataAccess.Models
         [Required(ErrorMessage = "کاربر ضروری است")]
         public int UserId { get; set; }
 
-        [MaxLength(20)]
-        [Required(ErrorMessage = "نام کاربر ضروری است")]
-        public string UserName { get; set; }=string.Empty;
 
         [Required(ErrorMessage = "محصول ضروری است")]
         public int ProductId { get; set; }

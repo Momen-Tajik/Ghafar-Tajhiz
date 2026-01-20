@@ -23,16 +23,51 @@ namespace DataAccess.Data
 
         public DbSet<Comment> Comments { get; set; }
 
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // جلوگیری از تکرار یک محصول در یک سبد
             modelBuilder.Entity<BasketItem>()
                 .HasIndex(bi => new { bi.BasketId, bi.ProductId })
                 .IsUnique();
-        }
 
+            modelBuilder.Entity<BasketItem>()
+                .HasOne(bi => bi.Basket)
+                .WithMany(b => b.BasketItems)
+                .HasForeignKey(bi => bi.BasketId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BasketItem>()
+                .HasOne(bi => bi.Product)
+                .WithMany()
+                .HasForeignKey(bi => bi.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.Category)
+                .WithMany(c => c.Products)
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.Product)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(c => c.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Basket>()
+                .HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
     
 }

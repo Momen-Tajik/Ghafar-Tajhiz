@@ -21,9 +21,9 @@ namespace DataAccess.Models
         [DataType(DataType.MultilineText)]
         public string? CategoryDescription { get; set; }
 
-        public List<Product>? Products { get; set; }
+        public List<Product>? Products { get; set; } = new List<Product>();
 
         
-        
+
     }
 }

@@ -16,7 +16,7 @@ namespace DataAccess.Models
 
         public DateTime Created { get; set; } = DateTime.Now;
 
-        public DateTime PaidDate { get; set; }
+        public DateTime? PaidDate { get; set; }
 
         public int UserId { get; set; }
 
@@ -33,6 +33,6 @@ namespace DataAccess.Models
         [ForeignKey(nameof(UserId))]
         public User? User { get; set; }
 
-        public ICollection<BasketItem>? BasketItems { get; set; } 
+        public ICollection<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
     }
 }

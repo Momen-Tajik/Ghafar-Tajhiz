@@ -26,6 +26,7 @@ namespace DataAccess.Models
         [Display(Name = "قیمت")]
         [Range(0, double.MaxValue, ErrorMessage = "قیمت باید عددی مثبت باشد")]
         [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
 
         [Display(Name = "تعداد موجودی")]
@@ -54,7 +55,7 @@ namespace DataAccess.Models
         public Category? Category { get; set; }
 
 
-        public ICollection<Comment> Comment { get; set; } = new List<Comment>();
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
 
     }

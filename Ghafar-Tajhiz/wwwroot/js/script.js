@@ -220,7 +220,7 @@ function AddToBasket() {
                 if (data.res == false) {
                     alert(data.msg)
                 }
-                alert("موفق")
+                showSuccessAlert()
             })
             .catch(err => console.error(err.message));
     
@@ -248,3 +248,23 @@ function RemoveBasketItem(id) {
 
 }
 
+
+/* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT */
+
+function showSuccessAlert() {
+    Swal.fire({
+        title: 'Hello!',
+        text: 'This is a SweetAlert2 alert.',
+        icon: 'success',
+        confirmButtonText: 'Cool'
+    });
+}
+
+function showFailAlert() {
+    Swal.fire({
+        title: 'Hello!',
+        text: 'This is a SweetAlert2 alert.',
+        icon: 'fail',
+        confirmButtonText: 'Cool'
+    });
+}
