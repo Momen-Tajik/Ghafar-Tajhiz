@@ -81,50 +81,39 @@
     </div>
 </header>
 
+<section class="comments-section">
+    <h3 class="comments-title">نظرات کاربران</h3>
 
-<h3>
-    نظرات
-</h3>
-<div class="comment-container">
-    <form asp-action="AddProductComment" asp-controller="Product" method="post">
+    <!-- فرم ثبت نظر -->
+    <form asp-action="AddProductComment" asp-controller="Product" method="post" class="comment-form">
         <input type="hidden" name="productId" value="@Model.ProductId" />
-        <div class="comment-items">
-            <div class="comment-text">
 
-                <input type="text" name="userName" value="" placeholder="نام" />
+        <input type="text" name="userName" placeholder="نام شما" required />
 
-                <textarea required name="text" placeholder="ثبت نظر جدید">
+        <textarea name="text" rows="4" placeholder="نظر خود را بنویسید..." required></textarea>
 
-                </textarea>
-
-                <button type="submit" class="btnProduct btn-success">ثبت</button>
-            </div>
-        </div>
+        <button type="submit" class="btn-submit">ثبت نظر</button>
     </form>
 
-    <div style="margin:20px; width:100%;height:auto;background-color:bisque">
-
-        <h2> @(Model.Comment.Count())</h2>
-    @foreach (var item in Model.Comment)
-    {
-        <div class="comment-items">
-            <div class="comment-title">
-                <span>
-                    @item.UserName
-                </span>
-                <span>
-                    @item.Created
-                </span>
-            </div>
-
-            <div class="comment-text">
-                <p>
-                    @item.Text
-                </p>
-            </div>
-        </div>
-    }
+    <!-- تعداد نظرات -->
+    <div class="comments-count">
+        <span>@Model.Comments.Count()</span> نظر
     </div>
-</div>
 
+    <!-- لیست نظرات -->
+    <div class="comments-list">
+        @foreach (var item in Model.Comments)
+        {
+            <div class="comment-item">
+                <div class="comment-header">
+                    <span class="comment-date">@item.Created</span>
+                </div>
+
+                <div class="comment-body">
+                    <p>@item.Text</p>
+                </div>
+            </div>
+        }
+    </div>
+</section>
 

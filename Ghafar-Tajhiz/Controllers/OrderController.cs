@@ -18,6 +18,7 @@ namespace Ghafar_Tajhiz.Controllers
             _basketItemService = basketItemService;
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             return View();
@@ -45,7 +46,7 @@ namespace Ghafar_Tajhiz.Controllers
            
         }
 
-
+        [Authorize]
         public async Task<IActionResult> Basket()
         {
             var userId=User.FindFirstValue(ClaimTypes.NameIdentifier);

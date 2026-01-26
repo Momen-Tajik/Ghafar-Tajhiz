@@ -54,7 +54,7 @@ namespace BusinessLogic.BasketServices
                     Qty = qty,
                     ProductId = product.ProductId,
                     Created = DateTime.Now,
-                    Price = product.Price * qty,
+                    UnitPrice = product.Price * qty,
                 };
                 await _basketItemRepository.Add(basketItem);
             }
@@ -103,7 +103,7 @@ namespace BusinessLogic.BasketServices
                 .Select(s=>new AdminOrderDto()
                 {
                     AdminOrderId = s.BasketId,
-                    PaidDate = s.PaidDate,
+                    PaidDate = s.PaidDate.Value,
                     UserId = s.UserId,
                     Address = s.Address,
                     MobileNumber = s.MobileNumber,

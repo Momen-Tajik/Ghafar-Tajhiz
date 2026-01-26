@@ -34,7 +34,7 @@ namespace BusinessLogic.ProductServices
         public async Task<Product> GetProductById(int id)
         {
             //return await _productRepo.GetById(id);
-            return await _productRepo.GetAll(a=>a.ProductId==id).Include(c=>c.Comment).FirstOrDefaultAsync();
+            return await _productRepo.GetAll(a=>a.ProductId==id).Include(c=>c.Comments).FirstOrDefaultAsync();
         }
 
         public async Task CreateProduct(ProductDto productDto)

@@ -27,7 +27,7 @@ namespace Ghafar_Tajhiz.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new User { PhoneNumber=model.PhoneNumber};
+                var user = new User { PhoneNumber=model.PhoneNumber, UserName = model.PhoneNumber, };
                 var res = await _userManager.CreateAsync(user,model.Password);
                 
                 if (res.Succeeded)

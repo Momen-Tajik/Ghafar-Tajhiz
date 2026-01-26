@@ -28,7 +28,6 @@ namespace BusinessLogic.CommentServices
                 ProductId=productId,
                 UserId=userId,
                 Created = DateTime.Now,
-                UserName=userName,
             };
 
             await _commentRepository.Add(comment);

@@ -60,7 +60,10 @@ namespace Ghafar_Tajhiz.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
              await _commentService.CreateComment(model.text,model.productId,Convert.ToInt32(userId),model.userName);
 
             return RedirectToAction("Index","Home");

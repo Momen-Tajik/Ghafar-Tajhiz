@@ -54,7 +54,7 @@
                         <td>
                             <div class="price">
                                 <input id="basePrice" type="hidden" value="@item.Product.Price">
-                                <strong id="basePriceShow">@item.Price.ToString("N0")  تومان</strong>
+                                <strong id="basePriceShow">@item.UnitPrice.ToString("N0")  تومان</strong>
                             </div>
                         </td>
                         <td>
@@ -86,7 +86,7 @@
 
                 <div class="summary-row">
                     <span>مبلغ نهایی:</span>
-                    <span>@(Model.Select(a => a.Price).Sum().ToString("N0"))  <strong>تومان</strong></span>
+                    <span>@(Model.Select(a => a.UnitPrice).Sum().ToString("N0"))  <strong>تومان</strong></span>
                 </div>
 
                 <button type="submit" class="checkout-btn">پرداخت و تکمیل سفارش</button>

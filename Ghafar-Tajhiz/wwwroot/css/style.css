@@ -467,6 +467,134 @@ a {
     }
 }
 
+/* ===== Comments Section ===== */
+
+.comments-section {
+    margin: 30px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+/* عنوان */
+.comments-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* ===== Form ===== */
+
+.comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+    .comment-form input,
+    .comment-form textarea {
+        padding: 8px 12px;
+        font-size: 0.95rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .comment-form textarea {
+        resize: vertical;
+        min-height: 90px;
+    }
+
+        .comment-form input:focus,
+        .comment-form textarea:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+            outline: none;
+        }
+
+/* دکمه ثبت */
+.btn-submit {
+    width: 130px;
+    padding: 8px 0;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+    .btn-submit:hover {
+        background-color: #218838;
+    }
+
+/* ===== Count ===== */
+
+.comments-count {
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
+}
+
+/* ===== List ===== */
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.comment-item {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 12px 15px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+/* هدر نظر */
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.comment-user {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.comment-date {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+/* متن نظر */
+.comment-body p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #444;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 768px) {
+    .comments-section {
+        margin: 20px 10px;
+    }
+
+    .btn-submit {
+        width: 100%;
+    }
+}
+
+
 /* bascket */ /* bascket */ /* bascket */ /* bascket */
 /* bascket */ /* bascket */ /* bascket */ /* bascket */
 /* bascket */ /* bascket */ /* bascket */ /* bascket */
