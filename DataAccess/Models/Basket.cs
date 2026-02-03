@@ -21,10 +21,10 @@ namespace DataAccess.Models
         public int UserId { get; set; }
 
         [MaxLength(500)]
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         [MaxLength(20)]
-        public string MobileNumber { get; set; }
+        public string? MobileNumber { get; set; }
 
         [Display(Name = "وضعیت سبد")]
         [Required]

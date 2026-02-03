@@ -30,9 +30,9 @@ namespace BusinessLogic.BasketServices
 
         public async Task<bool> AddToBasket(int productId, int qty, int userId)
         {
-
-            var basket = new Basket();
-            basket = await _basketRepository.GetAll(a => a.UserId == userId && a.Status == BasketStatus.Pending).FirstOrDefaultAsync();
+            var basket = await _basketRepository
+                .GetAll(a => a.UserId == userId && a.Status == BasketStatus.Pending)
+                .FirstOrDefaultAsync();
 
             if (basket == null)
             {
@@ -42,22 +42,37 @@ namespace BusinessLogic.BasketServices
                     Status = BasketStatus.Pending,
                     Created = DateTime.Now,
                 };
+
                 await _basketRepository.Add(basket);
+            }
+
+            var product = await _productRepository.GetById(productId);
+
+            var basketItem = await _basketItemRepository
+                .GetAll(a => a.BasketId == basket.BasketId && a.ProductId == productId)
+                .FirstOrDefaultAsync();
+
+            if (basketItem != null)
+            {
+                basketItem.Qty += qty;
+                basketItem.UnitPrice = product.Price * basketItem.Qty;
+
+                await _basketItemRepository.Update(basketItem);
             }
             else
             {
-                var product = await _productRepository.GetById(productId);
-
-                var basketItem = new BasketItem()
+                basketItem = new BasketItem
                 {
                     BasketId = basket.BasketId,
-                    Qty = qty,
                     ProductId = product.ProductId,
-                    Created = DateTime.Now,
+                    Qty = qty,
                     UnitPrice = product.Price * qty,
+                    Created = DateTime.Now
                 };
+
                 await _basketItemRepository.Add(basketItem);
             }
+
             return true;
         }
 

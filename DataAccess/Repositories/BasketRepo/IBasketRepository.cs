@@ -12,9 +12,9 @@ namespace DataAccess.Repositories.BasketRepo
     {
         IQueryable<Basket> GetAll(Expression<Func<Basket, bool>> where = null);
         Task<Basket> GetById(int id);
-        Task Add(Basket product);
-        Task Update(Basket category);
+        Task Add(Basket basket);
+        Task Update(Basket basket);
         Task Delete(int id);
-        Task Delete(Basket product);
+        Task Delete(Basket basket);
     }
 }

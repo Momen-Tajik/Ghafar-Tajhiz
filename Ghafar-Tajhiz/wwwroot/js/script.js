@@ -197,33 +197,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /*Basket*//*Basket*//*Basket*//*Basket*//*Basket*/
 
+
 function AddToBasket() {
     var productId = parseInt(document.getElementById("productId").value);
     var qty = parseInt(document.getElementById("countInput").value);
 
-    var data = {
-        productId: productId,
-        qty: qty
-    };
-
-    
-        fetch('/Order/AddToBasket', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId, qty })
-
-            
+    fetch('/Order/AddToBasket', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId, qty })
+    })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) throw data;
+            return data;
         })
-            .then(res => res.json())
-            .then(data => {
-                console.log(data)
-                if (data.res == false) {
-                    alert(data.msg)
-                }
-                showSuccessAlert()
-            })
-            .catch(err => console.error(err.message));
-    
+        .then(data => {
+            if (data.res === false) {
+                showFailAlert('', data.msg);
+            } else {
+                showSuccessAlert('', data.msg);
+            }
+        })
+        .catch(err => {
+            showFailAlert('', err.msg || 'خطای غیرمنتظره');
+        }); // ← این پرانتز و آکولاد بسته شد
 }
 
 function RemoveBasketItem(id) {
@@ -251,20 +249,20 @@ function RemoveBasketItem(id) {
 
 /* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT */
 
-function showSuccessAlert() {
+function showSuccessAlert(title,text='موفق') {
     Swal.fire({
-        title: 'Hello!',
-        text: 'This is a SweetAlert2 alert.',
+        title: title,
+        text: text,
         icon: 'success',
-        confirmButtonText: 'Cool'
+        confirmButtonText: 'باشه'
     });
 }
 
-function showFailAlert() {
+function showFailAlert(title,text='ناموفق') {
     Swal.fire({
-        title: 'Hello!',
-        text: 'This is a SweetAlert2 alert.',
-        icon: 'fail',
-        confirmButtonText: 'Cool'
+        title: title,
+        text: text,
+        icon: 'error',
+        confirmButtonText: 'باشه'
     });
 }

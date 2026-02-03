@@ -25,25 +25,27 @@ namespace Ghafar_Tajhiz.Controllers
         }
 
         [HttpPost]
+
         public async Task<IActionResult> AddToBasket([FromBody] AddBasketDto model)
         {
+            if (model == null || model.qty <= 0)
+                return BadRequest(new { res = false, msg = "اطلاعات نامعتبر است" });
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (User.FindFirstValue(ClaimTypes.NameIdentifier) == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
+            if (userId == null)
+                return Ok(new { res = false, msg = "شما لاگین نکرده‌اید" });
 
             var result = await _basketService.AddToBasket(
                 model.productId,
                 model.qty,
-                Convert.ToInt32( userId)
+                Convert.ToInt32(userId)
             );
 
+            if (!result)
+                return Ok(new { res = false, msg = "خطا در افزودن به سبد خرید" });
 
-
-            return Ok(new { res = true });
-           
+            return Ok(new { res = true, msg = "محصول با موفقیت اضافه شد" });
         }
 
         [Authorize]
