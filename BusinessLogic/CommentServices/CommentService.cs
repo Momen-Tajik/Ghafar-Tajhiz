@@ -19,15 +19,15 @@ namespace BusinessLogic.CommentServices
             _commentRepository = commentRepository;
         }
 
-        public async Task<bool> CreateComment(string text, int productId, int userId , string userName)
+        public async Task<bool> CreateComment(string text, int productId , string userName)
         {
-           
             var comment = new Comment()
             {
                 Text=text,
                 ProductId=productId,
-                UserId=userId,
+                UserName=userName,
                 Created = DateTime.Now,
+
             };
 
             await _commentRepository.Add(comment);

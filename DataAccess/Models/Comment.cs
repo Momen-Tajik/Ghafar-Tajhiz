@@ -18,16 +18,11 @@ namespace DataAccess.Models
 
         public DateTime Created { get; set; } = DateTime.Now;
 
+
         [Required(ErrorMessage = "کاربر ضروری است")]
-        public int UserId { get; set; }
-
-
+        public string UserName { get; set; }
         [Required(ErrorMessage = "محصول ضروری است")]
         public int ProductId { get; set; }
-
-        [Display(Name = "کاربر")]
-        [ForeignKey("UserId")]
-        public User? User { get; set; }
 
         [Display(Name = "محصول")]
         [ForeignKey("ProductId")]

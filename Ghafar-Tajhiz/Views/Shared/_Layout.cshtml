@@ -44,7 +44,7 @@
 
             @if(_signInManager.IsSignedIn(User))
             {
-                <a class="login-btn" asp-controller="Account" asp-action="Profile">پروفایل</a> <!-- دکمه ورود برای دسکتاپ -->
+                <a class="login-btn" asp-controller="Profile" asp-action="Index">پروفایل</a> <!-- دکمه ورود برای دسکتاپ -->
                 <a class="login-btn" asp-controller="Account" asp-action="Logout">خروج از حساب</a> 
             }
             else

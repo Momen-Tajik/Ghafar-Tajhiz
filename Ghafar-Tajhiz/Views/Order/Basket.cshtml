@@ -69,17 +69,20 @@
 
         <!--این قسمت رو درست کن بعدا -->
 
-        <form asp-action="Pay" asp-controller="Order" method="post">
-
-
+        <form id="payForm" asp-action="Pay" asp-controller="Order" method="post">
             <div class="cart-summary">
-
                 <div class="summary-row">
-                    <textarea style="width:stretch; direction:rtl; height:100px" class="text-opacity-100" name="address" placeholder="آدرس..."></textarea>
+                    <textarea id="address" style="width:stretch; direction:rtl; height:100px"
+                              class="text-opacity-100"
+                              name="address"
+                              placeholder="آدرس..."></textarea>
                 </div>
 
                 <div class="summary-row">
-                    <input style="width:stretch; height:50px" type="text" name="mobile" value="" placeholder="09........." />
+                    <input id="mobile" style="width:stretch; height:50px"
+                           type="text"
+                           name="mobile"
+                           placeholder="09........." />
                 </div>
 
                 <div class="summary-row">
@@ -87,7 +90,7 @@
                     <span>@(Model.Select(a => a.UnitPrice).Sum().ToString("N0"))  <strong>تومان</strong></span>
                 </div>
 
-                <button type="submit" class="checkout-btn">پرداخت و تکمیل سفارش</button>
+                <button type="submit" class="checkout-btn" onclick="return validateCheckOutForm()">پرداخت و تکمیل سفارش</button>
             </div>
         </form>
 

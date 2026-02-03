@@ -105,8 +105,9 @@
         @foreach (var item in Model.Comments)
         {
             <div class="comment-item">
-                <div class="comment-header">
-                    <span class="comment-date">@item.Created</span>
+                <div class="comment-header mb-4">
+                    <h6>@item.UserName</h6> 
+                    <span class="comment-date">  @item.Created.ToString("yyyy/MM/dd - HH:mm") </span>
                 </div>
 
                 <div class="comment-body">

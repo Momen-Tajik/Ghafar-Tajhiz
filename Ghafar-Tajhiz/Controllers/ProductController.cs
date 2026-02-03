@@ -64,7 +64,7 @@ namespace Ghafar_Tajhiz.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
-             await _commentService.CreateComment(model.text,model.productId,Convert.ToInt32(userId),model.userName);
+             await _commentService.CreateComment(model.text,model.productId,model.userName);
 
             return RedirectToAction("Index","Home");
 

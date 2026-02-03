@@ -221,7 +221,7 @@ function AddToBasket() {
         })
         .catch(err => {
             showFailAlert('', err.msg || 'خطای غیرمنتظره');
-        }); // ← این پرانتز و آکولاد بسته شد
+        }); 
 }
 
 function RemoveBasketItem(id) {
@@ -246,7 +246,23 @@ function RemoveBasketItem(id) {
 
 }
 
+function validateCheckOutForm() {
+    const address = document.getElementById('address').value.trim();
+    const mobile = document.getElementById('mobile').value.trim();
+    const mobileRegex = /^09\d{9}$/;
 
+    if (address === '') {
+        showFailAlert('خطا', 'لطفا آدرس را وارد کنید');
+        return false; // جلوی ارسال فرم رو می‌گیره
+    }
+
+    if (!mobileRegex.test(mobile)) {
+        showFailAlert('خطا', 'شماره موبایل وارد شده معتبر نیست');
+        return false; // جلوی ارسال فرم رو می‌گیره
+    }
+
+    return true; // فرم ارسال میشه
+}
 /* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT */
 
 function showSuccessAlert(title,text='موفق') {
@@ -254,7 +270,8 @@ function showSuccessAlert(title,text='موفق') {
         title: title,
         text: text,
         icon: 'success',
-        confirmButtonText: 'باشه'
+        showConfirmButton: false,
+        timer: 1500
     });
 }
 
