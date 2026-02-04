@@ -4,6 +4,7 @@ using BusinessLogic.CategoryServices;
 using BusinessLogic.CommentServices;
 using BusinessLogic.FileUpload;
 using BusinessLogic.ProductServices;
+using BusinessLogic.ProfileServices;
 using DataAccess.Data;
 using DataAccess.Models;
 using DataAccess.Repositories.BasketItemRepo;
@@ -42,6 +43,7 @@ builder.Services.AddScoped<BasketItemService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<CommentService>();
 
+builder.Services.AddScoped<ProfileService>();
 
 builder.Services.AddIdentity<User, Role>(options =>
 

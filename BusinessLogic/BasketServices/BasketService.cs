@@ -110,53 +110,83 @@ namespace BusinessLogic.BasketServices
 
         public async Task<List<AdminOrderDto>> GetAdminBskets(string? search, string sort = "paiddate")
         {
-            //var baskets = await _basketRepository.GetAll( a=> a.Status != BasketStatus.Pending)
-            //    .Include(a => a.BasketItems).ThenInclude(a => a.Product).AsNoTracking().ToListAsync();
-
-            var baskets =await _basketRepository.GetAll()
-                .Include(u=>u.User)
-                .Include(bi=>bi.BasketItems)
-                .ThenInclude(p=>p.Product)
-                .Select(s=>new AdminOrderDto()
+            var query = _basketRepository.GetAll(b => b.Status != BasketStatus.Pending)
+                .Include(b => b.User)
+                .Include(b => b.BasketItems)
+                    .ThenInclude(bi => bi.Product)
+                .Select(b => new AdminOrderDto
                 {
-                    AdminOrderId = s.BasketId,
-                    PaidDate = s.PaidDate.Value,
-                    UserId = s.UserId,
-                    Address = s.Address,
-                    MobileNumber = s.MobileNumber,
-                    Status = s.Status,
-                    UserName = s.User.UserName,
-                    items = s.BasketItems.Select(s=> s.Product.ProductName).ToList()
+                    AdminOrderId = b.BasketId,
+                    PaidDate = b.PaidDate!.Value,
+                    UserId = b.UserId,
+                    Address = b.Address,
+                    MobileNumber = b.MobileNumber,
+                    Status = b.Status,
+                    UserName = b.User.UserName,
+                    items = b.BasketItems.Select(i => i.Product.ProductName).ToList()
+                });
 
-                }).AsNoTracking().ToListAsync();
-
-            //Filtering
-            switch (sort.ToLower())
+            if (!string.IsNullOrEmpty(search))
             {
-                case "paiddate":
-                    baskets = (List<AdminOrderDto>)baskets.OrderByDescending(p => p.Status);
-                    break;
-
-                case "status":
-                    baskets = (List<AdminOrderDto>)baskets.OrderByDescending(p => p.Status);
-                    break;
-
-
-                default:
-                    baskets = (List<AdminOrderDto>)baskets.OrderByDescending(p => p.PaidDate);
-                    break;
-            }
-
-            // Searching
-            if (!search.IsNullOrEmpty())
-            {
-                baskets = (List<AdminOrderDto>)baskets.Where(p =>
+                query = query.Where(p =>
                     p.UserName.Contains(search) ||
                     p.MobileNumber.Contains(search) ||
-                    //p.PaidDate.ToString().Contains(search) ||
                     p.Address.Contains(search));
             }
-            return baskets;
+
+            query = sort.ToLower() switch
+            {
+                "status" => query.OrderByDescending(p => p.Status),
+                "paiddate" => query.OrderByDescending(p => p.PaidDate),
+                _ => query.OrderByDescending(p => p.PaidDate)
+            };
+
+            return await query.AsNoTracking().ToListAsync();
         }
+
+
+        public async Task<List<Basket>> GetUserOrders(int userId, string? search, BasketStatus? status, string sort = "paiddate")
+        {
+            var query = _basketRepository
+                .GetAll(b => b.UserId == userId)
+                .Include(b => b.BasketItems)
+                .ThenInclude(bi => bi.Product);
+
+            //if (status.HasValue)
+            //{
+            //    query = query.Where(b => b.Status == status);
+
+            //}
+
+            //if (!string.IsNullOrEmpty(search))
+            //{
+            //    query = query.Where(b =>
+            //        b.BasketId.ToString().Contains(search) ||
+            //        b.MobileNumber.Contains(search) ||
+            //        b.Address.Contains(search) ||
+            //        b.BasketItems.Any(i => i.Product.ProductName.Contains(search))
+            //    );
+            //}
+
+            //query = sort.ToLower() switch
+            //{
+            //    "status" => query.OrderByDescending(b => b.Status),
+            //    "oldest" => query.OrderBy(b => b.PaidDate),
+            //    "paiddate" => query.OrderByDescending(b => b.PaidDate),
+            //    _ => query.OrderByDescending(b => b.PaidDate)
+            //};
+
+            return await query.AsNoTracking().OrderByDescending(a=>a.Created).ToListAsync();
+        }
+
+        public async Task<Basket?> GetLastUserOrder(int userId)
+        {
+            return await _basketRepository
+                .GetAll(b => b.UserId == userId && b.Status != BasketStatus.Pending)
+                .OrderByDescending(b => b.PaidDate)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+        }
+
     }
 }

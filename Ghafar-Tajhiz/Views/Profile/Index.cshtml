@@ -1,36 +1,80 @@
-﻿@using DataAccess.Models
-@model List<Basket>
+﻿@using BusinessLogic.ProfileServices.Models
+@model UserProfileViewModel
 
 @{
-    ViewData["Title"] = "Index";
-}
-@foreach (var item in Model)
-{
-      
-    <h1>#@item.BasketId</h1>
-    @if (item.Status == DataAccess.Enums.BasketStatus.Paid )
-    {
-        <h1>پرداخت شده</h1>
-    }
-    else if (item.Status == DataAccess.Enums.BasketStatus.Shipped)
-    {
-        <h1>ارسال شده</h1>
-    }
-    else if (item.Status == DataAccess.Enums.BasketStatus.Cancelled)
-    {
-        <h1>لغو شده</h1>
-    }
-    
-    <h1>@item.PaidDate</h1>
-    <h1>@item.MobileNumber</h1>
-    <h1>@item.Address</h1>
-
-    foreach(var basketItem in item.BasketItems)
-    {
-        <h3>@basketItem.Product.ProductName --- @basketItem.UnitPrice</h3>
-    }
-
-
-
+    ViewData["Title"] = "Profile";
 }
 
+<div class="user-dashboard">
+
+    <aside class="user-info">
+        <div class="user-card">
+            <h3>اطلاعات کاربر</h3>
+            <p><strong>شماره موبایل:</strong> @(string.IsNullOrEmpty(Model.MobileNumber) ? "ثبت نشده" : Model.MobileNumber)</p>
+            <p><strong>آدرس:</strong> @(string.IsNullOrEmpty(Model.Address) ? "ثبت نشده" : Model.Address)</p>
+        </div>
+    </aside>
+
+    <section class="user-orders">
+
+        <!-- Search -->
+        <form method="get">
+            <input type="text" name="search" value="@Model.Search" placeholder="جستجوی سفارش..." />
+            <select name="status">
+                <option value="">همه</option>
+                <option value="Paid">پرداخت شده</option>
+                <option value="Sent">ارسال شده</option>
+                <option value="Canceled">لغو شده</option>
+            </select>
+            <select name="sort">
+                <option value="paiddate">جدیدترین</option>
+                <option value="oldest">قدیمی‌ترین</option>
+                <option value="status">وضعیت</option>
+            </select>
+            <button type="submit">اعمال فیلتر</button>
+        </form>
+
+        @if (Model.Orders == null || !Model.Orders.Any())
+        {
+            <div class="products-empty">
+                سفارشی وجود ندارد
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model.Orders)
+            {
+                <div class="order-card">
+                    <div class="order-header">
+                        <span>شماره فاکتور: @item.BasketId</span>
+                        <span class="order-status @item.Status.ToString().ToLower()">@item.Status</span>
+                    </div>
+                    <div class="order-meta">
+                        <span>@(item.PaidDate.HasValue ? item.PaidDate.Value.ToString("HH:mm - yyyy/MM/dd ") : "-")</span>
+                        <br />
+                        <span>@item.MobileNumber</span>
+                        <br />
+                        <span>@item.Address</span>
+                    </div>
+                    <div class="order-items">
+                        @if (item.BasketItems != null && item.BasketItems.Any())
+                        {
+                            foreach (var bi in item.BasketItems)
+                            {
+                                <div class="order-item">
+                                    <span class="product-name">@bi.Product?.ProductName</span>
+                                    <span class="price">@bi.Product?.Price.ToString("N0") تومان</span>
+                                    <span class="qty">@bi.Qty  عدد</span>
+                                    <span class="price">@bi.UnitPrice.ToString("N0") تومان</span>
+                                </div>
+
+
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </section>
+
+</div>

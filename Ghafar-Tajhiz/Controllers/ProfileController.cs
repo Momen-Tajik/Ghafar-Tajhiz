@@ -1,24 +1,27 @@
-﻿using BusinessLogic.BasketItemServices;
-using BusinessLogic.BasketServices;
+﻿using BusinessLogic.ProfileServices;
+using DataAccess.Enums;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Ghafar_Tajhiz.Controllers
 {
     public class ProfileController : Controller
     {
-        private readonly BasketService _basketService;
-        private readonly BasketItemService _basketItemService;
-        public ProfileController(BasketService basketService, BasketItemService basketItemService)
+        private readonly ProfileService _profileService;
+
+        public ProfileController(ProfileService profileService)
         {
-            _basketService = basketService;
-            _basketItemService = basketItemService;
+            _profileService = profileService;
         }
-        public async Task<IActionResult> Index()
+
+        public async Task<IActionResult> Index(string? search, BasketStatus? status, string sort = "paiddate")
         {
-            var userId  = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var data = await _basketService.GetUserBskets(Convert.ToInt32(userId));
-            return View(data);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var model = await _profileService.GetUserProfile(userId, search, status, sort);
+
+            return View(model);
         }
     }
 }
