@@ -1,4 +1,5 @@
 ﻿@using BusinessLogic.ProfileServices.Models
+@using DataAccess.Enums
 @model UserProfileViewModel
 
 @{
@@ -7,13 +8,13 @@
 
 <div class="user-dashboard">
 
-    <aside class="user-info">
+@*     <aside class="user-info">
         <div class="user-card">
             <h3>اطلاعات کاربر</h3>
             <p><strong>شماره موبایل:</strong> @(string.IsNullOrEmpty(Model.MobileNumber) ? "ثبت نشده" : Model.MobileNumber)</p>
             <p><strong>آدرس:</strong> @(string.IsNullOrEmpty(Model.Address) ? "ثبت نشده" : Model.Address)</p>
         </div>
-    </aside>
+    </aside> *@
 
     <section class="user-orders">
 
@@ -47,7 +48,23 @@
                 <div class="order-card">
                     <div class="order-header">
                         <span>شماره فاکتور: @item.BasketId</span>
-                        <span class="order-status @item.Status.ToString().ToLower()">@item.Status</span>
+
+                        @if (item.Status == BasketStatus.Paid)
+                        {
+                            <span class="order-status @item.Status.ToString().ToLower()">پرداخت شده</span>
+                        }
+                        else if (item.Status == BasketStatus.Shipped)
+                        {
+                            <span class="order-status @item.Status.ToString().ToLower()">ارسال شده</span>
+                        }
+                        else if (item.Status == BasketStatus.Cancelled)
+                        {
+                            <span class="order-status @item.Status.ToString().ToLower()">لغو شده</span>
+                        }
+                        else
+                        {
+                            <span class="order-status @item.Status.ToString().ToLower()">در انتظار پرداخت</span>
+                        }
                     </div>
                     <div class="order-meta">
                         <span>@(item.PaidDate.HasValue ? item.PaidDate.Value.ToString("HH:mm - yyyy/MM/dd ") : "-")</span>
@@ -68,8 +85,13 @@
                                     <span class="price">@bi.UnitPrice.ToString("N0") تومان</span>
                                 </div>
 
-
                             }
+
+                            <div class="order-items">
+                                <span class="‌total-price">جمع کل</span>
+                                 <span class="total-price">@item.BasketItems.Select(a => a.UnitPrice).Sum().ToString("N0") تومان</span>
+                            </div>
+
                         }
                     </div>
                 </div>

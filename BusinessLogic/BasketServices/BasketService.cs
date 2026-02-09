@@ -148,7 +148,7 @@ namespace BusinessLogic.BasketServices
         public async Task<List<Basket>> GetUserOrders(int userId, string? search, BasketStatus? status, string sort = "paiddate")
         {
             var query = _basketRepository
-                .GetAll(b => b.UserId == userId)
+                .GetAll(b => b.UserId == userId )
                 .Include(b => b.BasketItems)
                 .ThenInclude(bi => bi.Product);
 

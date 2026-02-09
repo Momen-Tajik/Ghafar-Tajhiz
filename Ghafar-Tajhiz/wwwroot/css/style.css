@@ -1399,17 +1399,18 @@ a {
 }
 
 .order-status {
-    font-size: 12px;
-    font-weight: 600;
-    padding: 2px 8px;
+    padding: 4px 10px;
     border-radius: 12px;
-    color: #fff;
-    text-transform: capitalize;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
 }
 
-    .order-status.Pending {
-        background-color: blue;
+    .order-status.pending {
+        background-color: #FFC107;
+        color: #000;
     }
+
     .order-status.paid {
         background-color: #4CAF50;
     }
@@ -1432,7 +1433,7 @@ a {
 
 /* Order Items */
 .order-items {
-    border-top: 1px solid #eee;
+    border-top: 2px solid #eee;
     padding-top: 10px;
 }
 
@@ -1451,6 +1452,10 @@ a {
     /* Product name spans full width on mobile */
     .order-item .product-name {
         text-align: left;
+    }
+
+    .order-item .total-price {
+        font-weight:600;
     }
 
 /* ===== Empty Orders ===== */

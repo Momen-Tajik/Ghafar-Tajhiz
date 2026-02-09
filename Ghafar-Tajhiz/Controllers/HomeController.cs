@@ -28,7 +28,6 @@ namespace Ghafar_Tajhiz.Controllers
 
 
 
-        [Authorize]
         public IActionResult aboutUs()
         {
             return View();
