@@ -35,16 +35,10 @@
         </div>
     </div>
 
-    <form asp-action="Delete" method="post" class="form-actions">
-        <input type="hidden" asp-for="CategoryId" />
-
-        <button type="submit" class="form-button danger">
-            حذف دسته‌بندی
-        </button>
-
-        <a asp-action="Index" class="form-button secondary">
-            انصراف
-        </a>
+    <form asp-action="DeleteConfirmed" method="post" class="form-actions">
+        <input type="hidden" name="id" value="@Model.CategoryId" />
+        <button type="submit" class="form-button danger">حذف دسته‌بندی</button>
+        <a asp-action="Index" class="form-button secondary">انصراف</a>
     </form>
 
 </div>

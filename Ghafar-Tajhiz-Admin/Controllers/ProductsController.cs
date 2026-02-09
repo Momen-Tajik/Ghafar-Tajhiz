@@ -123,35 +123,33 @@ namespace Ghafar_Tajhiz_Admin.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var products = await _productService.GetProductsWithCategory(p => p.ProductId == id);
-            var product = products.FirstOrDefault();
+            var product = (await _productService.GetProductsWithCategory(p => p.ProductId == id))
+                          .FirstOrDefault();
+
             if (product == null)
-            {
                 return NotFound();
-            }
 
             return View(product);
         }
 
         // POST: Products/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int ProductId)
         {
-            var products = await _productService.GetProductsWithCategory(p => p.ProductId == id);
-            var product = products.FirstOrDefault();
-            if (product != null)
-            {
-                await _productService.DeleteProduct(product);
-            }
+            var product = (await _productService.GetProductsWithCategory(p => p.ProductId == ProductId))
+                          .FirstOrDefault();
+
+            if (product == null)
+                return NotFound();
+
+            await _productService.DeleteProduct(product);
 
             return RedirectToAction(nameof(Index));
         }
 
-        
+
     }
 }

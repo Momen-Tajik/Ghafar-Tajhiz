@@ -29,7 +29,7 @@
 
         <div class="detail-item">
             <span class="label">قیمت</span>
-            <span class="value">@Model.Price</span>
+            <span class="value">@Model.Price.ToString("C")</span>
         </div>
 
         <div class="detail-item">
@@ -44,37 +44,35 @@
 
         <div class="detail-item">
             <span class="label">وضعیت</span>
-            <span class="value">
-                @(Model.IsAvailable ? "فعال" : "غیرفعال")
-            </span>
+            <span class="value">@((Model.IsAvailable) ? "فعال" : "غیرفعال")</span>
         </div>
 
         <div class="detail-item">
             <span class="label">تاریخ ایجاد</span>
-            <span class="value">@Model.CreateDate</span>
+            <span class="value">@Model.CreateDate.ToString("yyyy/MM/dd")</span>
         </div>
 
         <div class="detail-item image-item">
             <span class="label">تصویر</span>
             <span class="value">
-                <img src="/api/FileUpload/GetFile?filename=@Model.ImageUrl"
-                     alt="Product Image"
-                     class="delete-image" />
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="/api/FileUpload/GetFile?filename=@Model.ImageUrl" alt="Product Image" class="delete-image" />
+                }
+                else
+                {
+                    <span>بدون تصویر</span>
+                }
             </span>
         </div>
 
     </div>
 
-    <form asp-action="Delete" class="form-actions danger-actions">
+    <form asp-controller="Products" asp-action="DeleteConfirmed" method="post" class="form-actions danger-actions">
         <input type="hidden" asp-for="ProductId" />
-
-        <button type="submit" class="form-button danger">
-            حذف محصول
-        </button>
-
-        <a asp-action="Index" class="form-button secondary">
-            انصراف
-        </a>
+        <button type="submit" class="form-button danger">حذف محصول</button>
+        <a asp-action="Index" class="form-button secondary">انصراف</a>
     </form>
+
 
 </div>

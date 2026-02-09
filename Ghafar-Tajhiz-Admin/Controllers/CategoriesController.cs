@@ -119,7 +119,7 @@ namespace Ghafar_Tajhiz_Admin.Controllers
         }
 
         //POST: Categories/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
