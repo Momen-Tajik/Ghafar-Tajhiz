@@ -1,8 +1,71 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "داشبورد";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="admin-dashboard">
+
+    <!-- Page Title -->
+    <div class="mb-4">
+        <h2 class="fw-bold">داشبورد</h2>
+        <p class="text-muted mb-0">
+            خوش آمدید، وضعیت کلی سیستم را در یک نگاه مشاهده کنید.
+        </p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-3 col-sm-6">
+            <div class="admin-card text-center">
+                <i class="fa fa-cube fa-2x text-warning mb-2"></i>
+                <h5 class="mb-1">محصولات</h5>
+                <strong class="fs-4">128</strong>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="admin-card text-center">
+                <i class="fa fa-shopping-cart fa-2x text-success mb-2"></i>
+                <h5 class="mb-1">سفارش‌ها</h5>
+                <strong class="fs-4">56</strong>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="admin-card text-center">
+                <i class="fa fa-users fa-2x text-primary mb-2"></i>
+                <h5 class="mb-1">کاربران</h5>
+                <strong class="fs-4">42</strong>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="admin-card text-center">
+                <i class="fa fa-exclamation-circle fa-2x text-danger mb-2"></i>
+                <h5 class="mb-1">در انتظار</h5>
+                <strong class="fs-4">9</strong>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="admin-card">
+        <h5 class="mb-3">دسترسی سریع</h5>
+
+        <div class="d-flex flex-wrap gap-3">
+            <a asp-controller="Products" asp-action="Create" class="btn btn-primary">
+                <i class="fa fa-plus"></i> افزودن محصول
+            </a>
+
+            <a asp-controller="Orders" asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fa fa-shopping-cart"></i> مشاهده سفارش‌ها
+            </a>
+
+            <a asp-controller="Users" asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fa fa-users"></i> مدیریت کاربران
+            </a>
+        </div>
+    </div>
+
 </div>

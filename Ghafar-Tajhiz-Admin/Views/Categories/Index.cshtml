@@ -1,41 +1,78 @@
-﻿@model IEnumerable<DataAccess.Models.Category>
+﻿
+@model IEnumerable<DataAccess.Models.Category>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "دسته‌بندی‌ها";
 }
 
-<h1>Index</h1>
+<div class="page-header">
+    <h1>مدیریت دسته‌بندی‌ها</h1>
+    <p>ایجاد، ویرایش و حذف دسته‌بندی‌های محصولات</p>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CategoryName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CategoryDescription)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.CategoryName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CategoryDescription)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.CategoryId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CategoryId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="admin-card">
+
+    <div style="margin-bottom:16px;">
+        <a asp-action="Create" class="form-button">
+            <i class="fa fa-plus"></i>
+            افزودن دسته‌بندی جدید
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            هنوز هیچ دسته‌بندی‌ای ثبت نشده است.
+        </div>
+    }
+    else
+    {
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>نام دسته‌بندی</th>
+                    <th>توضیحات</th>
+                    <th style="width:140px;">عملیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.CategoryName</td>
+                        <td>
+                            @(string.IsNullOrWhiteSpace(item.CategoryDescription)
+                                ? "—"
+                                : item.CategoryDescription)
+                        </td>
+                        <td>
+                            <div class="action-group">
+                                <a asp-action="Edit"
+                                   asp-route-id="@item.CategoryId"
+                                   class="action-btn action-edit"
+                                   title="ویرایش">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+
+                                <a asp-action="Details"
+                                   asp-route-id="@item.CategoryId"
+                                   class="action-btn action-view"
+                                   title="جزئیات">
+                                    <i class="fa fa-eye"></i>
+                                </a>
+
+                                <a asp-action="Delete"
+                                   asp-route-id="@item.CategoryId"
+                                   class="action-btn action-delete"
+                                   title="حذف">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</div>

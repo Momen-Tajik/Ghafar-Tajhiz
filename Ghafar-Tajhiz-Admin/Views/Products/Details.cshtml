@@ -1,66 +1,68 @@
 ﻿@model DataAccess.Models.Product
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "جزئیات محصول";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Product</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductDescription)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductDescription)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StockQuantity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StockQuantity)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageUrl)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsAvailable)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsAvailable)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreateDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreateDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Category)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category.CategoryName)
-        </dd>
-    </dl>
+<div class="page-header">
+    <h1>جزئیات محصول</h1>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.ProductId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="admin-card details-card">
+
+    <div class="details-grid">
+
+        <div class="detail-item">
+            <span class="label">نام محصول</span>
+            <span class="value">@Model.ProductName</span>
+        </div>
+
+        <div class="detail-item">
+            <span class="label">توضیحات</span>
+            <span class="value">@Model.ProductDescription</span>
+        </div>
+
+        <div class="detail-item">
+            <span class="label">قیمت</span>
+            <span class="value">@Model.Price</span>
+        </div>
+
+        <div class="detail-item">
+            <span class="label">موجودی</span>
+            <span class="value">@Model.StockQuantity</span>
+        </div>
+
+        <div class="detail-item">
+            <span class="label">دسته‌بندی</span>
+            <span class="value">@Model.Category?.CategoryName</span>
+        </div>
+
+        <div class="detail-item">
+            <span class="label">وضعیت</span>
+            <span class="value">
+                @(Model.IsAvailable ? "فعال" : "غیرفعال")
+            </span>
+        </div>
+
+        <div class="detail-item">
+            <span class="label">تاریخ ایجاد</span>
+            <span class="value">@Model.CreateDate</span>
+        </div>
+
+        <div class="detail-item image-item">
+            <span class="label">تصویر</span>
+            <span class="value">
+                <img src="/api/FileUpload/GetFile?filename=@Model.ImageUrl"
+                     alt="Product Image"
+                     class="details-image" />
+            </span>
+        </div>
+
+    </div>
+
+    <div class="form-actions">
+        <a asp-action="Edit" asp-route-id="@Model.ProductId" class="form-button primary">ویرایش</a>
+        <a asp-action="Index" class="form-button secondary">بازگشت</a>
+    </div>
+
 </div>

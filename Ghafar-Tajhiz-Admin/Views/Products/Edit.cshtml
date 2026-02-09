@@ -1,70 +1,78 @@
 ﻿@model BusinessLogic.ProductServices.ProductDto
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "ویرایش محصول";
 }
 
-<h1>Edit</h1>
+<div class="page-header">
+    <h1>ویرایش محصول</h1>
+</div>
 
-<h4>Product</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ProductId" />
+<div class="admin-card">
+
+    <form asp-action="Edit" enctype="multipart/form-data" class="admin-form">
+        <input type="hidden" asp-for="ProductId" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="ProductName">نام محصول</label>
+            <input asp-for="ProductName" class="form-input" />
+            <span asp-validation-for="ProductName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ProductDescription">توضیحات</label>
+            <textarea asp-for="ProductDescription" class="form-input"></textarea>
+            <span asp-validation-for="ProductDescription" class="text-danger"></span>
+        </div>
+
+        <div class="two-columns">
             <div class="form-group">
-                <label asp-for="ProductName" class="control-label"></label>
-                <input asp-for="ProductName" class="form-control" />
-                <span asp-validation-for="ProductName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductDescription" class="control-label"></label>
-                <textarea asp-for="ProductDescription" class="form-control"></textarea>
-                <span asp-validation-for="ProductDescription" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
+                <label asp-for="Price">قیمت</label>
+                <input asp-for="Price" class="form-input" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="StockQuantity" class="control-label"></label>
-                <input asp-for="StockQuantity" class="form-control" />
+                <label asp-for="StockQuantity">موجودی</label>
+                <input asp-for="StockQuantity" class="form-input" />
                 <span asp-validation-for="StockQuantity" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ImageUrl" class="control-label"></label>
-                <img src="/api/FileUpload/GetFile?filename=@Model.ImageName" width="100px" alt="Alternate Text" />
-                <input type="file" asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsAvailable" /> @Html.DisplayNameFor(model => model.IsAvailable)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreateDate" class="control-label"></label>
-                <input asp-for="CreateDate" class="form-control" />
-                <span asp-validation-for="CreateDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+        </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+        <div class="form-group">
+            <label asp-for="CategoryId">دسته‌بندی</label>
+            <select asp-for="CategoryId" class="form-input" asp-items="ViewBag.CategoryId"></select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+        <div class="form-group">
+            <label asp-for="ImageUrl">تصویر محصول</label>
+            @if (!string.IsNullOrEmpty(Model.ImageName))
+            {
+                <img src="/api/FileUpload/GetFile?filename=@Model.ImageName" class="details-image" alt="Product Image" />
+            }
+            <input type="file" asp-for="ImageUrl" class="form-input" />
+            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+        </div>
+
+        <div class="form-group checkbox-group">
+            <label>
+                <input asp-for="IsAvailable" /> فعال
+            </label>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CreateDate">تاریخ ایجاد</label>
+            <input asp-for="CreateDate" class="form-input" />
+            <span asp-validation-for="CreateDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-actions">
+            <input type="submit" value="ذخیره" class="form-button primary" />
+            <a asp-action="Index" class="form-button secondary">بازگشت</a>
+        </div>
+
+    </form>
+</div>

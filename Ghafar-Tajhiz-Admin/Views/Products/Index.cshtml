@@ -1,77 +1,103 @@
 ﻿@model IEnumerable<DataAccess.Models.Product>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "مدیریت محصولات";
 }
 
-<h1>Index</h1>
+<div class="page-header">
+    <h1>مدیریت محصولات</h1>
+    <p>لیست محصولات ثبت‌شده در فروشگاه</p>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductDescription)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StockQuantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageUrl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsAvailable)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreateDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductDescription)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StockQuantity)
-            </td>
-            <td>
-                <img src="api/FileUpload/GetFile?filename=@item.ImageUrl" width="100px" alt="Alternate Text" />
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsAvailable)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreateDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.CategoryName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="admin-card">
+
+    <div style="margin-bottom:16px;">
+        <a asp-action="Create" class="form-button">
+            <i class="fa fa-plus"></i>
+            افزودن محصول جدید
+        </a>
+    </div>
+
+    <div class="table-scroll">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>نام محصول</th>
+                    <th>توضیحات</th>
+                    <th>قیمت</th>
+                    <th>موجودی</th>
+                    <th>تصویر</th>
+                    <th>وضعیت</th>
+                    <th>تاریخ ایجاد</th>
+                    <th>دسته‌بندی</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.ProductName</td>
+
+                        <td>
+                            @(item.ProductDescription?.Length > 50
+                                ? item.ProductDescription.Substring(0, 50) + "..."
+                                : item.ProductDescription)
+                        </td>
+
+                        <td>@item.Price.ToString("N0") تومان</td>
+
+                        <td>@item.StockQuantity</td>
+
+                        <td>
+                            <img class="product-image"
+                                 src="api/FileUpload/GetFile?filename=@item.ImageUrl"
+                                 alt="@item.ProductName" />
+                        </td>
+
+                        <td>
+                            @if (item.IsAvailable)
+                            {
+                                <span class="boolean-true">فعال</span>
+                            }
+                            else
+                            {
+                                <span class="boolean-false">غیرفعال</span>
+                            }
+                        </td>
+
+                        <td>@item.CreateDate.ToString("yyyy/MM/dd")</td>
+
+                        <td>@item.Category?.CategoryName</td>
+
+                        <td>
+                            <div class="action-group">
+                                <a asp-action="Edit"
+                                   asp-route-id="@item.ProductId"
+                                   class="action-btn action-edit"
+                                   title="ویرایش">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+
+                                <a asp-action="Details"
+                                   asp-route-id="@item.ProductId"
+                                   class="action-btn action-view"
+                                   title="جزئیات">
+                                    <i class="fa fa-eye"></i>
+                                </a>
+
+                                <a asp-action="Delete"
+                                   asp-route-id="@item.ProductId"
+                                   class="action-btn action-delete"
+                                   title="حذف">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

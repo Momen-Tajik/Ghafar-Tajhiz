@@ -1,30 +1,45 @@
 ﻿@model DataAccess.Models.Category
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "جزئیات دسته‌بندی";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Category</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CategoryName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CategoryName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CategoryDescription)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CategoryDescription)
-        </dd>
-    </dl>
+<div class="page-header">
+    <h1>جزئیات دسته‌بندی</h1>
+    <p>مشاهده اطلاعات ثبت‌شده دسته‌بندی</p>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.CategoryId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="admin-card">
+
+    <div class="details-list">
+
+        <div class="details-item">
+            <div class="details-label">نام دسته‌بندی:</div>
+            <div class="details-value">@Model.CategoryName</div>
+        </div>
+
+        <div class="details-item">
+            <div class="details-label">توضیحات:</div>
+            <div class="details-value">
+                @(string.IsNullOrWhiteSpace(Model.CategoryDescription)
+                    ? "—"
+                    : Model.CategoryDescription)
+            </div>
+        </div>
+
+    </div>
+
+    <div class="form-actions">
+        <a asp-action="Edit"
+           asp-route-id="@Model.CategoryId"
+           class="form-button">
+            ویرایش
+        </a>
+
+        <a asp-action="Index"
+           class="form-button secondary">
+            بازگشت
+        </a>
+    </div>
+
 </div>

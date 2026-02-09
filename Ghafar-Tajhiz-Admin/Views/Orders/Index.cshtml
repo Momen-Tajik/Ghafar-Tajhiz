@@ -1,129 +1,57 @@
-﻿@using BusinessLogic.BasketServices.Models
+﻿@using DataAccess.Enums
+@model List<BusinessLogic.BasketServices.Models.AdminOrderDto>
 
-@model List<AdminOrderDto>
 @{
-    ViewData["Title"] = "Index";
-
-    string search = ViewBag.Search ?? "";
-    string currentSort = ViewBag.Sort ?? "paiddate";
+    ViewData["Title"] = "سفارش‌ها";
 }
 
-<!-- Search -->
-<div class="products-search">
-    <form asp-action="Index" asp-controller="Orders" method="get">
-        <input style="width:70%"
-               type="text"
-               name="search"
-               value="@search"
-               placeholder="جستجوی محصول..." />
-
-        <button type="submit" class="btnProduct">
-            جستجو
-        </button>
-    </form>
+<div class="page-header">
+    <h1>مدیریت سفارش‌ها</h1>
+    <p>بررسی وضعیت سفارش‌های ثبت‌شده</p>
 </div>
 
-
-<!-- Filtering -->
-<div class="filtering-section">
-    <div class="filter-title">
-        مرتب‌سازی بر اساس:
-    </div>
-
-    <div class="filter-buttons">
-        <a asp-action="Index"
-           asp-route-page="1"
-           asp-route-search="@search"
-           asp-route-sort="paiddate"
-           class="filter-btn @(currentSort == "paiddate" ? "active" : "")">
-            تاریخ پرداخت
-        </a>
-
-        <a asp-action="Index"
-           asp-route-page="1"
-           asp-route-search="@search"
-           asp-route-sort="status"
-           class="filter-btn @(currentSort == "status" ? "active" : "")">
-            وضعیت پرداخت
-        </a>
-
-        
-    </div>
-</div>
-
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                نام
-            </th>
-            <th>
-                شماره تماس
-            </th>
-            <th>
-                تاریخ پرداخت
-            </th>
-            <th>
-                آدرس
-            </th>
-            <th>
-                محصول
-            </th>
-            <th>
-                وضعیت
-            </th>
-            <th>
-
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<div class="admin-card">
+    <table class="admin-table">
+        <thead>
             <tr>
-                <td>
-                    @item.UserName
-                </td>
-                <td>
-                    @item.MobileNumber
-                </td>
-                <td>
-                    @item.PaidDate
-                </td>
-                <td>
-                    @item.Address
-                </td>
-                <td>
-                    @string.Join(" + ",item.items)
-                </td>
-                @if (item.Status == DataAccess.Enums.BasketStatus.Paid)
-                {
-                    <td>
-                        پرداخت شده
-                    </td>
-                }
-                else if (item.Status == DataAccess.Enums.BasketStatus.Shipped)
-                {
-                    <td>
-                        تایید شده
-                    </td>
-                }
-                else if (item.Status == DataAccess.Enums.BasketStatus.Cancelled)
-                {
-                    <td>
-                        لغو شده
-                    </td>
-                }
-                <td>
-                    @item.MobileNumber
-                </td>
-                <td>
-                    <a asp-action="Accept" asp-route-id="">تایید</a> |
-                    <a asp-action="Cancel" asp-route-id="">کنسل</a>
-                </td>
+                <th>نام</th>
+                <th>شماره تماس</th>
+                <th>تاریخ پرداخت</th>
+                <th>محصولات</th>
+                <th>وضعیت</th>
+                <th>عملیات</th>
             </tr>
-        }
-    </tbody>
-</table>
-
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.UserName</td>
+                    <td>@item.MobileNumber</td>
+                    <td>@item.PaidDate</td>
+                    <td>@string.Join(" + ", item.items)</td>
+                    <td>
+                        @if (item.Status == BasketStatus.Paid)
+                        {
+                            <span class="badge badge-warning">پرداخت شده</span>
+                        }
+                        else if (item.Status == BasketStatus.Shipped)
+                        {
+                            <span class="badge badge-success">ارسال شده</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-danger">لغو شده</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="action-group">
+                            <a asp-action="Accept" asp-route-id="" class="action-btn action-accept"><i class="fa fa-check"></i></a>
+                            <a asp-action="Cancel" asp-route-id="" class="action-btn action-cancel"><i class="fa fa-times"></i></a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
