@@ -1,9 +1,11 @@
 ﻿using BusinessLogic.BasketServices;
 using BusinessLogic.CommentServices;
 using BusinessLogic.ProductServices;
+using DataAccess.Models;
 using Ghafar_Tajhiz.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -13,10 +15,12 @@ namespace Ghafar_Tajhiz.Controllers
     {
         private readonly ProductService _productService;
         private readonly CommentService _commentService;
-        public ProductController(ProductService productService, CommentService commentService)
+        private readonly UserManager<User> _userManager;
+        public ProductController(ProductService productService, CommentService commentService, UserManager<User> userManager)
         {
             _productService = productService;
             _commentService = commentService;
+            _userManager = userManager;
         }
         public async Task<IActionResult> Index(int id)
         {
@@ -55,19 +59,15 @@ namespace Ghafar_Tajhiz.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> AddProductComment(AddCommentDto model)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.GetUserAsync(User);
 
-            if (userId == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
-             await _commentService.CreateComment(model.text,model.productId,model.userName);
+            var userName = user.FullName; // نام واقعی کاربر
 
-            return RedirectToAction("Index","Home");
+            await _commentService.CreateComment(model.text, model.productId, userName);
 
+            return RedirectToAction("Index", "Home");
         }
     }
 }

@@ -4,7 +4,8 @@ namespace Ghafar_Tajhiz.Models
 {
     public class RegisterDto
     {
-
+        [Display(Name = "نام کاربری")]
+        public string UserName { get; set; }
 
         [Required(ErrorMessage = "شماره تلفن الزامی است")]
         [RegularExpression(@"^09[0-9]{9}$", ErrorMessage = "فرمت شماره موبایل نامعتبر است")]

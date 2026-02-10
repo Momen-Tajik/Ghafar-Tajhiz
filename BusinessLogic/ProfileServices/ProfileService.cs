@@ -14,7 +14,7 @@ namespace BusinessLogic.ProfileServices
             _basketService = basketService;
         }
 
-        public async Task<UserProfileViewModel> GetUserProfile(int userId, string? search, BasketStatus? status, string sort)
+        public async Task<UserProfileViewModel> GetUserProfile(int userId,string userName,string phoneNumber, string? search, BasketStatus? status, string sort)
         {
             var orders = await _basketService.GetUserOrders(userId, search, status, sort);
             var lastOrder = await _basketService.GetLastUserOrder(userId);
@@ -22,7 +22,8 @@ namespace BusinessLogic.ProfileServices
             return new UserProfileViewModel
             {
                 UserId = userId,
-                MobileNumber = lastOrder?.MobileNumber,
+                UserName = userName,
+                MobileNumber = phoneNumber,
                 Address = lastOrder?.Address,
                 Orders = orders,
                 Search = search,

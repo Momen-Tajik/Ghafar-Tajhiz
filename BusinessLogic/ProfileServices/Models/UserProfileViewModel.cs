@@ -7,6 +7,8 @@ namespace BusinessLogic.ProfileServices.Models
     {
         public int UserId { get; set; }
 
+        public string UserName { get; set; } ="کاربر";
+
         public string? MobileNumber { get; set; }
         public string? Address { get; set; }
 

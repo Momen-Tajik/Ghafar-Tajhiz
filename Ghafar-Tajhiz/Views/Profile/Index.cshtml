@@ -8,13 +8,14 @@
 
 <div class="user-dashboard">
 
-@*     <aside class="user-info">
+    <aside class="user-info">
         <div class="user-card">
             <h3>اطلاعات کاربر</h3>
-            <p><strong>شماره موبایل:</strong> @(string.IsNullOrEmpty(Model.MobileNumber) ? "ثبت نشده" : Model.MobileNumber)</p>
+            <p><strong>نام کاربری :</strong> @Model.UserName</p>
+            <p><strong>شماره موبایل:</strong> @Model.MobileNumber</p>
             <p><strong>آدرس:</strong> @(string.IsNullOrEmpty(Model.Address) ? "ثبت نشده" : Model.Address)</p>
         </div>
-    </aside> *@
+    </aside>
 
     <section class="user-orders">
 
