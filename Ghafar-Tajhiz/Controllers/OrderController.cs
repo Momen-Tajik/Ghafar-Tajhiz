@@ -75,5 +75,16 @@ namespace Ghafar_Tajhiz.Controllers
 
             return RedirectToAction("Index","Profile");
         }
+
+        public async Task<IActionResult> GetBasketCount()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Ok(0);   // not logged in -> empty basket
+
+            // Assuming you have a service to get basket items
+            var count = await _basketService.GetBasketItemCountAsync(Convert.ToInt32(userId));
+            return Ok(count);
+        }
     }
 }

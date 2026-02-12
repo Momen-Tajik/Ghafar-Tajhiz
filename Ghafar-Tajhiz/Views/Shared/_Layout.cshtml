@@ -25,15 +25,22 @@
         <div class="mobilenavbar hidden">
             <a><i id="mobileNavbarBtn" class="fa fa-bars" aria-hidden="true"></i></a>
             <a>Tajhizat-Tajik-Logo</a>
+            <a class="login-btn" asp-controller="Order" asp-action="Basket">
+                سبد خرید
+                <span id="cart-badge-mobile" class="cart-badge">0</span>
+            </a>
+
             @if (_signInManager.IsSignedIn(User))
             {
-                <a class="login-btn" asp-controller="Account" asp-action="Profile">پروفایل</a> <!-- دکمه ورود برای موبایل -->
+                <a class="login-btn" asp-controller="Profile" asp-action="Index">پروفایل</a> <!-- دکمه ورود برای موبایل -->
                 <a class="login-btn" asp-controller="Account" asp-action="Logout">خروج از حساب</a>
             }
             else
             {
                 <a class="login-btn" asp-controller="Account" asp-action="Login">ورود/ثبت نام</a> <!-- دکمه ورود برای موبایل -->
             }
+
+
         </div>
 
         <div class="desktopnavbar" id="desktopnavbar">
@@ -41,6 +48,11 @@
             <a asp-controller="Product" asp-action="ProductList">محصولات</a>
             <a>ارتباط با ما</a>
             <a asp-controller="Home" asp-action="aboutUs">درباره ما</a>
+
+            <a asp-controller="Order" asp-action="Basket">
+                سبد خرید
+                <span id="cart-badge-desktop" class="cart-badge">0</span>
+            </a>
 
             @if(_signInManager.IsSignedIn(User))
             {
@@ -52,7 +64,6 @@
                 <a class="login-btn"  asp-controller="Account" asp-action="Register">ورود/ثبت نام</a> <!-- دکمه ورود برای دسکتاپ -->
             }
 
-            <a asp-controller="Order" asp-action="Basket">سبد خرید</a>
             <a >Tajhizat-Tajik-Logo</a>
         </div>
     </nav>

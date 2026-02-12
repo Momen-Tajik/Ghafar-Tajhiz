@@ -59,15 +59,22 @@ namespace Ghafar_Tajhiz.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddProductComment(AddCommentDto model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddProductComment([FromBody] AddCommentDto model)
         {
-            var user = await _userManager.GetUserAsync(User);
+            if (model == null || string.IsNullOrWhiteSpace(model.text))
+                return BadRequest(new { res = false, msg = "اطلاعات نامعتبر است" });
 
-            var userName = user.FullName; // نام واقعی کاربر
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized(new { res = false, msg = "شما لاگین نکرده‌اید" });
+
+            var user = await _userManager.GetUserAsync(User);
+            var userName = user.FullName;
 
             await _commentService.CreateComment(model.text, model.productId, userName);
 
-            return RedirectToAction("Index", "Home");
+            return Ok(new { res = true, msg = "نظر شما با موفقیت ثبت شد" });
         }
     }
 }

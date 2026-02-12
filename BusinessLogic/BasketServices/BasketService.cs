@@ -187,6 +187,20 @@ namespace BusinessLogic.BasketServices
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
         }
+        public async Task<int> GetBasketItemCountAsync(int userId)
+        {
+            // Find the user's pending basket (only one such basket can exist)
+            var basket = await _basketRepository
+                .GetAll(b => b.UserId == userId && b.Status == BasketStatus.Pending)
+                .Include(b => b.BasketItems)          // include items to sum their quantities
+                .FirstOrDefaultAsync();
 
+            // No basket or no items -> count is 0
+            if (basket == null || basket.BasketItems == null)
+                return 0;
+
+            // Sum all quantities
+            return basket.BasketItems.Sum(bi => bi.Qty);
+        }
     }
 }

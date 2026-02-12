@@ -86,11 +86,12 @@
 
     <!-- فرم ثبت نظر -->
     <form asp-action="AddProductComment" asp-controller="Product" method="post" class="comment-form">
-        <input type="hidden" name="productId" value="@Model.ProductId" />
+        <input type="hidden" id="productId" name="productId" value="@Model.ProductId" />
+        @Html.AntiForgeryToken()
 
-        <textarea name="text" rows="4" placeholder="نظر خود را بنویسید..." required></textarea>
+        <textarea id="commentText" name="text" rows="4" placeholder="نظر خود را بنویسید..." required></textarea>
 
-        <button type="submit" class="btn-submit">ثبت نظر</button>
+        <button type="button" onclick="addComment()" class="btn-submit">ثبت نظر</button>
     </form>
 
     <!-- تعداد نظرات -->

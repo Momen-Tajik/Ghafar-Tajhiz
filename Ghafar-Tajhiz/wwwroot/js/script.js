@@ -217,6 +217,7 @@ function AddToBasket() {
                 showFailAlert('', data.msg);
             } else {
                 showSuccessAlert('', data.msg);
+                updateCartBadge()
             }
         })
         .catch(err => {
@@ -241,6 +242,7 @@ function RemoveBasketItem(id) {
         .then(data => {
             const row = document.getElementById("Basket_" + id);
             row.style.display = "none";
+            updateCartBadge()
         })
         .catch(err => console.error(err.message));
 
@@ -263,6 +265,75 @@ function validateCheckOutForm() {
 
     return true; // فرم ارسال میشه
 }
+
+function updateCartBadge() {
+    fetch('/Order/GetBasketCount')
+        .then(response => response.json())
+        .then(count => {
+            const badgeDesktop = document.getElementById('cart-badge-desktop');
+            const badgeMobile = document.getElementById('cart-badge-mobile');
+
+            if (badgeDesktop) {
+                badgeDesktop.textContent = count;
+                badgeDesktop.setAttribute('data-count', count);
+            }
+            if (badgeMobile) {
+                badgeMobile.textContent = count;
+                badgeMobile.setAttribute('data-count', count);
+            }
+        })
+        .catch(() => { });
+}
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', updateCartBadge);
+
+
+/*Comment*/
+
+function addComment() {
+    // Get values
+    const productId = parseInt(document.getElementById('productId').value);
+    const commentText = document.getElementById('commentText').value;
+    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+    // Validate
+    if (!commentText.trim()) {
+        showFailAlert('', 'متن نظر نمی‌تواند خالی باشد');
+        return;
+    }
+
+    // Send AJAX
+    fetch('/Product/AddProductComment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': token
+        },
+        body: JSON.stringify({
+            productId: productId,
+            text: commentText
+        })
+    })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) throw data;
+            return data;
+        })
+        .then(data => {
+            if (data.res === false) {
+                showFailAlert('', data.msg);
+            } else {
+                showSuccessAlert('', data.msg);
+                // ✅ Refresh the page after a short delay so user sees the success message
+                setTimeout(() => location.reload(), 750);
+            }
+        })
+        .catch(err => {
+            showFailAlert('', err.msg || 'خطای غیرمنتظره');
+        });
+}
+
 /* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT */
 
 function showSuccessAlert(title,text='موفق') {
@@ -271,7 +342,7 @@ function showSuccessAlert(title,text='موفق') {
         text: text,
         icon: 'success',
         showConfirmButton: false,
-        timer: 1500
+        timer: 1000
     });
 }
 
