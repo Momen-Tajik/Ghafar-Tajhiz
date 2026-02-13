@@ -23,6 +23,7 @@ namespace Ghafar_Tajhiz.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
+
             var model = await _profileService.GetUserProfile(
                 user.Id,
                 user.FullName,
@@ -34,6 +35,8 @@ namespace Ghafar_Tajhiz.Controllers
 
             return View(model);
         }
+
+
     }
 
 }

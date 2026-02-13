@@ -1,4 +1,6 @@
 ﻿using BusinessLogic.BasketServices;
+using BusinessLogic.ProductServices;
+using Ghafar_Tajhiz_Admin.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ghafar_Tajhiz_Admin.Controllers
@@ -21,6 +23,18 @@ namespace Ghafar_Tajhiz_Admin.Controllers
             ViewBag.Sort = sort;
 
             return View(data);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SetStateCommand([FromBody] StatusDto model)
+        {
+
+
+            await _basketService.SetState(model.BasketItemId, model.Status);
+
+            return Ok(new { res = true, msg = "محصول با موفقیت اضافه شد" });
+
         }
     }
 }

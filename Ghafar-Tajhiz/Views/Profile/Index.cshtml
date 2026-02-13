@@ -22,17 +22,21 @@
         <!-- Search -->
         <form method="get">
             <input type="text" name="search" value="@Model.Search" placeholder="جستجوی سفارش..." />
+
             <select name="status">
                 <option value="">همه</option>
-                <option value="Paid">پرداخت شده</option>
-                <option value="Sent">ارسال شده</option>
-                <option value="Canceled">لغو شده</option>
+                <option value="Paid" selected="@(Model.Status == BasketStatus.Paid)">پرداخت شده</option>
+                <option value="Shipped" selected="@(Model.Status == BasketStatus.Shipped)">ارسال شده</option>
+                <option value="Cancelled" selected="@(Model.Status == BasketStatus.Cancelled)">لغو شده</option>
             </select>
+
             <select name="sort">
-                <option value="paiddate">جدیدترین</option>
-                <option value="oldest">قدیمی‌ترین</option>
-                <option value="status">وضعیت</option>
+                <option value="paiddate" selected="@(Model.Sort=="paiddate")">جدیدترین</option>
+                <option value="oldest" selected="@(Model.Sort=="oldest")">قدیمی‌ترین</option>
+                <option value="status" selected="@(Model.Sort=="status")">وضعیت</option>
             </select>
+
+
             <button type="submit">اعمال فیلتر</button>
         </form>
 

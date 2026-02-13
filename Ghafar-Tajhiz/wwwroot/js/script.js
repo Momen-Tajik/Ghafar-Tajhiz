@@ -285,8 +285,6 @@ function updateCartBadge() {
         .catch(() => { });
 }
 
-// Run on page load
-document.addEventListener('DOMContentLoaded', updateCartBadge);
 
 
 /*Comment*/
@@ -354,3 +352,7 @@ function showFailAlert(title,text='ناموفق') {
         confirmButtonText: 'باشه'
     });
 }
+
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', updateCartBadge);
