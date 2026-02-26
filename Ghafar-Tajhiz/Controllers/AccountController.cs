@@ -51,12 +51,18 @@ namespace Ghafar_Tajhiz.Controllers
         {
             if (ModelState.IsValid)
             {
-                var res = await _signInManager.PasswordSignInAsync(model.PhoneNumber, model.Password, model.RememberMe, false);
+                var res = await _signInManager.PasswordSignInAsync(
+                    model.PhoneNumber,
+                    model.Password,
+                    model.RememberMe,
+                    false);
+
                 if (res.Succeeded)
-                {
                     return RedirectToAction("Index", "Home");
-                }
+
+                TempData["LoginError"] = "شماره موبایل یا رمز عبور اشتباه است";
             }
+
             return View(model);
         }
 

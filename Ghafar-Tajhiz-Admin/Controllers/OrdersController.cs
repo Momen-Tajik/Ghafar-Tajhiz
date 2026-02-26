@@ -33,7 +33,7 @@ namespace Ghafar_Tajhiz_Admin.Controllers
 
             await _basketService.SetState(model.BasketItemId, model.Status);
 
-            return Ok(new { res = true, msg = "محصول با موفقیت اضافه شد" });
+            return Ok(new { res = true, msg = "وضعیت سفارش با موفقیت تغیر کرد" });
 
         }
     }

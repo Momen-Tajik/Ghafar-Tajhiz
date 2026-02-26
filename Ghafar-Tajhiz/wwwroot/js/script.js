@@ -323,7 +323,6 @@ function addComment() {
                 showFailAlert('', data.msg);
             } else {
                 showSuccessAlert('', data.msg);
-                // ✅ Refresh the page after a short delay so user sees the success message
                 setTimeout(() => location.reload(), 750);
             }
         })
@@ -331,6 +330,27 @@ function addComment() {
             showFailAlert('', err.msg || 'خطای غیرمنتظره');
         });
 }
+
+
+/* LOGIN ERROR SWEETALERT */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const loginErrorDiv = document.getElementById("loginError");
+
+    if (!loginErrorDiv) return;
+
+    const errorMessage = loginErrorDiv.getAttribute("data-error");
+
+    if (errorMessage && errorMessage.trim() !== "") {
+        Swal.fire({
+            icon: 'error',
+            title: 'خطا',
+            text: errorMessage,
+            confirmButtonText: 'باشه'
+        });
+    }
+});
 
 /* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT */
 

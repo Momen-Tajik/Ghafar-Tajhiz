@@ -11,7 +11,7 @@
     })
         .then(res => res.json())
         .then(data => {
-            showSuccessAlert('', 'وضعیت سفارش با موفقیت تغییر کرد');
+            showSuccessAlert('', 'وضعیت سفارش با موفقیت تغیر کرد');
             setTimeout(() => window.location.reload(), 1000);
         })
         .catch(err => {

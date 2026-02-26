@@ -23,7 +23,7 @@
     <nav class="nav">
         <div class="mobilenavbar hidden">
             <a><i id="mobileNavbarBtn" class="fa fa-bars" aria-hidden="true"></i></a>
-            <a>Tajhizat-Tajik-Logo</a>
+            <a><img width="100px" src="~/asstes/icon/Logo.svg" alt="Alternate Text" /></a>
             <a class="login-btn" asp-controller="Order" asp-action="Basket">
                 سبد خرید
                 <span id="cart-badge-mobile" class="cart-badge">0</span>
@@ -45,8 +45,7 @@
         <div class="desktopnavbar" id="desktopnavbar">
             <a asp-controller="Home" asp-action="Index">صفحه اصلی</a>
             <a asp-controller="Product" asp-action="ProductList">محصولات</a>
-            <a>ارتباط با ما</a>
-            <a asp-controller="Home" asp-action="aboutUs">درباره ما</a>
+            
 
             <a asp-controller="Order" asp-action="Basket">
                 سبد خرید
@@ -63,7 +62,8 @@
                 <a class="login-btn"  asp-controller="Account" asp-action="Register">ورود/ثبت نام</a> <!-- دکمه ورود برای دسکتاپ -->
             }
 
-            <a >Tajhizat-Tajik-Logo</a>
+            <a asp-controller="Home" asp-action="aboutUs">درباره ما</a>
+            <a ><img width="100px" src="~/asstes/icon/Logo.svg" alt="Alternate Text" /></a>
         </div>
     </nav>
 
