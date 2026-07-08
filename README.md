@@ -276,13 +276,19 @@ PRODUCT ||--o{ BASKETITEM : ordered
 
 # 📸 Screenshots
 
-> Screenshots will be added soon.
 
-Suggested screenshots:
+> Product List
 
-- Home Page
-- Product List
-- Product Details
+<img width="1897" height="949" alt="Menu1" src="https://github.com/user-attachments/assets/ca28dcd7-1d07-40e5-91c1-62f2918335c7" />
+
+> Product Details
+
+<img width="1915" height="978" alt="ProductPage" src="https://github.com/user-attachments/assets/d80e1283-cebc-4055-b778-e3941bc8b7fa" />
+
+> Shopping Cart
+
+<img width="1914" height="981" alt="Basket" src="https://github.com/user-attachments/assets/22c25dd4-51c6-473d-9f98-7761a08b128e" />
+
 - Shopping Cart
 - Customer Profile
 - Login Page
