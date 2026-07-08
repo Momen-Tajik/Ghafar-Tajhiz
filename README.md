@@ -1,4 +1,4 @@
-<div align="center">
+<div align="left">
 
 # 🛒 Ghafar Tajhiz
 
@@ -266,21 +266,10 @@ Database implementation includes:
 
 # 📸 Screenshots
 
-Add screenshots inside the **screenshots** folder.
-
-Suggested screenshots:
-
-- Home Page
-- Product List
-- Product Details
-- Shopping Cart
-- Login
-- Customer Profile
-- Admin Dashboard
-- Product Management
-- Order Management
 
 
 ---
 
-<div align="center"> <sub>Built with ❤️ and a lot of .NET</sub> </div> ```
+<div align="left"> 
+    
+__Made with <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Symbols/Heart%20On%20Fire.webp" alt="Heart On Fire" width="20" height="20" />__
