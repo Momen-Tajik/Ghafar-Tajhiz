@@ -1,14 +1,16 @@
-<div align="left">
+<div align="center">
 
 # 🛒 Ghafar Tajhiz
 
-### A Layered ASP.NET Core MVC E-Commerce Platform
+### A Modern Multi-Layer E-Commerce Platform Built with ASP.NET Core MVC
 
-[![.NET](https://img.shields.io/badge/.NET-8-512BD4?style=flat&logo=dotnet)](https://dotnet.microsoft.com/)
-[![ASP.NET Core](https://img.shields.io/badge/ASP.NET-Core-blue?style=flat&logo=dotnet)](https://learn.microsoft.com/aspnet/core)
-[![Entity Framework Core](https://img.shields.io/badge/EF-Core-green?style=flat)](https://learn.microsoft.com/ef/core)
-[![SQL Server](https://img.shields.io/badge/SQL-Server-red?style=flat&logo=microsoftsqlserver)](https://www.microsoft.com/sql-server)
-[![Architecture](https://img.shields.io/badge/Architecture-Layered-success?style=flat)](#)
+![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=csharp&logoColor=white)
+![.NET 8](https://img.shields.io/badge/.NET%208-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![Entity Framework Core](https://img.shields.io/badge/Entity%20Framework%20Core-68217A?style=for-the-badge)
+![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 
 *A multi-layer online shopping platform consisting of two web applications: a Customer Store and an Admin Dashboard.*
 
@@ -19,11 +21,13 @@
 # 📑 Table of Contents
 
 - Overview
+- Applications
 - Project Highlights
 - Features
 - Architecture
 - Solution Structure
 - Database Design
+- Technical Features
 - Technology Stack
 - Screenshots
 
@@ -31,35 +35,48 @@
 
 # 📖 Overview
 
-**Ghafar Tajhiz** is a multi-layer e-commerce application developed with **ASP.NET Core MVC (.NET 8)** and **Entity Framework Core**.
+**Ghafar Tajhiz** is a multi-layer e-commerce application built with **ASP.NET Core MVC (.NET 8)**, **Entity Framework Core**, and **SQL Server**.
 
-The solution consists of two separate web applications sharing the same **Business Logic** and **Data Access** layers.
+The solution contains two independent web applications that share the same **Business Logic** and **Data Access** layers.
 
-### Customer Website
+The project was developed to practice building scalable ASP.NET Core applications while applying software engineering principles such as layered architecture, dependency injection, repository pattern, asynchronous programming, and maintainable application design.
 
-- Browse products
-- Search products
-- Sort products
-- Pagination
-- Product details
-- Shopping cart
-- Checkout
-- Order history
-- Product comments
-- Authentication
-- Customer profile
+---
 
-### Admin Dashboard
+# 🖥 Applications
 
-- Product management
-- Category management
-- Product image upload
-- Order management
-- Approve / Cancel orders
-- Search orders
-- Sort orders
+## 🛍 Customer Website
 
-The project was developed to demonstrate software engineering principles including layered architecture, repository pattern, service layer, dependency injection and maintainable application design.
+Customers can:
+
+- Register and Login
+- Browse Products
+- View Product Details
+- Search Products
+- Sort Products
+- Browse with Pagination
+- Add Products to Shopping Cart
+- Remove Products from Cart
+- Checkout Orders
+- View Order History
+- Submit Product Comments
+- Manage Personal Profile
+
+---
+
+## ⚙️ Admin Dashboard
+
+Administrators can:
+
+- Manage Products (CRUD)
+- Manage Categories (CRUD)
+- Upload Product Images
+- Delete Uploaded Images
+- Manage Customer Orders
+- Approve Orders
+- Cancel Orders
+- Search Orders
+- Sort Orders
 
 ---
 
@@ -67,34 +84,32 @@ The project was developed to demonstrate software engineering principles includi
 
 | Area | Implementation |
 |------|----------------|
-| Architecture | Layered Architecture |
+| Architecture | Multi-Layer Architecture |
 | Backend | ASP.NET Core MVC (.NET 8) |
 | ORM | Entity Framework Core |
 | Database | SQL Server |
 | Authentication | ASP.NET Identity |
 | Data Access | Repository Pattern |
 | Business Logic | Service Layer |
-| Dependency Injection | Built-in DI |
+| Dependency Injection | Built-in Dependency Injection |
 | Validation | DataAnnotations |
 | Programming | Async / Await |
 | Querying | LINQ |
-| Frontend | Razor Views + HTML + CSS + JavaScript |
+| Frontend | Razor Views, HTML, CSS, JavaScript |
 
 ---
 
 # ✨ Features
 
-## Customer
+## Customer Features
 
-- User Registration & Login
-- Cookie Authentication
-- Product Listing
+- Authentication
+- Product Catalog
 - Product Details
 - Product Search
 - Product Sorting
 - Pagination
 - Shopping Cart
-- Add / Remove Basket Items
 - Basket Counter
 - Checkout
 - Customer Profile
@@ -103,23 +118,23 @@ The project was developed to demonstrate software engineering principles includi
 
 ---
 
-## Admin
+## Admin Features
 
-- Product CRUD
-- Category CRUD
+- Product Management (CRUD)
+- Category Management (CRUD)
 - Product Image Upload
 - Product Image Delete
 - Order Management
 - Order Approval
 - Order Cancellation
-- Search Orders
-- Sort Orders
+- Order Search
+- Order Sorting
 
 ---
 
 # 🏗 Architecture
 
-The application follows a layered architecture to keep responsibilities separated.
+The project follows a **Layered Architecture** to keep responsibilities separated.
 
 ```mermaid
 graph TD
@@ -128,19 +143,15 @@ Presentation["Presentation Layer<br/>MVC Controllers & Razor Views"]
 
 Business["Business Logic Layer<br/>Services"]
 
-Repository["Repository Layer"]
+Data["Data Access Layer<br/>Repositories"]
 
-EF["Entity Framework Core"]
-
-SQL[(SQL Server)]
+Database[(SQL Server)]
 
 Presentation --> Business
 
-Business --> Repository
+Business --> Data
 
-Repository --> EF
-
-EF --> SQL
+Data --> Database
 ```
 
 ---
@@ -150,8 +161,6 @@ EF --> SQL
 ```
 Ghafar-Tajhiz
 
-│
-
 ├── BusinessLogic
 │   ├── BasketServices
 │   ├── BasketItemServices
@@ -160,25 +169,19 @@ Ghafar-Tajhiz
 │   ├── ProductServices
 │   ├── ProfileServices
 │   └── FileUpload
-
 │
-
 ├── DataAccess
 │   ├── Data
 │   ├── Models
 │   ├── Repositories
 │   ├── Enums
 │   └── Migrations
-
 │
-
 ├── Ghafar-Tajhiz
 │   ├── Controllers
 │   ├── Views
 │   └── wwwroot
-
 │
-
 └── Ghafar-Tajhiz-Admin
     ├── Controllers
     ├── Views
@@ -189,7 +192,7 @@ Ghafar-Tajhiz
 
 # 🗄 Database Design
 
-Main entities:
+### Main Entities
 
 - User
 - Role
@@ -213,7 +216,7 @@ BASKET ||--o{ BASKETITEM : contains
 PRODUCT ||--o{ BASKETITEM : ordered
 ```
 
-Database implementation includes:
+### Database Features
 
 - Entity Framework Core Code First
 - Composite Unique Index for Basket Items
@@ -224,25 +227,26 @@ Database implementation includes:
 
 ---
 
-# ⚙ Technical Features
+# ⚡ Technical Features
 
+- Layered Architecture
 - Repository Pattern
 - Service Layer
-- Layered Architecture
 - Dependency Injection
 - Entity Framework Core
 - ASP.NET Identity
 - Cookie Authentication
-- DTOs
+- DTO Pattern
 - LINQ
-- Async / Await
+- Async Programming
 - Razor Views
-- AJAX Requests
 - Partial Views
+- AJAX Requests
 - File Upload
 - Data Validation
 - Pagination
-- Search & Sorting
+- Product Search
+- Product Sorting
 
 ---
 
@@ -257,19 +261,39 @@ Database implementation includes:
 
 ## Frontend
 
+- Razor Views
 - HTML5
 - CSS3
 - JavaScript
-- Razor Views
+
+## Development Tools
+
+- Visual Studio 2022
+- Git
+- GitHub
 
 ---
 
 # 📸 Screenshots
 
+> Screenshots will be added soon.
 
+Suggested screenshots:
+
+- Home Page
+- Product List
+- Product Details
+- Shopping Cart
+- Customer Profile
+- Login Page
+- Admin Dashboard
+- Product Management
+- Order Management
 
 ---
 
-<div align="left"> 
+<div align="left">
     
 __Made with <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Symbols/Heart%20On%20Fire.webp" alt="Heart On Fire" width="20" height="20" />__
+
+</div>
