@@ -12,7 +12,7 @@
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 
-*A multi-layer online shopping platform consisting of two web applications: a Customer Store and an Admin Dashboard.*
+*A multi-layer e-commerce platform consisting of two web applications: a Customer Store and an Admin Dashboard.*
 
 </div>
 
@@ -22,12 +22,10 @@
 
 - Overview
 - Applications
-- Project Highlights
-- Features
 - Architecture
+- Features
 - Solution Structure
 - Database Design
-- Technical Features
 - Technology Stack
 - Screenshots
 
@@ -35,11 +33,11 @@
 
 # 📖 Overview
 
-**Ghafar Tajhiz** is a multi-layer e-commerce application built with **ASP.NET Core MVC (.NET 8)**, **Entity Framework Core**, and **SQL Server**.
+**Ghafar Tajhiz** is a modern multi-layer e-commerce platform built with **ASP.NET Core MVC (.NET 8)**, **Entity Framework Core**, and **SQL Server**.
 
-The solution contains two independent web applications that share the same **Business Logic** and **Data Access** layers.
+The solution contains two independent web applications that share the same Business Logic and Data Access layers.
 
-The project was developed to practice building scalable ASP.NET Core applications while applying software engineering principles such as layered architecture, dependency injection, repository pattern, asynchronous programming, and maintainable application design.
+The project was developed to simulate a real-world online shopping platform while applying software engineering principles such as layered architecture, dependency injection, repository pattern, asynchronous programming, and clean separation of concerns.
 
 ---
 
@@ -47,94 +45,31 @@ The project was developed to practice building scalable ASP.NET Core application
 
 ## 🛍 Customer Website
 
-Customers can:
-
-- Register and Login
+- User Registration & Login
 - Browse Products
-- View Product Details
-- Search Products
-- Sort Products
-- Browse with Pagination
-- Add Products to Shopping Cart
-- Remove Products from Cart
-- Checkout Orders
-- View Order History
-- Submit Product Comments
-- Manage Personal Profile
+- Product Details
+- Product Search & Sorting
+- Pagination
+- Shopping Cart
+- Checkout
+- Order History
+- Product Comments
+- Profile Management
 
 ---
 
 ## ⚙️ Admin Dashboard
 
-Administrators can:
-
-- Manage Products (CRUD)
-- Manage Categories (CRUD)
-- Upload Product Images
-- Delete Uploaded Images
-- Manage Customer Orders
-- Approve Orders
-- Cancel Orders
-- Search Orders
-- Sort Orders
-
----
-
-# 🚀 Project Highlights
-
-| Area | Implementation |
-|------|----------------|
-| Architecture | Multi-Layer Architecture |
-| Backend | ASP.NET Core MVC (.NET 8) |
-| ORM | Entity Framework Core |
-| Database | SQL Server |
-| Authentication | ASP.NET Identity |
-| Data Access | Repository Pattern |
-| Business Logic | Service Layer |
-| Dependency Injection | Built-in Dependency Injection |
-| Validation | DataAnnotations |
-| Programming | Async / Await |
-| Querying | LINQ |
-| Frontend | Razor Views, HTML, CSS, JavaScript |
-
----
-
-# ✨ Features
-
-## Customer Features
-
-- Authentication
-- Product Catalog
-- Product Details
-- Product Search
-- Product Sorting
-- Pagination
-- Shopping Cart
-- Basket Counter
-- Checkout
-- Customer Profile
-- Order History
-- Product Comments
-
----
-
-## Admin Features
-
 - Product Management (CRUD)
 - Category Management (CRUD)
-- Product Image Upload
-- Product Image Delete
+- Product Image Upload/Delete
 - Order Management
-- Order Approval
-- Order Cancellation
-- Order Search
-- Order Sorting
+- Order Approval & Cancellation
+- Order Search & Sorting
 
 ---
 
 # 🏗 Architecture
-
-The project follows a **Layered Architecture** to keep responsibilities separated.
 
 ```mermaid
 graph TD
@@ -156,9 +91,53 @@ Data --> Database
 
 ---
 
+# ✨ Features
+
+## Architecture & Backend
+
+- Layered Architecture
+- Repository Pattern
+- Service Layer
+- Dependency Injection
+- Entity Framework Core
+- ASP.NET Identity
+- Cookie Authentication
+- DTO Pattern
+- Async Programming
+- LINQ
+
+---
+
+## Frontend
+
+- Razor Views
+- Partial Views
+- HTML5
+- CSS3
+- JavaScript
+- AJAX Requests
+
+---
+
+## Business Features
+
+- Authentication
+- Product Catalog
+- Shopping Cart
+- Checkout
+- Customer Profile
+- Order Management
+- Product Comments
+- File Upload
+- Pagination
+- Product Search & Sorting
+- Data Validation
+
+---
+
 # 📁 Solution Structure
 
-```
+```text
 Ghafar-Tajhiz
 
 ├── BusinessLogic
@@ -219,34 +198,11 @@ PRODUCT ||--o{ BASKETITEM : ordered
 ### Database Features
 
 - Entity Framework Core Code First
-- Composite Unique Index for Basket Items
 - Foreign Key Constraints
+- Composite Unique Index
 - Cascade Delete
 - Restrict Delete
 - DataAnnotations Validation
-
----
-
-# ⚡ Technical Features
-
-- Layered Architecture
-- Repository Pattern
-- Service Layer
-- Dependency Injection
-- Entity Framework Core
-- ASP.NET Identity
-- Cookie Authentication
-- DTO Pattern
-- LINQ
-- Async Programming
-- Razor Views
-- Partial Views
-- AJAX Requests
-- File Upload
-- Data Validation
-- Pagination
-- Product Search
-- Product Sorting
 
 ---
 
@@ -326,8 +282,9 @@ PRODUCT ||--o{ BASKETITEM : ordered
 
 ---
 
+
 <div align="left">
-    
-__Made with <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Symbols/Heart%20On%20Fire.webp" alt="Heart On Fire" width="20" height="20" />__
+
+__Made with <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Symbols/Heart%20On%20Fire.webp" width="20" height="20" />__
 
 </div>
