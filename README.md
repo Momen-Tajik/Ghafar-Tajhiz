@@ -281,20 +281,48 @@ PRODUCT ||--o{ BASKETITEM : ordered
 
 <img width="1897" height="949" alt="Menu1" src="https://github.com/user-attachments/assets/ca28dcd7-1d07-40e5-91c1-62f2918335c7" />
 
+---
+
 > Product Details
 
 <img width="1915" height="978" alt="ProductPage" src="https://github.com/user-attachments/assets/d80e1283-cebc-4055-b778-e3941bc8b7fa" />
+
+---
 
 > Shopping Cart
 
 <img width="1914" height="981" alt="Basket" src="https://github.com/user-attachments/assets/22c25dd4-51c6-473d-9f98-7761a08b128e" />
 
-- Shopping Cart
-- Customer Profile
-- Login Page
-- Admin Dashboard
-- Product Management
-- Order Management
+---
+
+> Customer Profile
+
+<img width="1920" height="983" alt="Profile" src="https://github.com/user-attachments/assets/ffcca4db-f7ea-46ba-aaf4-0b7748547b12" />
+
+---
+
+> Login Page
+
+<img width="1920" height="984" alt="Login" src="https://github.com/user-attachments/assets/981bfa20-e9d7-4613-94d2-ff9c5ec1cfcd" />
+
+---
+
+> Admin Dashboard
+
+<img width="1920" height="957" alt="AdminCategories" src="https://github.com/user-attachments/assets/829fab9b-7951-4fb6-a836-e084ba9c4ba8" />
+
+---
+
+> Product Management
+
+<img width="1915" height="982" alt="AdminProducts" src="https://github.com/user-attachments/assets/ad1759ac-8a87-4e7a-aa4b-a3eb1f8ce068" />
+
+---
+
+> Order Management
+
+<img width="1920" height="985" alt="AdminOrders" src="https://github.com/user-attachments/assets/b8665170-fc86-43a1-9d52-2206f38dd984" />
+
 
 ---
 
