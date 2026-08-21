@@ -51,21 +51,42 @@
 
     <!-- Quick Actions -->
     <div class="admin-card">
+
         <h5 class="mb-3">دسترسی سریع</h5>
 
         <div class="d-flex flex-wrap gap-3">
-            <a asp-controller="Products" asp-action="Create" class="btn btn-primary">
-                <i class="fa fa-plus"></i> افزودن محصول
+
+            <a asp-controller="Products"
+               asp-action="Create"
+               class="btn btn-primary">
+
+                <i class="fa fa-plus"></i>
+                افزودن محصول
+
             </a>
 
-            <a asp-controller="Orders" asp-action="Index" class="btn btn-outline-secondary">
-                <i class="fa fa-shopping-cart"></i> مشاهده سفارش‌ها
+
+            <a asp-controller="Orders"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+
+                <i class="fa fa-shopping-cart"></i>
+                مشاهده سفارش‌ها
+
             </a>
 
-            <a asp-controller="Users" asp-action="Index" class="btn btn-outline-secondary">
-                <i class="fa fa-users"></i> مدیریت کاربران
+
+            <a asp-controller="AdminUser"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+
+                <i class="fa fa-users"></i>
+                مدیریت کاربران
+
             </a>
+
         </div>
+
     </div>
 
 </div>

@@ -1,17 +1,17 @@
 
 /*Navbar*//*Navbar*//*Navbar*/
-var navBtn = document.getElementById("mobileNavbarBtn");
-var desktopNav = document.getElementById("desktopnavbar");
+document.addEventListener("DOMContentLoaded", function () {
 
-navBtn.addEventListener("click", () => {
-    if (desktopNav.style.display === "flex") {
-        desktopNav.style.display = "none";
-    } else {
-        desktopNav.style.display = "flex";
-        desktopNav.style.flexDirection = "column";
+    var navBtn = document.getElementById("mobileNavbarBtn");
+    var desktopNav = document.getElementById("desktopnavbar");
+
+    if (navBtn && desktopNav) {
+        navBtn.addEventListener("click", function () {
+            desktopNav.classList.toggle("active");
+        });
     }
-});
 
+});
 // تابع برای فرمت کردن قیمت
 function formatPrice(price) {
     // تبدیل به عدد و سپس فرمت با جداکننده هزارگان

@@ -30,51 +30,44 @@ a {
 /* Navbar */ /* Navbar *//* Navbar */
 
 
-.hidden {
-    display: none;
-}
-
-/* Make the entire navbar sticky */
+/* Navbar wrapper */
 .nav {
     position: sticky;
     top: 0;
-    z-index: 1000; /* stays above other content */
+    z-index: 1000;
     background-color: #1e1e1ed4;
-    color: whitesmoke;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* optional: subtle shadow */
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    position: relative; /* خیلی مهم برای absolute */
 }
 
-/* Prevent content from hiding under the sticky navbar */
-.container {
-    padding-top: 20px; /* adjust to match your navbar height */
-}
-
-/* For mobile, ensure the toggled menu also stays on top */
+/* ================= DESKTOP ================= */
 .desktopnavbar {
-    position: sticky; /* if it becomes visible on mobile */
-    top: 0;
-    z-index: 999;
-
     display: flex;
-    justify-content: right;
     align-items: center;
+    height: 80px;
+    padding: 0 20px;
+    direction: rtl;
 }
 
     .desktopnavbar a {
         position: relative;
-        padding: 15px 25px;
+        padding: 0 20px;
+        line-height: 80px;
         font-size: 15px;
+        text-decoration: none;
+        color: white;
     }
 
         .desktopnavbar a::after {
             content: "";
             position: absolute;
-            left: 50%;
             bottom: 0;
+            left: 50%;
             width: 0;
             height: 3px;
             background-color: #FF7043;
-            transition: all 0.5s ease;
+            transition: 0.3s;
             transform: translateX(-50%);
         }
 
@@ -82,47 +75,64 @@ a {
             width: 100%;
         }
 
-/* دکمه ورود (سمت مخالف) */
-.login-btn {
-    margin-left: auto; /* باعث می‌شود سمت مخالف باشد */
+    .desktopnavbar .logo {
+        margin-right: auto;
+        height: 55px;
+    }
+/* ================= MOBILE ================= */
+
+.mobilenavbar {
+    display: none;
+    width: 100%; /* مهم */
+    height: 70px;
+    padding: 0 15px;
+    align-items: center;
+    justify-content: space-between; /* این همونی هست که میخوای */
 }
 
-/* موبایل */
-.mobilenavbar a {
-    position: relative;
-    padding: 15px 25px;
-    font-size: 15px;
+    .mobilenavbar i {
+        font-size: 22px;
+        cursor: pointer;
+    }
+
+.mobile-logo {
+    height: 45px;
 }
 
-    .mobilenavbar a::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        bottom: 0;
-        width: 0;
-        height: 3px;
-        background-color: #FF7043;
-        transition: all 0.5s ease;
-        transform: translateX(-50%);
-    }
+.mobile-logo {
+    height: 45px;
+}
 
-    .mobilenavbar a:hover::after {
-        width: 100%;
-    }
-
-@media (max-width:635px) {
-    .mobilenavbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+/* Mobile menu style when opened */
+@media (max-width: 635px) {
 
     .desktopnavbar {
         display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 70px; /* دقیق برابر با mobilenavbar */
+        right: 0;
+        width: 100%;
+        background-color: #1e1e1ed4;
     }
 
-    .login-btn {
-        margin-left: 0; /* موبایل، راست یا چپ می‌توانید تغییر دهید */
+        .desktopnavbar.active {
+            display: flex;
+        }
+
+        .desktopnavbar .logo {
+            display: none;
+        }
+
+        .desktopnavbar a {
+            width: 100%;
+            text-align: center;
+            line-height: 50px;
+            padding: 10px 0;
+        }
+
+    .mobilenavbar {
+        display: flex; /* فقط داخل موبایل فعال شود */
     }
 }
 
@@ -1530,4 +1540,321 @@ a {
         .order-item span {
             font-size: 12px;
         }
+}
+
+/* =========================================================
+   ABOUT US PAGE
+   ========================================================= */
+
+
+/* ================= HERO ================= */
+
+.about-hero {
+    min-height: 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient( rgba(30, 30, 30, 0.82), rgba(30, 30, 30, 0.82) );
+    color: #fff;
+    padding: 60px 20px;
+}
+
+.about-hero-content {
+    max-width: 800px;
+}
+
+.about-badge {
+    display: inline-block;
+    background-color: #FF7043;
+    color: #fff;
+    padding: 7px 18px;
+    border-radius: 30px;
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+
+.about-hero h1 {
+    margin: 0 0 15px;
+    font-size: 38px;
+    font-weight: bold;
+}
+
+.about-hero p {
+    margin: 0;
+    color: #ddd;
+    font-size: 17px;
+    line-height: 2;
+}
+
+
+/* ================= GENERAL SECTION ================= */
+
+.about-introduction,
+.about-values,
+.about-mission,
+.about-cta {
+    padding: 70px 25px;
+}
+
+.about-introduction-content {
+    max-width: 1000px;
+    margin: auto;
+}
+
+
+/* ================= SECTION TITLE ================= */
+
+.about-section-title {
+    margin-bottom: 30px;
+}
+
+    .about-section-title span,
+    .about-small-title {
+        color: #FF7043;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .about-section-title h2 {
+        margin-top: 8px;
+        font-size: 27px;
+        color: #222;
+    }
+
+    .about-section-title.center {
+        text-align: center;
+    }
+
+
+/* ================= INTRODUCTION ================= */
+
+.about-introduction {
+    background-color: #fff;
+}
+
+.about-introduction-content p {
+    color: #555;
+    line-height: 2.2;
+    font-size: 15px;
+    text-align: justify;
+    margin-bottom: 15px;
+}
+
+
+/* ================= VALUES ================= */
+
+.about-values {
+    background-color: #FAFAFA;
+}
+
+.about-values-grid {
+    max-width: 1100px;
+    margin: 40px auto 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.about-value-card {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 30px 20px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .about-value-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+.about-value-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: rgba(255, 112, 67, 0.1);
+    color: #FF7043;
+    font-size: 25px;
+}
+
+.about-value-card h3 {
+    font-size: 17px;
+    margin-bottom: 12px;
+}
+
+.about-value-card p {
+    color: #777;
+    font-size: 13px;
+    line-height: 1.9;
+    margin: 0;
+}
+
+
+/* ================= MISSION ================= */
+
+.about-mission {
+    background-color: #fff;
+}
+
+.about-mission-content {
+    max-width: 1100px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+}
+
+.about-mission-text {
+    flex: 1;
+}
+
+    .about-mission-text h2 {
+        font-size: 28px;
+        margin: 10px 0 20px;
+    }
+
+    .about-mission-text p {
+        color: #666;
+        font-size: 14px;
+        line-height: 2.1;
+        text-align: justify;
+    }
+
+
+.about-mission-list {
+    flex: 0 0 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+    .about-mission-list div {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background-color: #FAFAFA;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 15px 20px;
+        color: #444;
+        transition: 0.2s;
+    }
+
+        .about-mission-list div:hover {
+            border-color: #FF7043;
+        }
+
+    .about-mission-list i {
+        color: #FF7043;
+        width: 25px;
+        text-align: center;
+        font-size: 18px;
+    }
+
+
+/* ================= CTA ================= */
+
+.about-cta {
+    background-color: #1E1E1E;
+    text-align: center;
+    color: #fff;
+}
+
+    .about-cta h2 {
+        margin-bottom: 12px;
+        font-size: 26px;
+    }
+
+    .about-cta p {
+        color: #BDBDBD;
+        margin-bottom: 25px;
+        font-size: 14px;
+    }
+
+.about-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #FF7043;
+    color: #fff !important;
+    padding: 11px 25px;
+    border-radius: 7px;
+    transition: 0.3s;
+}
+
+    .about-cta-btn:hover {
+        background-color: #E64A19;
+        transform: translateY(-2px);
+    }
+
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+
+    .about-values-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .about-mission-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 35px;
+    }
+
+    .about-mission-list {
+        flex: none;
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .about-hero {
+        min-height: 300px;
+        padding: 40px 20px;
+    }
+
+        .about-hero h1 {
+            font-size: 28px;
+        }
+
+        .about-hero p {
+            font-size: 14px;
+        }
+
+
+    .about-introduction,
+    .about-values,
+    .about-mission,
+    .about-cta {
+        padding: 50px 18px;
+    }
+
+
+    .about-section-title h2 {
+        font-size: 22px;
+    }
+
+
+    .about-values-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .about-mission-text h2 {
+        font-size: 23px;
+    }
+
+
+    .about-cta h2 {
+        font-size: 22px;
+    }
 }

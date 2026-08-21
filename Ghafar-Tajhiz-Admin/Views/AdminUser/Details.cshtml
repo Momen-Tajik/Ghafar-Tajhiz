@@ -1,0 +1,214 @@
+﻿@model DataAccess.Models.User
+
+@{
+    ViewData["Title"] = "جزئیات کاربر";
+
+    var roles = ViewBag.Roles as IList<string> ?? new List<string>();
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>جزئیات کاربر</h2>
+
+            <p class="text-muted mb-0">
+                اطلاعات حساب کاربری
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <!-- شناسه -->
+            <p>
+                <strong>شناسه:</strong>
+                @Model.Id
+            </p>
+
+
+            <!-- نام -->
+            <p>
+                <strong>نام و نام خانوادگی:</strong>
+
+                @(string.IsNullOrWhiteSpace(Model.FullName)
+                    ? "-"
+                    : Model.FullName)
+            </p>
+
+
+            <!-- شماره تلفن -->
+            <p>
+                <strong>شماره تلفن:</strong>
+
+                @(string.IsNullOrWhiteSpace(Model.PhoneNumber)
+                    ? "-"
+                    : Model.PhoneNumber)
+            </p>
+
+
+            <!-- Email -->
+            <p>
+                <strong>Email:</strong>
+
+                @(string.IsNullOrWhiteSpace(Model.Email)
+                    ? "-"
+                    : Model.Email)
+            </p>
+
+
+            <!-- Username -->
+            <p>
+                <strong>نام کاربری:</strong>
+
+                @(string.IsNullOrWhiteSpace(Model.UserName)
+                    ? "-"
+                    : Model.UserName)
+            </p>
+
+
+            <!-- Role -->
+            <p>
+
+                <strong>Role:</strong>
+
+                @if (roles.Any())
+                {
+                    foreach (var role in roles)
+                    {
+                        <span class="badge bg-primary me-1">
+                            @role
+                        </span>
+                    }
+                }
+                else
+                {
+                    <span class="badge bg-secondary">
+                        بدون نقش
+                    </span>
+                }
+
+            </p>
+
+
+            <!-- وضعیت رمز عبور -->
+            <p>
+
+                <strong>رمز عبور:</strong>
+
+                @if (!string.IsNullOrEmpty(Model.PasswordHash))
+                {
+                    <span class="badge bg-success">
+                        تنظیم شده
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">
+                        تنظیم نشده
+                    </span>
+                }
+
+            </p>
+
+
+            <!-- وضعیت شماره تلفن -->
+            <p>
+
+                <strong>تأیید شماره تلفن:</strong>
+
+                @if (Model.PhoneNumberConfirmed)
+                {
+                    <span class="badge bg-success">
+                        تأیید شده
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">
+                        تأیید نشده
+                    </span>
+                }
+
+            </p>
+
+
+            <!-- وضعیت ایمیل -->
+            <p>
+
+                <strong>تأیید ایمیل:</strong>
+
+                @if (Model.EmailConfirmed)
+                {
+                    <span class="badge bg-success">
+                        تأیید شده
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">
+                        تأیید نشده
+                    </span>
+                }
+
+            </p>
+
+
+            <!-- وضعیت قفل -->
+            <p>
+
+                <strong>وضعیت حساب:</strong>
+
+                @if (Model.LockoutEnd.HasValue &&
+                Model.LockoutEnd.Value > DateTimeOffset.UtcNow)
+                {
+                    <span class="badge bg-danger">
+                        قفل شده
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-success">
+                        فعال
+                    </span>
+                }
+
+            </p>
+
+
+            <hr />
+
+
+            <!-- دکمه‌ها -->
+            <div class="mt-3">
+
+                <a asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-warning">
+
+                    <i class="fa fa-edit"></i>
+                    ویرایش کاربر
+
+                </a>
+
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+
+                    <i class="fa fa-arrow-right"></i>
+                    بازگشت
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

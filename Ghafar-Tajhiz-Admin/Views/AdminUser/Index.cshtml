@@ -1,0 +1,171 @@
+﻿@model IEnumerable<DataAccess.Models.User>
+
+@{
+    ViewData["Title"] = "مدیریت کاربران";
+}
+
+<div class="admin-dashboard">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold">
+                مدیریت کاربران
+            </h2>
+
+            <p class="text-muted mb-0">
+                لیست کاربران ثبت‌نام شده در سیستم
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="admin-card">
+
+        <div class="table-responsive">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["Success"]
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["Error"]
+                </div>
+            }
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            #
+                        </th>
+
+                        <th>
+                            نام و نام خانوادگی
+                        </th>
+
+                        <th>
+                            شماره موبایل
+                        </th>
+
+                        <th>
+                            ایمیل
+                        </th>
+
+                        <th>
+                            عملیات
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        int counter = 1;
+
+                        foreach (var user in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @counter
+                                </td>
+
+                                <td>
+                                    @(user.FullName ?? "-")
+                                </td>
+
+                                <td>
+                                    @(user.PhoneNumber ?? "-")
+                                </td>
+
+                                <td>
+                                    @(user.Email ?? "-")
+                                </td>
+
+                                <td>
+
+                                    <a asp-controller="AdminUser"
+                                       asp-action="Details"
+                                       asp-route-id="@user.Id"
+                                       class="btn btn-sm btn-info">
+
+                                        <i class="fa fa-eye"></i>
+                                        جزئیات
+
+                                    </a>
+
+
+                                    <a asp-controller="AdminUser"
+                                       asp-action="Edit"
+                                       asp-route-id="@user.Id"
+                                       class="btn btn-sm btn-warning">
+
+                                        <i class="fa fa-edit"></i>
+                                        ویرایش
+
+                                    </a>
+
+
+                                    <form asp-controller="AdminUser"
+                                          asp-action="Delete"
+                                          asp-route-id="@user.Id"
+                                          method="post"
+                                          style="display:inline;">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-danger"
+                                                onclick="return confirm('آیا از حذف این کاربر مطمئن هستید؟');">
+
+                                            <i class="fa fa-trash"></i>
+                                            حذف
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                            counter++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+
+                            <td colspan="5"
+                                class="text-center text-muted">
+
+                                هیچ کاربری پیدا نشد.
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

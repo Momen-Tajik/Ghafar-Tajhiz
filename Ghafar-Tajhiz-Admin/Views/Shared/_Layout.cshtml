@@ -1,48 +1,167 @@
 ﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
+
     <meta charset="utf-8" />
-    <title>@ViewData["Title"] | پنل مدیریت</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 
-    <!-- SweetAlert2 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <!-- SweetAlert2 JS -->
+    <title>
+        @ViewData["Title"] | پنل مدیریت
+    </title>
 
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/admin.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
 </head>
+
+
 <body class="admin-body">
 
+
+    <!-- Navbar -->
+
     <header class="admin-navbar">
-        <div class="title">پنل مدیریت Ghafar Tajhiz</div>
-        <a asp-controller="Account" asp-action="Logout" class="logout">خروج</a>
+
+        <div class="title">
+            پنل مدیریت Ghafar Tajhiz
+        </div>
+
+        <a asp-controller="AdminAccount"
+           asp-action="Logout"
+           class="logout">
+
+            خروج
+
+        </a>
+
     </header>
 
+
+
     <div class="admin-container">
+
+
+        <!-- Sidebar -->
+
         <aside class="admin-sidebar">
+
             <ul>
-                <li><a asp-controller="Home" asp-action="index"><i class="fa fa-dashboard"></i> داشبورد</a></li>
-                <li><a asp-controller="Categories" asp-action="Index"><i class="fa fa-list"></i> دسته‌بندی‌ها</a></li>
-                <li><a asp-controller="Products" asp-action="Index"><i class="fa fa-cube"></i> محصولات</a></li>
-                <li><a asp-controller="Orders" asp-action="Index"><i class="fa fa-shopping-cart"></i> سفارش‌ها</a></li>
-                <li><a asp-controller="Users" asp-action="Index"><i class="fa fa-users"></i> کاربران</a></li>
+
+                <li>
+
+                    <a asp-controller="Home"
+                       asp-action="Index">
+
+                        <i class="fa fa-dashboard"></i>
+
+                        داشبورد
+
+                    </a>
+
+                </li>
+
+
+                <li>
+
+                    <a asp-controller="Categories"
+                       asp-action="Index">
+
+                        <i class="fa fa-list"></i>
+
+                        دسته‌بندی‌ها
+
+                    </a>
+
+                </li>
+
+
+                <li>
+
+                    <a asp-controller="Products"
+                       asp-action="Index">
+
+                        <i class="fa fa-cube"></i>
+
+                        محصولات
+
+                    </a>
+
+                </li>
+
+
+                <li>
+
+                    <a asp-controller="Orders"
+                       asp-action="Index">
+
+                        <i class="fa fa-shopping-cart"></i>
+
+                        سفارش‌ها
+
+                    </a>
+
+                </li>
+
+
+                <li>
+
+                    <a asp-controller="AdminUser"
+                       asp-action="Index">
+
+                        <i class="fa fa-users"></i>
+
+                        کاربران
+
+                    </a>
+
+                </li>
+
             </ul>
+
         </aside>
 
+
+
+        <!-- Content -->
+
         <main class="admin-content">
+
             @RenderBody()
+
         </main>
+
+
     </div>
 
+
+
+    <!-- Footer -->
+
     <footer class="admin-footer">
+
         © ۱۴۰۴ - Ghafar Tajhiz
+
     </footer>
 
-</body>
-</html>
 
-<script src="~/js/site.js" asp-append-version="true"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-@await RenderSectionAsync("Scripts", required: false)
+
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+
+</html>

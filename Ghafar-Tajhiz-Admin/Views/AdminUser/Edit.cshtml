@@ -1,0 +1,128 @@
+﻿@model DataAccess.Models.User
+
+@{
+    ViewData["Title"] = "ویرایش کاربر";
+}
+
+<div class="container mt-4">
+
+    <h2>ویرایش کاربر</h2>
+
+    <form asp-action="Edit" method="post">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="id" value="@Model.Id" />
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                نام کامل
+            </label>
+
+            <input type="text"
+                   name="fullName"
+                   value="@Model.FullName"
+                   class="form-control" />
+
+        </div>
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                شماره تلفن
+            </label>
+
+            <input type="text"
+                   name="phoneNumber"
+                   value="@Model.PhoneNumber"
+                   class="form-control" />
+
+        </div>
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Email
+            </label>
+
+            <input type="email"
+                   name="email"
+                   value="@Model.Email"
+                   class="form-control" />
+
+        </div>
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Role
+            </label>
+
+            <select name="role" class="form-select">
+
+                @foreach (var role in ViewBag.Roles)
+                {
+                    <option value="@role.Name"
+                            selected="@(role.Name == ViewBag.CurrentRole)">
+                        @role.Name
+                    </option>
+                }
+
+            </select>
+
+        </div>
+
+        <hr class="my-4" />
+
+        <h5 class="mb-3">
+            تغییر رمز عبور
+        </h5>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                رمز عبور جدید
+            </label>
+
+            <input type="password"
+                   name="newPassword"
+                   class="form-control"
+                   autocomplete="new-password" />
+
+            <small class="text-muted">
+                در صورت خالی گذاشتن، رمز عبور تغییر نمی‌کند.
+            </small>
+
+        </div>
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                تکرار رمز عبور جدید
+            </label>
+
+            <input type="password"
+                   name="confirmPassword"
+                   class="form-control"
+                   autocomplete="new-password" />
+
+        </div>
+
+        <button type="submit"
+                class="btn btn-success">
+            ذخیره تغییرات
+        </button>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            انصراف
+        </a>
+
+    </form>
+
+</div>

@@ -1,0 +1,96 @@
+﻿@{
+    ViewData["Title"] = "ورود مدیر";
+}
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-5">
+
+            <div class="card shadow">
+
+                <div class="card-body">
+
+                    <h3 class="text-center mb-4">
+                        ورود به پنل مدیریت
+                    </h3>
+
+                    @if (TempData["LoginError"] != null)
+                    {
+                        <div class="alert alert-danger">
+                            @TempData["LoginError"]
+                        </div>
+                    }
+
+                    <form asp-controller="AdminAccount"
+                          asp-action="Login"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                شماره موبایل
+                            </label>
+
+                            <input type="text"
+                                   name="phoneNumber"
+                                   class="form-control"
+                                   placeholder="مثلاً 09123456789"
+                                   autocomplete="username" />
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                رمز عبور
+                            </label>
+
+                            <input type="password"
+                                   name="password"
+                                   class="form-control"
+                                   autocomplete="current-password" />
+
+                        </div>
+
+
+                        <div class="form-check mb-3">
+
+                            <input type="checkbox"
+                                   name="rememberMe"
+                                   value="true"
+                                   class="form-check-input"
+                                   id="rememberMe" />
+
+                            <label class="form-check-label"
+                                   for="rememberMe">
+
+                                مرا به خاطر بسپار
+
+                            </label>
+
+                        </div>
+
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+
+                            ورود به پنل مدیریت
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
