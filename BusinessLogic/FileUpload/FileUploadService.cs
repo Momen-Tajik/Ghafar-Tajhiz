@@ -1,34 +1,77 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogic.FileUpload
 {
     public class FileUploadService : IFileUploadService
     {
         private readonly string _storagePath;
+
+        private const long MaxFileSize = 5 * 1024 * 1024;
+
+        private static readonly HashSet<string> AllowedExtensions =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".webp"
+            };
+
+        private static readonly HashSet<string> AllowedContentTypes =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            };
+
         public FileUploadService(IConfiguration configuration)
         {
-            _storagePath = configuration["FileUpload:StoragePath"];
+            _storagePath =
+                configuration["FileUpload:StoragePath"]
+                ?? throw new InvalidOperationException(
+                    "FileUpload:StoragePath is not configured.");
         }
+
         public async Task<string> UploadFileAsync(IFormFile file)
         {
-            if (!Directory.Exists(_storagePath))
-                Directory.CreateDirectory(_storagePath);
-
             if (file == null || file.Length == 0)
-                throw new Exception("فایلی ارسال نشده است.");
+                throw new ArgumentException("فایلی ارسال نشده است.");
 
-            var fileName= Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-            var fullPath=  Path.Combine(_storagePath, fileName);
-            using (var stream = new FileStream(fullPath, FileMode.Create)) 
-            {
-                await file.CopyToAsync(stream);
-            }
+            if (file.Length > MaxFileSize)
+                throw new InvalidOperationException(
+                    "حجم فایل نمی‌تواند بیشتر از 5 مگابایت باشد.");
+
+            var extension =
+                Path.GetExtension(file.FileName);
+
+            if (!AllowedExtensions.Contains(extension))
+                throw new InvalidOperationException(
+                    "فرمت فایل مجاز نیست.");
+
+            if (!AllowedContentTypes.Contains(file.ContentType))
+                throw new InvalidOperationException(
+                    "نوع فایل مجاز نیست.");
+
+            Directory.CreateDirectory(_storagePath);
+
+            var fileName =
+                $"{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
+
+            var fullPath =
+                Path.Combine(_storagePath, fileName);
+
+            await using var stream = new FileStream(
+                fullPath,
+                FileMode.CreateNew,
+                FileAccess.Write,
+                FileShare.None,
+                64 * 1024,
+                useAsync: true);
+
+            await file.CopyToAsync(stream);
+
             return fileName;
         }
 
@@ -37,15 +80,26 @@ namespace BusinessLogic.FileUpload
             if (string.IsNullOrWhiteSpace(fileName))
                 return false;
 
-            var fullPath = Path.Combine(_storagePath, fileName);
+            var safeFileName =
+                Path.GetFileName(fileName);
 
-            if (File.Exists(fullPath))
+            if (!string.Equals(
+                    safeFileName,
+                    fileName,
+                    StringComparison.Ordinal))
             {
-                File.Delete(fullPath);
-                return true;
+                return false;
             }
 
-            return false;
+            var fullPath =
+                Path.Combine(_storagePath, safeFileName);
+
+            if (!File.Exists(fullPath))
+                return false;
+
+            File.Delete(fullPath);
+
+            return true;
         }
     }
 }

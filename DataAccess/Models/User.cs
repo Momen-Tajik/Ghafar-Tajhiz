@@ -9,6 +9,7 @@ namespace DataAccess.Models
 {
     public class User:IdentityUser<int>
     {
-        public string? FullName {  get; set; }
+        public string? FullName { get; set; }
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }
 }

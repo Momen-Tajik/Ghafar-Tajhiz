@@ -1,26 +1,32 @@
-﻿using DataAccess.Repositories.BasketItemRepo;
+﻿using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogic.BasketItemServices
 {
     public class BasketItemService
     {
-        private readonly IBasketItemRepository _basketItemRepository;
+        private readonly GhafarTajhizShopDbContext _context;
 
-        public BasketItemService(IBasketItemRepository basketItemRepository)
+        public BasketItemService(GhafarTajhizShopDbContext context)
         {
-            _basketItemRepository = basketItemRepository;
+            _context = context;
         }
 
-       public async Task<bool> RemoveBasketItem(int id)
+        public async Task<bool> RemoveBasketItem(int basketItemId, int userId)
         {
-            var basketItem = await _basketItemRepository.GetAll(a=>a.BasketItemId==id).FirstOrDefaultAsync();
-            await _basketItemRepository.Delete(basketItem);
+            var basketItem = await _context.BasketItems
+                .FirstOrDefaultAsync(i =>
+                    i.BasketItemId == basketItemId &&
+                    i.Basket.UserId == userId &&
+                    i.Basket.Status == DataAccess.Enums.BasketStatus.Pending);
+
+            if (basketItem == null)
+                return false;
+
+            _context.BasketItems.Remove(basketItem);
+
+            await _context.SaveChangesAsync();
+
             return true;
         }
     }

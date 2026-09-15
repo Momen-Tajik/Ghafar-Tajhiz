@@ -1,191 +1,226 @@
 ﻿using BusinessLogic.FileUpload;
+using DataAccess.Data;
 using DataAccess.Models;
-using DataAccess.Repositories.ProductRepo;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogic.ProductServices
 {
     public class ProductService
     {
-        private readonly IProductRepository _productRepo;
+        private readonly GhafarTajhizShopDbContext _context;
         private readonly IFileUploadService _fileUploadService;
 
-        public ProductService(IProductRepository productRepo, IFileUploadService fileUploadService)
+        public ProductService(
+            GhafarTajhizShopDbContext context,
+            IFileUploadService fileUploadService)
         {
-            _productRepo = productRepo;
+            _context = context;
             _fileUploadService = fileUploadService;
         }
 
-        public async Task<IEnumerable<Product>> GetProducts()
+        public async Task<IReadOnlyList<Product>> GetProducts()
         {
-            return await _productRepo.GetAll().ToListAsync();
+            return await _context.Products
+                .AsNoTracking()
+                .ToListAsync();
         }
-        public async Task<IEnumerable<Product>> GetProductsWithCategory(Expression<Func<Product, bool>> where = null)
+
+        public async Task<IReadOnlyList<Product>> GetProductsWithCategory()
         {
-            return await _productRepo.GetAll(where).Include(p => p.Category).OrderByDescending(a => a.IsAvailable == true).ToListAsync();
+            return await _context.Products
+                .AsNoTracking()
+                .Include(p => p.Category)
+                .OrderByDescending(p => p.IsAvailable)
+                .ThenByDescending(p => p.CreateDate)
+                .ToListAsync();
         }
-        public async Task<Product> GetProductById(int id)
+
+        public async Task<Product?> GetProductById(int id)
         {
-            //return await _productRepo.GetById(id);
-            return await _productRepo.GetAll(a=>a.ProductId==id).Include(c=>c.Comments.OrderByDescending(a=>a.Created)).FirstOrDefaultAsync();
+            return await _context.Products
+                .Include(p => p.Comments
+                    .OrderByDescending(c => c.Created))
+                .FirstOrDefaultAsync(p => p.ProductId == id);
         }
 
         public async Task CreateProduct(ProductDto productDto)
         {
-            var product = new Product()
+            var product = new Product
             {
                 ProductName = productDto.ProductName,
                 ProductDescription = productDto.ProductDescription,
                 Price = productDto.Price,
                 StockQuantity = productDto.StockQuantity,
                 CategoryId = productDto.CategoryId,
-                IsAvailable = productDto.IsAvailable,
-                Category = productDto.Category,
+                IsAvailable = productDto.IsAvailable
             };
-            product.ImageUrl = await _fileUploadService.UploadFileAsync(productDto.ImageUrl);
-            await _productRepo.Add(product);
+
+            if (productDto.ImageUrl != null)
+            {
+                product.ImageUrl =
+                    await _fileUploadService.UploadFileAsync(productDto.ImageUrl);
+            }
+
+            await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateProduct(ProductDto productDto)
+        public async Task<bool> UpdateProduct(ProductDto productDto)
         {
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p =>
+                    p.ProductId == productDto.ProductId);
 
-            var product = await _productRepo.GetById(productDto.ProductId);
+            if (product == null)
+                return false;
+
             product.ProductName = productDto.ProductName;
             product.ProductDescription = productDto.ProductDescription;
             product.Price = productDto.Price;
             product.StockQuantity = productDto.StockQuantity;
             product.CategoryId = productDto.CategoryId;
             product.IsAvailable = productDto.IsAvailable;
-            product.Category = productDto.Category;
 
-            if (productDto.ImageUrl != null)
+            if (product.StockQuantity == 0)
             {
-                if (!string.IsNullOrEmpty(product.ImageUrl))
-                    _fileUploadService.DeleteFile(product.ImageUrl);
-
-                product.ImageUrl = await _fileUploadService.UploadFileAsync(productDto.ImageUrl);
+                product.IsAvailable = false;
             }
 
             if (productDto.ImageUrl != null)
             {
-                product.ImageUrl = await _fileUploadService.UploadFileAsync(productDto.ImageUrl);
+                var oldImage = product.ImageUrl;
+
+                product.ImageUrl =
+                    await _fileUploadService.UploadFileAsync(productDto.ImageUrl);
+
+                if (!string.IsNullOrWhiteSpace(oldImage))
+                {
+                    _fileUploadService.DeleteFile(oldImage);
+                }
             }
 
-            await _productRepo.Update(product);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
-        public async Task DeleteProduct(int id)
+        public async Task<bool> DeleteProduct(int id)
         {
-            var p = await _productRepo.GetById(id);
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p => p.ProductId == id);
 
-            if (!string.IsNullOrEmpty(p.ImageUrl))
-                _fileUploadService.DeleteFile(p.ImageUrl);
+            if (product == null)
+                return false;
 
-            await _productRepo.Delete(p);
-        }
-        public async Task DeleteProduct(Product product)
-        {
-            await _productRepo.Delete(product);
-        }
+            var imageName = product.ImageUrl;
 
-        public async Task<ProductDto> GetProductDtoById(int id)
-        {
-            var product = await _productRepo.GetById(id);
-            var productDto = new ProductDto()
+            _context.Products.Remove(product);
+
+            await _context.SaveChangesAsync();
+
+            if (!string.IsNullOrWhiteSpace(imageName))
             {
-                CategoryId = product.CategoryId,
-                ProductName = product.ProductName,
-                ProductDescription = product.ProductDescription,
-                Price = product.Price,
-                StockQuantity = product.StockQuantity,
-                ProductId = product.ProductId,
-                ImageName = product.ImageUrl,
-                IsAvailable = product.IsAvailable,
+                _fileUploadService.DeleteFile(imageName);
+            }
+
+            return true;
+        }
+
+        public async Task<ProductDto?> GetProductDtoById(int id)
+        {
+            return await _context.Products
+                .AsNoTracking()
+                .Where(p => p.ProductId == id)
+                .Select(p => new ProductDto
+                {
+                    ProductId = p.ProductId,
+                    ProductName = p.ProductName,
+                    ProductDescription = p.ProductDescription,
+                    Price = p.Price,
+                    StockQuantity = p.StockQuantity,
+                    ImageName = p.ImageUrl,
+                    IsAvailable = p.IsAvailable,
+                    CategoryId = p.CategoryId,
+                    CreateDate = p.CreateDate
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<PagedProductDto> GetProductPagination(
+            int page,
+            int pageSize,
+            string? search,
+            string sort = "newest")
+        {
+            if (page < 1)
+                page = 1;
+
+            if (pageSize < 1)
+                pageSize = 12;
+
+            if (pageSize > 100)
+                pageSize = 100;
+
+            var query = _context.Products
+                .AsNoTracking()
+                .Include(p => p.Category)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.Trim();
+
+                query = query.Where(p =>
+                    p.ProductName.Contains(term) ||
+                    (p.ProductDescription != null &&
+                     p.ProductDescription.Contains(term)) ||
+                    p.Category!.CategoryName.Contains(term));
+            }
+
+            query = sort.Trim().ToLowerInvariant() switch
+            {
+                "highestprice" =>
+                    query.OrderByDescending(p => p.Price),
+
+                "lowestprice" =>
+                    query.OrderBy(p => p.Price),
+
+                "bestselling" =>
+                    query.OrderByDescending(p => p.StockQuantity),
+
+                _ =>
+                    query.OrderByDescending(p => p.CreateDate)
             };
-            return productDto;
-        }
 
-        public async Task<PagedProductDto> GetProductPagination(int page, int pageSize, string? search, string sort = "newest")
-        {
-            
-            var products = _productRepo.GetAll();
+            var totalCount = await query.CountAsync();
 
-            //Filtering
-            switch (sort.ToLower())
-            {
-                case "bestselling":
-                    // ترکیبی از تاریخ و موجودی
-                    products = products.OrderByDescending(p => p.CreateDate)
-                                       .ThenByDescending(p => p.StockQuantity);
-                    break;
-
-                case "newest":
-                    products = products.OrderByDescending(p => p.CreateDate);
-                    break;
-
-                case "highestprice":
-                    products = products.OrderByDescending(p => p.Price);
-                    break;
-
-                case "lowestprice":
-                    products = products.OrderBy(p => p.Price);
-                    break;
-
-                default:
-                    products = products.OrderByDescending(p => p.CreateDate);
-                    break;
-            }
-
-            // Searching
-            if (!search.IsNullOrEmpty())
-            {
-                products = products.Where(p =>
-                    p.ProductName.Contains(search) ||
-                    p.ProductDescription.Contains(search) ||
-                    p.Category.CategoryName.Contains(search) ||
-                    p.Price.ToString().Contains(search));
-            }
-
-            // Pagination content
-            int totalCount = await products.CountAsync();
-            int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
-
-            // Pagination
-            var pagedProducts = await products
+            var products = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .Select(p => new ProductDto
+                {
+                    ProductId = p.ProductId,
+                    ProductName = p.ProductName,
+                    ProductDescription = p.ProductDescription,
+                    Price = p.Price,
+                    StockQuantity = p.StockQuantity,
+                    ImageName = p.ImageUrl,
+                    IsAvailable = p.IsAvailable,
+                    CategoryId = p.CategoryId,
+                    CreateDate = p.CreateDate
+                })
                 .ToListAsync();
 
-            // Convert to DTO
-            var productDto = pagedProducts.Select(p => new ProductDto()
-            {
-                CategoryId = p.CategoryId,
-                ProductName = p.ProductName,
-                ProductDescription = p.ProductDescription,
-                Price = p.Price,
-                StockQuantity = p.StockQuantity,
-                ProductId = p.ProductId,
-                ImageName = p.ImageUrl,
-                IsAvailable = p.IsAvailable,
-                CreateDate = p.CreateDate
-            }).ToList();
+            var totalPages =
+                (int)Math.Ceiling(totalCount / (double)pageSize);
 
-            // Return the result
-            return new PagedProductDto()
+            return new PagedProductDto
             {
                 Page = page,
                 TotalPage = totalPages,
-                Products = productDto,
-                TotalCount = totalCount
+                TotalCount = totalCount,
+                Products = products
             };
         }
-
     }
 }

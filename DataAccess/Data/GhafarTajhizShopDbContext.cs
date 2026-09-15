@@ -28,8 +28,17 @@ namespace DataAccess.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Basket>()
+                .HasIndex(b => new { b.UserId, b.Status })
+                .HasFilter("[Status] = 0")
+                .IsUnique();
+
             modelBuilder.Entity<BasketItem>()
-                .HasIndex(bi => new { bi.BasketId, bi.ProductId })
+                .HasIndex(bi => new
+                {
+                    bi.BasketId,
+                    bi.ProductId
+                })
                 .IsUnique();
 
             modelBuilder.Entity<BasketItem>()
@@ -56,12 +65,17 @@ namespace DataAccess.Data
                 .HasForeignKey(c => c.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Comments)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Basket>()
                 .HasOne(b => b.User)
                 .WithMany()
                 .HasForeignKey(b => b.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-
         }
     }
     
