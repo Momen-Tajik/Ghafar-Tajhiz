@@ -1,123 +1,247 @@
 ﻿@using DataAccess.Models
 @using Microsoft.AspNetCore.Identity
-@inject SignInManager<User> _signInManager;
-
+@inject SignInManager<User> SignInManager
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Ghafar_Tajhiz</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Ghafar_Tajhiz.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-    <!-- SweetAlert2 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <!-- SweetAlert2 JS -->
+
+    <title>@ViewData["Title"] - Ghafar Tajhiz</title>
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/style.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/Ghafar_Tajhiz.styles.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
+
 <body>
 
-    <!-- Navbar -->
     <nav class="nav">
 
-        <!-- Mobile Navbar -->
         <div class="mobilenavbar">
-            <i id="mobileNavbarBtn" class="fa fa-bars"></i>
+            <i id="mobileNavbarBtn"
+               class="fa fa-bars"></i>
 
-            <img class="mobile-logo" src="~/asstes/icon/Logo.svg" alt="Logo" />
-
+            <img class="mobile-logo"
+                 src="~/asstes/icon/Logo.svg"
+                 alt="Ghafar Tajhiz" />
         </div>
 
-        <!-- Desktop Navbar -->
-        <div class="desktopnavbar" id="desktopnavbar">
-            <a asp-controller="Home" asp-action="Index">صفحه اصلی</a>
-            <a asp-controller="Product" asp-action="ProductList">محصولات</a>
+        <div class="desktopnavbar"
+             id="desktopnavbar">
 
-            <a asp-controller="Order" asp-action="Basket">
-                سبد خرید
-                <span id="cart-badge-desktop" class="cart-badge">0</span>
+            <a asp-controller="Home"
+               asp-action="Index">
+                صفحه اصلی
             </a>
 
-            @if (_signInManager.IsSignedIn(User))
+            <a asp-controller="Product"
+               asp-action="ProductList">
+                محصولات
+            </a>
+
+            <a asp-controller="Order"
+               asp-action="Basket">
+                سبد خرید
+                <span id="cart-badge-desktop"
+                      class="cart-badge">
+                    0
+                </span>
+            </a>
+
+            @if (SignInManager.IsSignedIn(User))
             {
-                <a asp-controller="Profile" asp-action="Index">پروفایل</a>
-                <a asp-controller="Account" asp-action="Logout">خروج از حساب</a>
+                <a asp-controller="Profile"
+                   asp-action="Index">
+                    پروفایل
+                </a>
+
+                <form asp-controller="Account"
+                      asp-action="Logout"
+                      method="post"
+                      style="display:inline;">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit"
+                            class="nav-link-button">
+                        خروج از حساب
+                    </button>
+                </form>
             }
             else
             {
-                <a asp-controller="Account" asp-action="Register">ورود/ثبت نام</a>
+                <a asp-controller="Account"
+                   asp-action="Login">
+                    ورود / ثبت نام
+                </a>
             }
 
-            <a asp-controller="Home" asp-action="aboutUs">درباره ما</a>
+            <a asp-controller="Home"
+               asp-action="AboutUs">
+                درباره ما
+            </a>
 
-            <img class="logo" src="~/asstes/icon/Logo.svg" alt="Logo" />
+            <img class="logo"
+                 src="~/asstes/icon/Logo.svg"
+                 alt="Ghafar Tajhiz" />
         </div>
-
     </nav>
 
 
-
     <div class="container">
-        <main role="main" class="pb-3">
+        <main role="main"
+              class="pb-3">
+
             @RenderBody()
+
         </main>
     </div>
 
 
-    <!-- Footer -->
     <footer class="footer">
+
         <div class="footer-container">
 
             <div class="footer-section about">
                 <h3>درباره ما</h3>
+
                 <p>
-                    ما یک شرکت فناوری پیشرو هستیم که در زمینه طراحی و توسعه سامانه‌های وب و راهکارهای ابری فعالیت می‌کنیم. هدف ما توانمندسازی کسب‌وکارها با استفاده از فناوری‌های نوین است.
+                    ما یک شرکت فناوری پیشرو هستیم که در زمینه طراحی و توسعه
+                    سامانه‌های وب و راهکارهای ابری فعالیت می‌کنیم.
                 </p>
             </div>
 
+
             <div class="footer-section links">
+
                 <h3>لینک‌های مهم</h3>
+
                 <ul>
-                    <li><a asp-controller="Home" asp-action="Index">صفحه اصلی</a></li>
-                    <li><a href="#">خدمات</a></li>
-                    <li><a href="#">مقالات</a></li>
-                    <li><a href="#">تماس با ما</a></li>
+                    <li>
+                        <a asp-controller="Home"
+                           asp-action="Index">
+                            صفحه اصلی
+                        </a>
+                    </li>
+
+                    <li>
+                        <a asp-controller="Product"
+                           asp-action="ProductList">
+                            محصولات
+                        </a>
+                    </li>
+
+                    <li>
+                        <a asp-controller="Home"
+                           asp-action="AboutUs">
+                            درباره ما
+                        </a>
+                    </li>
                 </ul>
+
             </div>
+
 
             <div class="footer-section social">
+
                 <h3>ما را دنبال کنید</h3>
+
                 <div class="social-icons">
-                    <a><img src="~/asstes/icon/icons8-facebook.svg" alt=""></a>
-                    <a><img src="~/asstes/icon/icons8-whatsapp.svg" alt=""></a>
-                    <a><img src="~/asstes/icon/icons8-instagram.svg" alt=""></a>
+
+                    <a href="#"
+                       aria-label="Facebook">
+                        <img src="~/asstes/icon/icons8-facebook.svg"
+                             alt="Facebook" />
+                    </a>
+
+                    <a href="#"
+                       aria-label="WhatsApp">
+                        <img src="~/asstes/icon/icons8-whatsapp.svg"
+                             alt="WhatsApp" />
+                    </a>
+
+                    <a href="#"
+                       aria-label="Instagram">
+                        <img src="~/asstes/icon/icons8-instagram.svg"
+                             alt="Instagram" />
+                    </a>
+
                 </div>
+
             </div>
 
         </div>
+
 
         <div class="footer-bottom">
-            <p>© ۱۴۰۴ شرکت شما. تمامی حقوق محفوظ است.</p>
+            <p>
+                © ۱۴۰۴ غفار تجهیز
+            </p>
         </div>
+
     </footer>
 
-    <!-- Modal -->
-    <div id="modal" class="modal">
+
+    <div id="modal"
+         class="modal">
+
         <div class="modal-content">
-            <span id="closeModal" class="close">&times;</span>
 
-            <div id="modalBody">
+            <button type="button"
+                    id="closeModal"
+                    class="close"
+                    aria-label="بستن">
+                &times;
+            </button>
 
-            </div>
+            <div id="modalBody"></div>
+
         </div>
     </div>
 
 
+    <!--
+        Anti-Forgery Token
+        JavaScript می‌تواند از این token
+        برای درخواست‌های POST/AJAX استفاده کند.
+    -->
+    <form id="antiForgeryForm"
+          style="display:none;">
+        @Html.AntiForgeryToken()
+    </form>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script src="~/js/script.js"
+            asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-<script src="~/js/script.js" asp-append-version="true"></script>
-@await RenderSectionAsync("Scripts", required: false)

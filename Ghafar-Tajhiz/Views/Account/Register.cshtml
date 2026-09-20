@@ -1,11 +1,8 @@
 ﻿@model Ghafar_Tajhiz.Models.RegisterDto
 
 @{
-    ViewData["Title"] = "Register";
-    Layout = "_Layout"; 
+    ViewData["Title"] = "ثبت نام";
 }
-
-
 
 <div class="register-container">
     <div class="register-card">
@@ -16,103 +13,152 @@
 
         <div class="register-body">
 
-            <form asp-action="Register" method="post">
+            <form asp-action="Register"
+                  asp-controller="Account"
+                  method="post">
+
                 @Html.AntiForgeryToken()
 
-                <!-- UserName -->
-                <div class="mb-3">
-                    <label asp-for="UserName" class="form-label">
-                    </label>
-                    <input asp-for="UserName"
-                           class="form-control"
-                           placeholder="Ali_Hasani"
-                           dir="ltr" />
-                    <span asp-validation-for="UserName" class="text-danger"></span>
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
                 </div>
 
-                <!-- Phone -->
                 <div class="mb-3">
-                    <label asp-for="PhoneNumber" class="form-label">
+                    <label asp-for="UserName"
+                           class="form-label">
                     </label>
+
+                    <input asp-for="UserName"
+                           class="form-control"
+                           placeholder="نام شما"
+                           autocomplete="name" />
+
+                    <span asp-validation-for="UserName"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PhoneNumber"
+                           class="form-label">
+                    </label>
+
                     <input asp-for="PhoneNumber"
                            class="form-control"
                            placeholder="09xxxxxxxxx"
-                           dir="ltr" />
-                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                           dir="ltr"
+                           autocomplete="tel" />
+
+                    <span asp-validation-for="PhoneNumber"
+                          class="text-danger">
+                    </span>
                 </div>
 
-                <!-- Password -->
                 <div class="mb-3">
-                    <label asp-for="Password" class="form-label">
+                    <label asp-for="Password"
+                           class="form-label">
                     </label>
+
                     <div class="password-wrapper">
-                        <button dir="ltr" type="button" class="toggle-password" id="togglePassword"></button>
+                        <button type="button"
+                                class="toggle-password"
+                                id="togglePassword"
+                                aria-label="نمایش رمز عبور">
+                        </button>
+
                         <input asp-for="Password"
                                class="form-control"
                                type="password"
                                id="passwordInput"
+                               autocomplete="new-password"
                                dir="ltr" />
                     </div>
-                    <span asp-validation-for="Password" class="text-danger"></span>
+
+                    <span asp-validation-for="Password"
+                          class="text-danger">
+                    </span>
                 </div>
 
-                <!-- Confirm -->
                 <div class="mb-3">
-                    <label asp-for="ConfirmPassword" class="form-label">
+                    <label asp-for="ConfirmPassword"
+                           class="form-label">
                     </label>
+
                     <input asp-for="ConfirmPassword"
                            class="form-control"
                            type="password"
+                           autocomplete="new-password"
                            dir="ltr" />
-                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+
+                    <span asp-validation-for="ConfirmPassword"
+                          class="text-danger">
+                    </span>
                 </div>
 
-
-
-                <!-- Terms -->
                 <div class="mb-3">
                     <label class="terms">
-                        با <a class="openModal" data-bs-toggle="modal" data-bs-target="#termsModal">قوانین و مقررات</a> موافقم
-                        <input type="checkbox" required />
+                        <input type="checkbox"
+                               required />
+
+                        <span>
+                            با
+                            <a href="#"
+                               data-bs-toggle="modal"
+                               data-bs-target="#termsModal">
+                                قوانین و مقررات
+                            </a>
+                            موافقم
+                        </span>
                     </label>
                 </div>
 
-                <button type="submit" class="btn-register">
+                <button type="submit"
+                        class="btn-register">
                     ثبت نام
                 </button>
 
                 <div class="login-link">
                     قبلاً ثبت نام کرده‌اید؟
-                    <a asp-action="Login" asp-controller="Account">ورود</a>
+
+                    <a asp-action="Login"
+                       asp-controller="Account">
+                        ورود
+                    </a>
                 </div>
+
             </form>
+
         </div>
     </div>
 </div>
 
-<!-- Modal قوانین -->
-<div class="modal fade" id="termsModal" tabindex="-1">
+<div class="modal fade"
+     id="termsModal"
+     tabindex="-1"
+     aria-hidden="true">
+
     <div class="modal-dialog modal-lg modal-dialog-centered">
+
         <div class="modal-content">
+
             <div class="modal-header">
-                <h5 class="modal-title">قوانین و مقررات</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title">
+                    قوانین و مقررات
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="بستن">
+                </button>
             </div>
+
             <div class="modal-body">
-                <p>شرایط و قوانین استفاده از سامانه قهار تجهیز...</p>
+                <p>
+                    شرایط و قوانین استفاده از سامانه قهار تجهیز...
+                </p>
             </div>
+
         </div>
     </div>
 </div>
-
-
-@* <!-- Modal -->
-<div id="modal" class="modal">
-    <div class="modal-content">
-        <span id="closeModal" class="close">&times;</span>
-
-        <div id="modalBody">
-        </div>
-    </div>
-</div> *@
-

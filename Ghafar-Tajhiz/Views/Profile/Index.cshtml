@@ -3,44 +3,98 @@
 @model UserProfileViewModel
 
 @{
-    ViewData["Title"] = "Profile";
+    ViewData["Title"] = "پروفایل";
 }
 
 <div class="user-dashboard">
 
     <aside class="user-info">
+
         <div class="user-card">
-            <h3>اطلاعات کاربر</h3>
-            <p><strong>نام کاربری :</strong> @Model.UserName</p>
-            <p><strong>شماره موبایل:</strong> @Model.MobileNumber</p>
-            <p><strong>آدرس:</strong> @(string.IsNullOrEmpty(Model.Address) ? "ثبت نشده" : Model.Address)</p>
+
+            <h3>
+                اطلاعات کاربر
+            </h3>
+
+            <p>
+                <strong>نام کاربری:</strong>
+                @Model.UserName
+            </p>
+
+            <p>
+                <strong>شماره موبایل:</strong>
+                @(Model.MobileNumber ?? "ثبت نشده")
+            </p>
+
+            <p>
+                <strong>آدرس:</strong>
+                @(string.IsNullOrWhiteSpace(Model.Address)
+                    ? "ثبت نشده"
+                    : Model.Address)
+            </p>
+
         </div>
+
     </aside>
 
     <section class="user-orders">
 
-        <!-- Search -->
         <form method="get">
-            <input type="text" name="search" value="@Model.Search" placeholder="جستجوی سفارش..." />
+
+            <input type="text"
+                   name="search"
+                   value="@Model.Search"
+                   placeholder="جستجوی سفارش..." />
 
             <select name="status">
-                <option value="">همه</option>
-                <option value="Paid" selected="@(Model.Status == BasketStatus.Paid)">پرداخت شده</option>
-                <option value="Shipped" selected="@(Model.Status == BasketStatus.Shipped)">ارسال شده</option>
-                <option value="Cancelled" selected="@(Model.Status == BasketStatus.Cancelled)">لغو شده</option>
+
+                <option value="">
+                    همه
+                </option>
+
+                <option value="Paid"
+                        selected="@(Model.Status == BasketStatus.Paid ? "selected" : null)">
+                    پرداخت شده
+                </option>
+
+                <option value="Shipped"
+                        selected="@(Model.Status == BasketStatus.Shipped ? "selected" : null)">
+                    ارسال شده
+                </option>
+
+                <option value="Cancelled"
+                        selected="@(Model.Status == BasketStatus.Cancelled ? "selected" : null)">
+                    لغو شده
+                </option>
+
             </select>
 
             <select name="sort">
-                <option value="paiddate" selected="@(Model.Sort=="paiddate")">جدیدترین</option>
-                <option value="oldest" selected="@(Model.Sort=="oldest")">قدیمی‌ترین</option>
-                <option value="status" selected="@(Model.Sort=="status")">وضعیت</option>
+
+                <option value="paiddate"
+                        selected="@(Model.Sort == "paiddate" ? "selected" : null)">
+                    جدیدترین
+                </option>
+
+                <option value="oldest"
+                        selected="@(Model.Sort == "oldest" ? "selected" : null)">
+                    قدیمی‌ترین
+                </option>
+
+                <option value="status"
+                        selected="@(Model.Sort == "status" ? "selected" : null)">
+                    وضعیت
+                </option>
+
             </select>
 
+            <button type="submit">
+                اعمال فیلتر
+            </button>
 
-            <button type="submit">اعمال فیلتر</button>
         </form>
 
-        @if (Model.Orders == null || !Model.Orders.Any())
+        @if (!Model.Orders.Any())
         {
             <div class="products-empty">
                 سفارشی وجود ندارد
@@ -48,60 +102,132 @@
         }
         else
         {
-            foreach (var item in Model.Orders)
+            foreach (var order in Model.Orders)
             {
                 <div class="order-card">
+
                     <div class="order-header">
-                        <span>شماره فاکتور: @item.BasketId</span>
 
-                        @if (item.Status == BasketStatus.Paid)
+                        <span>
+                            شماره سفارش:
+                            @order.BasketId
+                        </span>
+
+                        @switch (order.Status)
                         {
-                            <span class="order-status @item.Status.ToString().ToLower()">پرداخت شده</span>
+                            case BasketStatus.Paid:
+                                <span class="order-status paid">
+                                    پرداخت شده
+                                </span>
+                                break;
+
+                            case BasketStatus.Shipped:
+                                <span class="order-status shipped">
+                                    ارسال شده
+                                </span>
+                                break;
+
+                            case BasketStatus.Cancelled:
+                                <span class="order-status cancelled">
+                                    لغو شده
+                                </span>
+                                break;
+
+                            default:
+                                <span class="order-status">
+                                    در انتظار پرداخت
+                                </span>
+                                break;
                         }
-                        else if (item.Status == BasketStatus.Shipped)
-                        {
-                            <span class="order-status @item.Status.ToString().ToLower()">ارسال شده</span>
-                        }
-                        else if (item.Status == BasketStatus.Cancelled)
-                        {
-                            <span class="order-status @item.Status.ToString().ToLower()">لغو شده</span>
-                        }
-                        else
-                        {
-                            <span class="order-status @item.Status.ToString().ToLower()">در انتظار پرداخت</span>
-                        }
+
                     </div>
+
                     <div class="order-meta">
-                        <span>@(item.PaidDate.HasValue ? item.PaidDate.Value.ToString("HH:mm - yyyy/MM/dd ") : "-")</span>
-                        <br />
-                        <span>@item.MobileNumber</span>
-                        <br />
-                        <span>@item.Address</span>
-                    </div>
-                    <div class="order-items">
-                        @if (item.BasketItems != null && item.BasketItems.Any())
-                        {
-                            foreach (var bi in item.BasketItems)
-                            {
-                                <div class="order-item">
-                                    <span class="product-name">@bi.Product?.ProductName</span>
-                                    <span class="price">@bi.Product?.Price.ToString("N0") تومان</span>
-                                    <span class="qty">@bi.Qty  عدد</span>
-                                    <span class="price">@bi.UnitPrice.ToString("N0") تومان</span>
-                                </div>
 
+                        <span>
+                            @(order.PaidDate.HasValue
+                                ? order.PaidDate.Value.ToString(
+                                    "HH:mm - yyyy/MM/dd")
+                                : "-")
+                        </span>
+
+                        <br />
+
+                        <span>
+                            @order.MobileNumber
+                        </span>
+
+                        <br />
+
+                        <span>
+                            @order.Address
+                        </span>
+
+                    </div>
+
+                    <div class="order-items">
+
+                        @if (order.BasketItems.Any())
+                        {
+                            foreach (var item in order.BasketItems)
+                            {
+                                var itemTotal =
+                                    item.Qty * item.UnitPrice;
+
+                                <div class="order-item">
+
+                                    <span class="product-name">
+                                        @item.Product?.ProductName
+                                    </span>
+
+                                    <span class="price">
+                                        قیمت واحد:
+                                        @item.UnitPrice.ToString("N0")
+                                        تومان
+                                    </span>
+
+                                    <span class="qty">
+                                        @item.Qty عدد
+                                    </span>
+
+                                    <span class="price">
+                                        جمع:
+                                        @itemTotal.ToString("N0")
+                                        تومان
+                                    </span>
+
+                                </div>
                             }
 
-                            <div class="order-items">
-                                <span class="‌total-price">جمع کل</span>
-                                 <span class="total-price">@item.BasketItems.Select(a => a.UnitPrice).Sum().ToString("N0") تومان</span>
-                            </div>
+                            
+                                decimal orderTotal = 0;
 
+                                foreach (var item in order.BasketItems)
+                                {
+                                    orderTotal += item.Qty * item.UnitPrice;
+                                }
+                            
+
+                            <div class="order-items">
+
+                                <span class="total-price">
+                                    جمع کل
+                                </span>
+
+                                <span class="total-price">
+                                    @orderTotal.ToString("N0")
+                                    تومان
+                                </span>
+
+                            </div>
                         }
+
                     </div>
+
                 </div>
             }
         }
+
     </section>
 
 </div>

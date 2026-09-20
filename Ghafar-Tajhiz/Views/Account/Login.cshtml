@@ -1,10 +1,8 @@
 ﻿@model Ghafar_Tajhiz.Models.LoginViewModel
 
 @{
-    ViewData["Title"] = "Login";
-    Layout = "_Layout";
+    ViewData["Title"] = "ورود";
 }
-
 
 <div class="register-container">
     <div class="register-card">
@@ -15,86 +13,83 @@
 
         <div class="register-body">
 
-            <form asp-action="Login" method="post">
+            <form asp-action="Login"
+                  asp-controller="Account"
+                  method="post">
+
                 @Html.AntiForgeryToken()
 
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
 
-                <!-- Phone -->
                 <div class="mb-3">
-                    <label asp-for="PhoneNumber" class="form-label">
-                        شماره موبایل
+                    <label asp-for="PhoneNumber"
+                           class="form-label">
                     </label>
+
                     <input asp-for="PhoneNumber"
                            class="form-control"
                            placeholder="09xxxxxxxxx"
-                           dir="ltr" />
-                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                           dir="ltr"
+                           autocomplete="tel" />
+
+                    <span asp-validation-for="PhoneNumber"
+                          class="text-danger">
+                    </span>
                 </div>
 
-                <!-- Password -->
                 <div class="mb-3">
-                    <label asp-for="Password" class="form-label">
-                        رمز عبور
+                    <label asp-for="Password"
+                           class="form-label">
                     </label>
+
                     <div class="password-wrapper">
                         <input asp-for="Password"
                                class="form-control"
                                type="password"
-                               id="passwordInput" />
-                        <button type="button" class="toggle-password" id="togglePassword"></button>
+                               id="passwordInput"
+                               autocomplete="current-password"
+                               dir="ltr" />
+
+                        <button type="button"
+                                class="toggle-password"
+                                id="togglePassword"
+                                aria-label="نمایش رمز عبور">
+                        </button>
                     </div>
-                    <span asp-validation-for="Password" class="text-danger"></span>
+
+                    <span asp-validation-for="Password"
+                          class="text-danger">
+                    </span>
                 </div>
 
-                <!-- RememberMe -->
                 <div class="mb-3">
-                    <label asp-for="RememberMe" class="form-label">
-                        من را به یاد داشته باش
+                    <label class="terms">
                         <input asp-for="RememberMe"
-                               class="terms"
                                type="checkbox" />
-                        <span asp-validation-for="RememberMe" class="text-danger"></span>
+
+                        <span>
+                            مرا به یاد بسپار
+                        </span>
                     </label>
-                    
-                    
                 </div>
 
-                <!-- Terms -->
-                
-
-                <button type="submit" class="btn-register">
+                <button type="submit"
+                        class="btn-register">
                     ورود
                 </button>
 
                 <div class="login-link">
-                    ایجاد حساب کاربری
-                    <a asp-action="Register" asp-controller="Account">جدید</a>
+                    حساب کاربری ندارید؟
+                    <a asp-action="Register"
+                       asp-controller="Account">
+                        ثبت نام
+                    </a>
                 </div>
+
             </form>
-        </div>
-    </div>
 
-    <div id="loginError"
-     data-error="@TempData["LoginError"]">
-    </div>
-
-</div>
-
-<!-- Modal قوانین -->
-<div class="modal fade" id="termsModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">قوانین و مقررات</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>شرایط و قوانین استفاده از سامانه قهار تجهیز...</p>
-            </div>
         </div>
     </div>
 </div>
-
-
-
-

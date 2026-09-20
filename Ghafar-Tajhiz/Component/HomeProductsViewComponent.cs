@@ -3,17 +3,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ghafar_Tajhiz.Component
 {
-    public class HomeProducts:ViewComponent
+    public class HomeProductsViewComponent : ViewComponent
     {
         private readonly ProductService _productService;
-        public HomeProducts(ProductService productService)
+
+        public HomeProductsViewComponent(ProductService productService)
         {
             _productService = productService;
         }
+
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var data = await _productService.GetProductsWithCategory();
-            return View("/Views/Shared/Component/HomeProduct.cshtml",data);
+            var products = await _productService.GetProductsWithCategory();
+
+            return View(
+                "/Views/Shared/Component/HomeProduct.cshtml",
+                products);
         }
     }
 }

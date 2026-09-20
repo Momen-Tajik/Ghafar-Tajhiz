@@ -1,5 +1,4 @@
-﻿
-using BusinessLogic.BasketItemServices;
+﻿using BusinessLogic.BasketItemServices;
 using BusinessLogic.BasketServices;
 using Ghafar_Tajhiz.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -8,83 +7,177 @@ using System.Security.Claims;
 
 namespace Ghafar_Tajhiz.Controllers
 {
+    [Authorize]
     public class OrderController : Controller
     {
         private readonly BasketService _basketService;
         private readonly BasketItemService _basketItemService;
-        public OrderController(BasketService basketService, BasketItemService basketItemService)
+
+        public OrderController(
+            BasketService basketService,
+            BasketItemService basketItemService)
         {
             _basketService = basketService;
             _basketItemService = basketItemService;
         }
 
-        [Authorize]
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
         [HttpPost]
-
-        public async Task<IActionResult> AddToBasket([FromBody] AddBasketDto model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddToBasket(
+            [FromBody] AddBasketDto model)
         {
-            if (model == null || model.qty <= 0)
-                return BadRequest(new { res = false, msg = "اطلاعات نامعتبر است" });
+            if (model == null || model.Qty <= 0)
+            {
+                return BadRequest(new
+                {
+                    res = false,
+                    msg = "اطلاعات نامعتبر است."
+                });
+            }
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = GetCurrentUserId();
 
-            if (userId == null)
-                return Ok(new { res = false, msg = "شما لاگین نکرده‌اید" });
+            if (!userId.HasValue)
+            {
+                return Unauthorized(new
+                {
+                    res = false,
+                    msg = "لطفاً ابتدا وارد حساب کاربری شوید."
+                });
+            }
 
             var result = await _basketService.AddToBasket(
-                model.productId,
-                model.qty,
-                Convert.ToInt32(userId)
-            );
+                model.ProductId,
+                model.Qty,
+                userId.Value);
 
             if (!result)
-                return Ok(new { res = false, msg = "خطا در افزودن به سبد خرید" });
+            {
+                return BadRequest(new
+                {
+                    res = false,
+                    msg = "افزودن محصول به سبد خرید انجام نشد."
+                });
+            }
 
-            return Ok(new { res = true, msg = "محصول با موفقیت اضافه شد" });
+            return Ok(new
+            {
+                res = true,
+                msg = "محصول با موفقیت به سبد خرید اضافه شد."
+            });
         }
 
-        [Authorize]
+        [HttpGet]
         public async Task<IActionResult> Basket()
         {
-            var userId=User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = GetCurrentUserId();
 
-            var data= await _basketService.GetUserBasket(Convert.ToInt32(userId));
+            if (!userId.HasValue)
+                return Unauthorized();
+
+            var data = await _basketService.GetUserBasket(userId.Value);
 
             return View(data);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveBasketItem(
+            [FromBody] RemoveBasketItemDto model)
+        {
+            if (model == null || model.BasketItemId <= 0)
+            {
+                return BadRequest(new
+                {
+                    res = false,
+                    msg = "شناسه سبد خرید نامعتبر است."
+                });
+            }
+
+            var userId = GetCurrentUserId();
+
+            if (!userId.HasValue)
+            {
+                return Unauthorized(new
+                {
+                    res = false,
+                    msg = "لطفاً ابتدا وارد حساب کاربری شوید."
+                });
+            }
+
+            var result = await _basketItemService.RemoveBasketItem(
+                model.BasketItemId,
+                userId.Value);
+
+            if (!result)
+            {
+                return NotFound(new
+                {
+                    res = false,
+                    msg = "آیتم سبد خرید پیدا نشد."
+                });
+            }
+
+            return Ok(new
+            {
+                res = true,
+                msg = "محصول از سبد خرید حذف شد."
+            });
+        }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveBasketItem([FromBody] RemoveBasketItemDto model)
-        {
-            var res = await _basketItemService.RemoveBasketItem(model.BasketItemId);
-            return Ok(new { res = true });
-
-        }
-
-        [Authorize]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Pay(PayDto model)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var data = await _basketService.Pay(model.mobile,model.address,Convert.ToInt32(userId));
+            if (!ModelState.IsValid)
+                return RedirectToAction("Basket");
 
-            return RedirectToAction("Index","Profile");
+            var userId = GetCurrentUserId();
+
+            if (!userId.HasValue)
+                return Unauthorized();
+
+            var result = await _basketService.Pay(
+                model.Mobile,
+                model.Address,
+                userId.Value);
+
+            if (!result)
+                return RedirectToAction("Basket");
+
+            return RedirectToAction("Index", "Profile");
         }
 
+        [AllowAnonymous]
+        [HttpGet]
         public async Task<IActionResult> GetBasketCount()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Ok(0);   // not logged in -> empty basket
+            var userId = GetCurrentUserId();
 
-            // Assuming you have a service to get basket items
-            var count = await _basketService.GetBasketItemCountAsync(Convert.ToInt32(userId));
+            if (!userId.HasValue)
+                return Ok(0);
+
+            var count =
+                await _basketService.GetBasketItemCountAsync(userId.Value);
+
             return Ok(count);
+        }
+
+        private int? GetCurrentUserId()
+        {
+            var claim = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+            if (int.TryParse(claim, out var userId))
+                return userId;
+
+            return null;
         }
     }
 }

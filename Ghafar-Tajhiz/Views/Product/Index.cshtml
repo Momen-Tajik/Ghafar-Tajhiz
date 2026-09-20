@@ -1,43 +1,93 @@
 ﻿@using DataAccess.Models
 @model Product
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = Model.ProductName;
 }
 
+<input id="productId"
+       type="hidden"
+       value="@Model.ProductId" />
 
-<input id="productId" type="hidden" name="name" value="@Model.ProductId" />
-<!-- Header -->
 <header class="productHeader">
+
     <div class="product">
+
         <div class="product-image">
-            <img src="/api/FileUpload/GetFile?filename=@Model.ImageUrl" alt="@Model.ProductName" class="product-img">
+
+            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+            {
+                <img src="/api/FileUpload/GetFile?filename=@Uri.EscapeDataString(Model.ImageUrl)"
+                     alt="@Model.ProductName"
+                     class="product-img"
+                     loading="lazy" />
+            }
+
         </div>
 
         <div class="product-content">
+
             <div class="product-details">
-                <h1>@Model.ProductName</h1>
+
+                <h1>
+                    @Model.ProductName
+                </h1>
 
                 <div class="features">
+
                     <ul>
-                        <li>@* @Model.Category.CategoryName *@</li>
-                        <li>ظرفیت استثنایی پخت ۱۸ تکه جوجه در هر بار، راندمان تولید شما را تا ۴۰٪ افزایش می‌دهد</li>
-                        <li>سیستم پخت ۳۶۰ درجه و کنترل دمای دیجیتال، کیفیت یکسان هر بار پخت را تضمین می‌کند</li>
-                        <li>کاهش ۳۰٪ در مصرف انرژی و ۵۰٪ در نیروی انسانی مورد نیاز برای بخش کباب</li>
-                        <li>طراحی استیل ضدزنگ با سینی جداشونده، نظافت و رعایت پروتکل‌های بهداشتی را تسهیل می‌کند</li>
-                        <li>@Model.ProductDescription</li>
+                        <li>
+                            ظرفیت استثنایی پخت ۱۸ تکه جوجه در هر بار،
+                            راندمان تولید شما را افزایش می‌دهد.
+                        </li>
+
+                        <li>
+                            سیستم پخت ۳۶۰ درجه و کنترل دمای دیجیتال،
+                            کیفیت یکسان هر بار پخت را تضمین می‌کند.
+                        </li>
+
+                        <li>
+                            طراحی استیل ضدزنگ با سینی جداشونده،
+                            نظافت را ساده‌تر می‌کند.
+                        </li>
+
+                        @if (!string.IsNullOrWhiteSpace(
+                        Model.ProductDescription))
+                        {
+                            <li>
+                                @Model.ProductDescription
+                            </li>
+                        }
                     </ul>
+
                 </div>
 
                 <div class="purchase-section">
+
                     <div class="price">
-                        <!-- اضافه کردن موجودی انبار به صورت hidden -->
-                        <input id="stockQuantity" type="hidden" value="@Model.StockQuantity">
-                        <input id="basePrice" type="hidden" value="@Model.Price">
-                        <strong id="basePriceShow">قیمت نهایی: @Model.Price.ToString("N0") تومان</strong>
+
+                        <input id="stockQuantity"
+                               type="hidden"
+                               value="@Model.StockQuantity" />
+
+                        <input id="basePrice"
+                               type="hidden"
+                               value="@Model.Price" />
+
+                        <strong id="basePriceShow">
+                            قیمت:
+                            @Model.Price.ToString("N0")
+                            تومان
+                        </strong>
+
                     </div>
+
                     <div class="quantity">
-                        <label>تعداد:</label>
-                        <!-- تنظیم max بر اساس موجودی انبار -->
+
+                        <label>
+                            تعداد:
+                        </label>
+
                         @if (Model.StockQuantity > 0)
                         {
                             <input id="countInput"
@@ -45,9 +95,14 @@
                                    min="1"
                                    max="@Model.StockQuantity"
                                    value="1"
-                                   class="quantity-input">
-                            <span id="stockMessage" class="stock-message" style="font-size: 12px; color: #666;">
-                                موجودی انبار: @Model.StockQuantity عدد
+                                   class="quantity-input" />
+
+                            <span id="stockMessage"
+                                  class="stock-message"
+                                  style="font-size:12px;color:#666;">
+                                موجودی انبار:
+                                @Model.StockQuantity
+                                عدد
                             </span>
                         }
                         else
@@ -58,62 +113,113 @@
                                    max="0"
                                    value="0"
                                    class="quantity-input"
-                                   disabled>
-                            <span id="stockMessage" class="stock-message" style="font-size: 12px; color: red;">
+                                   disabled />
+
+                            <span id="stockMessage"
+                                  class="stock-message"
+                                  style="font-size:12px;color:red;">
                                 موجودی: ۰
                             </span>
                         }
+
                     </div>
+
                 </div>
 
-                @if (  Model.StockQuantity > 0)
+                @if (Model.StockQuantity > 0)
                 {
-                    <a onclick="AddToBasket() " class="btnProduct">افزودن به سبد خرید</a>
+                    <button type="button"
+                            onclick="AddToBasket()"
+                            class="btnProduct">
+                        افزودن به سبد خرید
+                    </button>
                 }
                 else
                 {
-                    <a href="Product.html" class="btnProduct disabled" style="opacity: 0.5; cursor: not-allowed;">
-                        این محصول موجود نمیباشد
-                    </a>
+                    <button type="button"
+                            class="btnProduct"
+                            disabled
+                            style="opacity:0.5;cursor:not-allowed;">
+                        این محصول موجود نمی‌باشد
+                    </button>
                 }
+
             </div>
+
         </div>
+
     </div>
+
 </header>
 
 <section class="comments-section">
-    <h3 class="comments-title">نظرات کاربران</h3>
 
-    <!-- فرم ثبت نظر -->
-    <form asp-action="AddProductComment" asp-controller="Product" method="post" class="comment-form">
-        <input type="hidden" id="productId" name="productId" value="@Model.ProductId" />
+    <h3 class="comments-title">
+        نظرات کاربران
+    </h3>
+
+    <form asp-action="AddProductComment"
+          asp-controller="Product"
+          method="post"
+          class="comment-form">
+
         @Html.AntiForgeryToken()
 
-        <textarea id="commentText" name="text" rows="4" placeholder="نظر خود را بنویسید..." required></textarea>
+        <textarea id="commentText"
+                  name="Text"
+                  rows="4"
+                  maxlength="500"
+                  placeholder="نظر خود را بنویسید..."
+                  required></textarea>
 
-        <button type="button" onclick="addComment()" class="btn-submit">ثبت نظر</button>
+        <button type="button"
+                onclick="addComment()"
+                class="btn-submit">
+            ثبت نظر
+        </button>
+
     </form>
 
-    <!-- تعداد نظرات -->
     <div class="comments-count">
-        <span>@Model.Comments.Count()</span> نظر
+
+        <span>
+            @Model.Comments.Count
+        </span>
+
+        نظر
+
     </div>
 
-    <!-- لیست نظرات -->
     <div class="comments-list">
+
         @foreach (var item in Model.Comments)
         {
             <div class="comment-item">
+
                 <div class="comment-header mb-4">
-                    <h6>@item.UserName</h6> 
-                    <span class="comment-date">  @item.Created.ToString("yyyy/MM/dd - HH:mm") </span>
+
+                    <h6>
+                        @(item.User?.FullName ?? "کاربر")
+                    </h6>
+
+                    <span class="comment-date">
+                        @item.Created.ToString(
+                                 "yyyy/MM/dd - HH:mm")
+                    </span>
+
                 </div>
 
                 <div class="comment-body">
-                    <p>@item.Text</p>
+
+                    <p>
+                        @item.Text
+                    </p>
+
                 </div>
+
             </div>
         }
-    </div>
-</section>
 
+    </div>
+
+</section>

@@ -1,102 +1,166 @@
 ﻿@using DataAccess.Models
-@model List<BasketItem>
+@model IReadOnlyList<BasketItem>
+
 @{
-    ViewData["Title"] = "Basket";
+    ViewData["Title"] = "سبد خرید";
+
+    var totalPrice = Model.Sum(item =>
+        item.Qty * item.UnitPrice);
 }
 
-<!-- bascket --><!-- bascket --><!-- bascket --><!-- bascket -->
-
 <div class="cart-container">
-    <h1 class="cart-header">سبد خرید شما</h1>
 
-    @if (!Model.Any() )
+    <h1 class="cart-header">
+        سبد خرید شما
+    </h1>
+
+    @if (!Model.Any())
     {
-        <!-- در صورت خالی بودن سبد خرید -->
         <div class="empty-cart">
-            <p>سبد خرید شما خالی است</p>
-            <a class="continue-shopping">ادامه خرید</a>
+
+            <p>
+                سبد خرید شما خالی است
+            </p>
+
+            <a asp-controller="Product"
+               asp-action="ProductList"
+               class="btnProduct">
+                ادامه خرید
+            </a>
+
         </div>
     }
     else
     {
-        <!-- در صورت وجود محصول در سبد خرید -->
         <table class="cart-table">
+
             <thead>
                 <tr>
                     <th>محصول</th>
-                    <th>قیمت</th>
+                    <th>قیمت واحد</th>
                     <th>تعداد</th>
                     <th>جمع</th>
                     <th>حذف</th>
                 </tr>
             </thead>
+
             <tbody>
-                <!-- global totalPrice= 0; -->
+
                 @foreach (var item in Model)
                 {
+                    var itemTotal =
+                    item.Qty * item.UnitPrice;
+
                     <tr id="Basket_@item.BasketItemId">
+
                         <td>
-                            <div style="display: flex; align-items: center;">
-                                <img src="/api/FileUpload/GetFile?filename=@item.Product.ImageUrl" alt="@item.Product.ProductName" class="cart-item-image">
-                                <span style="margin-right: 15px;">@item.Product.ProductName</span>
+                            <div style="display:flex;align-items:center;">
+
+                                @if (!string.IsNullOrWhiteSpace(
+                               item.Product?.ImageUrl))
+                                {
+                                    <img src="/api/FileUpload/GetFile?filename=@Uri.EscapeDataString(item.Product.ImageUrl)"
+                                         alt="@item.Product.ProductName"
+                                         class="cart-item-image"
+                                         loading="lazy" />
+                                }
+
+                                <span style="margin-right:15px;">
+                                    @item.Product?.ProductName
+                                </span>
+
                             </div>
                         </td>
+
                         <td>
-                            @item.Product.Price.ToString("N0") تومان
+                            @item.UnitPrice.ToString("N0")
+                            تومان
                         </td>
+
                         <td>
                             <div class="quantity-control">
                                 @item.Qty
                             </div>
                         </td>
+
                         <td>
-                            <div class="price">
-                                <input id="basePrice" type="hidden" value="@item.Product.Price">
-                                <strong id="basePriceShow">@item.UnitPrice.ToString("N0")  تومان</strong>
-                            </div>
+                            <strong>
+                                @itemTotal.ToString("N0")
+                                تومان
+                            </strong>
                         </td>
+
                         <td>
-                            <button onclick="RemoveBasketItem(@item.BasketItemId)" class="remove-btn">حذف</button>
+                            <button type="button"
+                                    onclick="RemoveBasketItem(@item.BasketItemId)"
+                                    class="remove-btn">
+                                حذف
+                            </button>
                         </td>
+
                     </tr>
-                    //totalPrice = item.Price + totalPrice;
                 }
 
-
-                <!-- می‌توانید ردیف‌های بیشتری برای محصولات دیگر اضافه کنید -->
             </tbody>
+
         </table>
 
-        <!--این قسمت رو درست کن بعدا -->
+        <form asp-action="Pay"
+              asp-controller="Order"
+              method="post"
+              id="payForm">
 
-        <form id="payForm" asp-action="Pay" asp-controller="Order" method="post">
-            <div class="cart-summary">
-                <div class="summary-row">
-                    <textarea id="address" style="width:stretch; direction:rtl; height:100px"
-                              class="text-opacity-100"
-                              name="address"
-                              placeholder="آدرس..."></textarea>
-                </div>
+            @Html.AntiForgeryToken()
 
-                <div class="summary-row">
-                    <input id="mobile" style="width:stretch; height:50px"
-                           type="text"
-                           name="mobile"
-                           placeholder="09........." />
-                </div>
-
-                <div class="summary-row">
-                    <span>مبلغ نهایی:</span>
-                    <span>@(Model.Select(a => a.UnitPrice).Sum().ToString("N0"))  <strong>تومان</strong></span>
-                </div>
-
-                <button type="submit" class="checkout-btn" onclick="return validateCheckOutForm()">پرداخت و تکمیل سفارش</button>
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger mb-3">
             </div>
-        </form>
 
+            <div class="cart-summary">
+
+                <div class="summary-row">
+
+                    <textarea id="address"
+                              name="Address"
+                              style="width:stretch;direction:rtl;height:100px"
+                              class="text-opacity-100"
+                              placeholder="آدرس..."></textarea>
+
+                </div>
+
+                <div class="summary-row">
+
+                    <input id="mobile"
+                           name="Mobile"
+                           style="width:stretch;height:50px"
+                           type="text"
+                           inputmode="numeric"
+                           placeholder="09xxxxxxxxx" />
+
+                </div>
+
+                <div class="summary-row">
+
+                    <span>
+                        مبلغ نهایی:
+                    </span>
+
+                    <span>
+                        @totalPrice.ToString("N0")
+                        <strong>تومان</strong>
+                    </span>
+
+                </div>
+
+                <button type="submit"
+                        class="checkout-btn"
+                        onclick="return validateCheckOutForm()">
+                    پرداخت و تکمیل سفارش
+                </button>
+
+            </div>
+
+        </form>
     }
 
-
 </div>
-
-

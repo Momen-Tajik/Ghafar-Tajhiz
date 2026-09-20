@@ -1,24 +1,32 @@
 ﻿@using DataAccess.Models
-@model List<Product>
+@model IReadOnlyList<Product>
 
 <div class="productsContainer">
-
     @foreach (var item in Model)
     {
         <div class="productsItems">
-            <img class="productsImage"
-                 src="/api/FileUpload/GetFile?filename=@item.ImageUrl"
-                 alt="@item.ProductName" />
+
+            @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+            {
+                <img class="productsImage"
+                     src="/api/FileUpload/GetFile?filename=@Uri.EscapeDataString(item.ImageUrl)"
+                     alt="@item.ProductName"
+                     loading="lazy" />
+            }
 
             <div class="productsInfo">
-                <div style="display:flex;justify-content:space-between; align-items:center">
-                    <h5>@item.ProductName </h5>
-                    <a class="openModal" data-product-id="@item.ProductId">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <h5>@item.ProductName</h5>
+
+                    <button type="button"
+                            class="openModal"
+                            data-product-id="@item.ProductId"
+                            aria-label="مشاهده اطلاعات محصول">
                         <i class="infoBtn fa fa-info-circle"></i>
-                    </a>
+                    </button>
                 </div>
+
                 <p>@item.Price.ToString("N0") تومان</p>
-                
 
                 <a asp-controller="Product"
                    asp-action="Index"
@@ -29,5 +37,4 @@
             </div>
         </div>
     }
-
 </div>

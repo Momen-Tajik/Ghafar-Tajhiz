@@ -4,8 +4,17 @@ namespace Ghafar_Tajhiz.Models
 {
     public class PayDto
     {
-        public string address { get; set; }
+        [Required(ErrorMessage = "آدرس الزامی است")]
+        [StringLength(
+            500,
+            MinimumLength = 10,
+            ErrorMessage = "آدرس باید بین 10 تا 500 کاراکتر باشد")]
+        public string Address { get; set; } = string.Empty;
 
-        public string mobile { get; set; }
+        [Required(ErrorMessage = "شماره موبایل الزامی است")]
+        [RegularExpression(
+            @"^09[0-9]{9}$",
+            ErrorMessage = "فرمت شماره موبایل نامعتبر است")]
+        public string Mobile { get; set; } = string.Empty;
     }
 }
