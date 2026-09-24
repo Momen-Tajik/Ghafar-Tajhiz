@@ -1,23 +1,30 @@
 ﻿using BusinessLogic.BasketServices;
-using BusinessLogic.ProductServices;
 using Ghafar_Tajhiz_Admin.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ghafar_Tajhiz_Admin.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class OrdersController : Controller
     {
-
         private readonly BasketService _basketService;
 
-        public OrdersController(BasketService basketService)
+        public OrdersController(
+            BasketService basketService)
         {
             _basketService = basketService;
         }
 
-        public async Task<IActionResult> Index(string search = null, string sort = "paiddate")
+        [HttpGet]
+        public async Task<IActionResult> Index(
+            string? search,
+            string sort = "paiddate")
         {
-            var data = await _basketService.GetAdminBskets(search, sort);
+            var data =
+                await _basketService.GetAdminBskets(
+                    search,
+                    sort);
 
             ViewBag.Search = search;
             ViewBag.Sort = sort;
@@ -25,16 +32,40 @@ namespace Ghafar_Tajhiz_Admin.Controllers
             return View(data);
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> SetStateCommand([FromBody] StatusDto model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetStateCommand(
+            [FromBody] StatusDto model)
         {
+            if (model == null ||
+                model.BasketId <= 0)
+            {
+                return BadRequest(new
+                {
+                    res = false,
+                    msg = "شناسه سفارش نامعتبر است."
+                });
+            }
 
+            var result =
+                await _basketService.SetState(
+                    model.BasketId,
+                    model.Status);
 
-            await _basketService.SetState(model.BasketItemId, model.Status);
+            if (!result)
+            {
+                return BadRequest(new
+                {
+                    res = false,
+                    msg = "تغییر وضعیت سفارش انجام نشد."
+                });
+            }
 
-            return Ok(new { res = true, msg = "وضعیت سفارش با موفقیت تغیر کرد" });
-
+            return Ok(new
+            {
+                res = true,
+                msg = "وضعیت سفارش با موفقیت تغییر کرد."
+            });
         }
     }
 }

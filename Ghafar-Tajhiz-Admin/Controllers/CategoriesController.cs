@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using DataAccess.Data;
+﻿using BusinessLogic.CategoryServices;
 using DataAccess.Models;
-using BusinessLogic.CategoryServices;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Ghafar_Tajhiz_Admin.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
         private readonly CategoryService _categoryService;
@@ -20,121 +15,124 @@ namespace Ghafar_Tajhiz_Admin.Controllers
             _categoryService = categoryService;
         }
 
-        // GET: Categories
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _categoryService.GetCategories());
+            var categories =
+                await _categoryService.GetCategories();
+
+            return View(categories);
         }
 
-        // GET: Categories/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
+            if (id <= 0)
                 return NotFound();
-            }
 
-            var category = await _categoryService.GetCategoryById(id.Value);
+            var category =
+                await _categoryService.GetCategoryById(id);
+
             if (category == null)
-            {
                 return NotFound();
-            }
 
             return View(category);
         }
 
-        // GET: Categories/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Categories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,CategoryName,CategoryDescription")] Category category)
+        public async Task<IActionResult> Create(
+            [Bind("CategoryName,CategoryDescription")] Category category)
         {
-            if (ModelState.IsValid)
-            {
-                await _categoryService.CreatCategory(category);
-                return RedirectToAction(nameof(Index));
-            }
-            return View(category);
-        }
+            if (!ModelState.IsValid)
+                return View(category);
 
-        // GET: Categories/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            await _categoryService.CreateCategory(category);
 
-            var category = await _categoryService.GetCategoryById(id.Value);
-            if (category == null)
-            {
-                return NotFound();
-            }
-            return View(category);
-        }
-
-        // POST: Categories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Category category)
-        {
-            if (id != category.CategoryId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-             
-                await _categoryService.EditCategory(category);
-                return RedirectToAction(nameof(Index));
-            }
-            return View(category);
-        }
-
-        // GET: Categories/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var category = await _categoryService.GetCategoryById(id.Value);
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            return View(category);
-        }
-
-        //POST: Categories/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var category = await _categoryService.GetCategoryById(id);
-            if (category != null)
-            {
-                await _categoryService.DeleteCategory(category);
-            }
+            TempData["Success"] =
+                "دسته‌بندی با موفقیت ایجاد شد.";
 
             return RedirectToAction(nameof(Index));
         }
 
-        //private bool CategoryExists(int id)
-        //{
-        //    return _context.Categories.Any(e => e.CategoryId == id);
-        //}
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id <= 0)
+                return NotFound();
+
+            var category =
+                await _categoryService.GetCategoryById(id);
+
+            if (category == null)
+                return NotFound();
+
+            return View(category);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("CategoryId,CategoryName,CategoryDescription")]
+            Category category)
+        {
+            if (id != category.CategoryId)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return View(category);
+
+            var result =
+                await _categoryService.EditCategory(category);
+
+            if (!result)
+                return NotFound();
+
+            TempData["Success"] =
+                "دسته‌بندی با موفقیت بروزرسانی شد.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id <= 0)
+                return NotFound();
+
+            var category =
+                await _categoryService.GetCategoryById(id);
+
+            if (category == null)
+                return NotFound();
+
+            return View(category);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            if (id <= 0)
+                return NotFound();
+
+            var result =
+                await _categoryService.DeleteCategory(id);
+
+            if (!result)
+                return NotFound();
+
+            TempData["Success"] =
+                "دسته‌بندی با موفقیت حذف شد.";
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

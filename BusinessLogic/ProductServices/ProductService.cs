@@ -40,6 +40,7 @@ namespace BusinessLogic.ProductServices
             return await _context.Products
                 .Include(p => p.Comments
                     .OrderByDescending(c => c.Created))
+                .ThenInclude(c => c.User)
                 .FirstOrDefaultAsync(p => p.ProductId == id);
         }
 

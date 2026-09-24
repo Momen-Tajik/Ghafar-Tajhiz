@@ -1,378 +1,789 @@
+/* =========================================================
+   NAVBAR
+========================================================= */
 
-/*Navbar*//*Navbar*//*Navbar*/
 document.addEventListener("DOMContentLoaded", function () {
-
-    var navBtn = document.getElementById("mobileNavbarBtn");
-    var desktopNav = document.getElementById("desktopnavbar");
+    const navBtn = document.getElementById("mobileNavbarBtn");
+    const desktopNav = document.getElementById("desktopnavbar");
 
     if (navBtn && desktopNav) {
         navBtn.addEventListener("click", function () {
             desktopNav.classList.toggle("active");
         });
     }
-
 });
-// تابع برای فرمت کردن قیمت
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
 function formatPrice(price) {
-    // تبدیل به عدد و سپس فرمت با جداکننده هزارگان
-    return new Intl.NumberFormat('fa-IR').format(price);
+    const value = Number(price);
+
+    if (Number.isNaN(value)) {
+        return "۰";
+    }
+
+    return new Intl.NumberFormat("fa-IR").format(value);
 }
 
-// تابع برای به‌روزرسانی قیمت
-function updatePrice() {
-    let basePriceElement = document.getElementById("basePrice");
-    let countInput = document.getElementById("countInput");
-    let stockQuantityElement = document.getElementById("stockQuantity");
-    let basePriceShow = document.getElementById("basePriceShow");
-    let stockMessage = document.getElementById("stockMessage");
 
-    // اگر المان‌ها وجود نداشته باشند، تابع را متوقف کن
-    if (!basePriceElement || !countInput || !stockQuantityElement || !basePriceShow) {
-        return;
-    }
+function getAntiForgeryToken() {
+    const token = document.querySelector(
+        'input[name="__RequestVerificationToken"]'
+    );
 
-    let basePrice = parseFloat(basePriceElement.value);
-    let stockQuantity = parseInt(stockQuantityElement.value);
-    let count = parseInt(countInput.value);
+    return token ? token.value : null;
+}
 
-    // اگر موجودی انبار صفر باشد
-    if (stockQuantity <= 0) {
-        basePriceShow.innerHTML = `قیمت نهایی: ۰ تومان`;
-        if (countInput) {
-            countInput.disabled = true;
+
+async function parseResponse(response) {
+    const contentType = response.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw data;
         }
+
+        return data;
+    }
+
+    const text = await response.text();
+
+    if (!response.ok) {
+        throw {
+            msg: text || "خطای غیرمنتظره"
+        };
+    }
+
+    return text;
+}
+
+
+/* =========================================================
+   PRODUCT PRICE / QUANTITY
+========================================================= */
+
+function updatePrice() {
+    const basePriceElement =
+        document.getElementById("basePrice");
+
+    const countInput =
+        document.getElementById("countInput");
+
+    const stockQuantityElement =
+        document.getElementById("stockQuantity");
+
+    const basePriceShow =
+        document.getElementById("basePriceShow");
+
+    const stockMessage =
+        document.getElementById("stockMessage");
+
+    if (
+        !basePriceElement ||
+        !countInput ||
+        !stockQuantityElement ||
+        !basePriceShow
+    ) {
         return;
     }
 
-    // محدود کردن مقدار ورودی به موجودی انبار
+    const basePrice =
+        Number(basePriceElement.value);
+
+    const stockQuantity =
+        Number(stockQuantityElement.value);
+
+    let count =
+        Number(countInput.value);
+
+    if (Number.isNaN(basePrice) ||
+        Number.isNaN(stockQuantity)) {
+        return;
+    }
+
+    if (stockQuantity <= 0) {
+        countInput.value = 0;
+        countInput.disabled = true;
+
+        basePriceShow.textContent =
+            "قیمت نهایی: ۰ تومان";
+
+        if (stockMessage) {
+            stockMessage.textContent =
+                "موجودی: ۰";
+
+            stockMessage.style.color = "red";
+        }
+
+        return;
+    }
+
+    if (Number.isNaN(count) || count < 1) {
+        count = 1;
+    }
+
     if (count > stockQuantity) {
         count = stockQuantity;
-        countInput.value = count;
     }
 
-    if (count <= 0) {
-        count = 1;
-        countInput.value = 1;
-    }
+    countInput.value = count;
 
-    // به‌روزرسانی پیام موجودی
     if (stockMessage) {
-        stockMessage.innerHTML = `موجودی انبار: ${stockQuantity} عدد`;
+        stockMessage.textContent =
+            `موجودی انبار: ${formatPrice(stockQuantity)} عدد`;
 
-        // تغییر رنگ پیام وقتی موجودی کم است
         if (stockQuantity < 5) {
             stockMessage.style.color = "orange";
-        } else if (stockQuantity <= 0) {
-            stockMessage.style.color = "red";
         } else {
             stockMessage.style.color = "#666";
         }
     }
 
-    // محاسبه و نمایش قیمت نهایی
-    let totalPrice = basePrice * count;
-    basePriceShow.innerHTML = `قیمت نهایی: ${formatPrice(totalPrice)} تومان`;
-}
+    const totalPrice =
+        basePrice * count;
 
-// اجرای تابع هنگام بارگذاری صفحه
-document.addEventListener('DOMContentLoaded', function () {
-    // اولین بار قیمت را محاسبه کن
-    updatePrice();
-
-    // اضافه کردن event listener برای تغییرات
-    let countInput = document.getElementById("countInput");
-    if (countInput && !countInput.disabled) {
-        countInput.addEventListener("input", updatePrice);
-        countInput.addEventListener("change", updatePrice);
-
-        // اضافه کردن event برای جلوگیری از ورود مقادیر نامعتبر
-        countInput.addEventListener("keydown", function (e) {
-            let stockQuantity = parseInt(document.getElementById("stockQuantity").value);
-            let currentValue = parseInt(this.value) || 0;
-
-            // اگر کاربر عددی بیشتر از موجودی وارد کرد
-            if (currentValue > stockQuantity) {
-                this.value = stockQuantity;
-                updatePrice();
-            }
-        });
-    }
-});
-
-// همچنین می‌توانیم event listener برای تغییرات دستی مقدار input اضافه کنیم
-document.addEventListener('input', function (e) {
-    if (e.target && e.target.id === 'countInput') {
-        updatePrice();
-    }
-});
-
-
-/*Register*//*Register*//*Register*//*Register*/
-
-document.getElementById("togglePassword")?.addEventListener("click", function () {
-    const input = document.getElementById("passwordInput");
-    input.type = input.type === "password" ? "text" : "password";
-});
-
-/*Modal *//*Modal *//*Modal *//*Modal *//*Modal */
-
-//Product Information Modal
-document.addEventListener("DOMContentLoaded", function () {
-
-    const modal = document.getElementById("modal");
-    const closeBtn = document.querySelector(".close");
-    const modalBody = document.getElementById("modalBody");
-
-    document.querySelectorAll(".openModal").forEach(btn => {
-
-        btn.addEventListener("click", async function () {
-
-            const productId = btn.dataset.productId;
-            console.log("ProductId:", productId);
-
-            modal.style.display = "block";
-            modalBody.innerHTML = document.getElementById("modelBody");
-
-            try {
-                const response = await fetch(`/Product/GetProduct?id=${productId}`);
-
-                if (!response.ok)
-                    throw new Error("Request failed");
-
-                const html = await response.text();
-                modalBody.innerHTML = html;
-            }
-            catch (err) {
-                modalBody.innerHTML = "خطا در دریافت اطلاعات محصول";
-                console.error(err);
-            }
-        });
-
-    });
-
-    closeBtn.onclick = () => modal.style.display = "none";
-
-    window.onclick = e => {
-        if (e.target === modal)
-            modal.style.display = "none";
-    };
-});
-
-//Term Modal  errrrrror
-
-//document.addEventListener("DOMContentLoaded", function () {
-
-//    const modal = document.getElementById("termsModal");
-//    const closeBtn = document.querySelector(".close");
-//    const modalBody = document.getElementById("termModalBody");
-
-//    document.querySelectorAll(".openModal").forEach(btn => {
-
-//        btn.addEventListener("click", async function () {
-
-
-//            modal.style.display = "block";
-//            modalBody.innerHTML = "قوانینننننننن";
-
-//            try {
-
-//                modalBody.innerHTML = "قوانینننننننن";
-//            }
-//            catch (err) {
-//                modalBody.innerHTML = "خطا در دریافت اطلاعات محصول";
-//                console.error(err);
-//            }
-//        });
-
-//    });
-
-//    closeBtn.onclick = () => modal.style.display = "none";
-
-//    window.onclick = e => {
-//        if (e.target === modal)
-//            modal.style.display = "none";
-//    };
-//});
-
-
-/*Basket*//*Basket*//*Basket*//*Basket*//*Basket*/
-
-
-function AddToBasket() {
-    var productId = parseInt(document.getElementById("productId").value);
-    var qty = parseInt(document.getElementById("countInput").value);
-
-    fetch('/Order/AddToBasket', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId, qty })
-    })
-        .then(async res => {
-            const data = await res.json();
-            if (!res.ok) throw data;
-            return data;
-        })
-        .then(data => {
-            if (data.res === false) {
-                showFailAlert('', data.msg);
-            } else {
-                showSuccessAlert('', data.msg);
-                updateCartBadge()
-            }
-        })
-        .catch(err => {
-            showFailAlert('', err.msg || 'خطای غیرمنتظره');
-        }); 
-}
-
-function RemoveBasketItem(id) {
-
-    var data = {
-        BasketItemId:id
-    };
-
-
-    fetch('/Order/RemoveBasketItem', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-
-    })
-        .then(res => res.json())
-        .then(data => {
-            const row = document.getElementById("Basket_" + id);
-            row.style.display = "none";
-            updateCartBadge()
-        })
-        .catch(err => console.error(err.message));
-
-}
-
-function validateCheckOutForm() {
-    const address = document.getElementById('address').value.trim();
-    const mobile = document.getElementById('mobile').value.trim();
-    const mobileRegex = /^09\d{9}$/;
-
-    if (address === '') {
-        showFailAlert('خطا', 'لطفا آدرس را وارد کنید');
-        return false; // جلوی ارسال فرم رو می‌گیره
-    }
-
-    if (!mobileRegex.test(mobile)) {
-        showFailAlert('خطا', 'شماره موبایل وارد شده معتبر نیست');
-        return false; // جلوی ارسال فرم رو می‌گیره
-    }
-
-    return true; // فرم ارسال میشه
-}
-
-function updateCartBadge() {
-    fetch('/Order/GetBasketCount')
-        .then(response => response.json())
-        .then(count => {
-            const badgeDesktop = document.getElementById('cart-badge-desktop');
-            const badgeMobile = document.getElementById('cart-badge-mobile');
-
-            if (badgeDesktop) {
-                badgeDesktop.textContent = count;
-                badgeDesktop.setAttribute('data-count', count);
-            }
-            if (badgeMobile) {
-                badgeMobile.textContent = count;
-                badgeMobile.setAttribute('data-count', count);
-            }
-        })
-        .catch(() => { });
+    basePriceShow.textContent =
+        `قیمت نهایی: ${formatPrice(totalPrice)} تومان`;
 }
 
 
+function initializeQuantityInput() {
+    const countInput =
+        document.getElementById("countInput");
 
-/*Comment*/
-
-function addComment() {
-    // Get values
-    const productId = parseInt(document.getElementById('productId').value);
-    const commentText = document.getElementById('commentText').value;
-    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
-    // Validate
-    if (!commentText.trim()) {
-        showFailAlert('', 'متن نظر نمی‌تواند خالی باشد');
+    if (!countInput || countInput.disabled) {
         return;
     }
 
-    // Send AJAX
-    fetch('/Product/AddProductComment', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'RequestVerificationToken': token
-        },
-        body: JSON.stringify({
-            productId: productId,
-            text: commentText
-        })
-    })
-        .then(async res => {
-            const data = await res.json();
-            if (!res.ok) throw data;
-            return data;
-        })
-        .then(data => {
-            if (data.res === false) {
-                showFailAlert('', data.msg);
-            } else {
-                showSuccessAlert('', data.msg);
-                setTimeout(() => location.reload(), 750);
-            }
-        })
-        .catch(err => {
-            showFailAlert('', err.msg || 'خطای غیرمنتظره');
-        });
+    countInput.addEventListener("input", updatePrice);
+    countInput.addEventListener("change", updatePrice);
+
+    updatePrice();
 }
 
 
-/* LOGIN ERROR SWEETALERT */
+/* =========================================================
+   PASSWORD
+========================================================= */
 
-document.addEventListener("DOMContentLoaded", function () {
+function initializePasswordToggle() {
+    const toggleButton =
+        document.getElementById("togglePassword");
 
-    const loginErrorDiv = document.getElementById("loginError");
+    const passwordInput =
+        document.getElementById("passwordInput");
 
-    if (!loginErrorDiv) return;
-
-    const errorMessage = loginErrorDiv.getAttribute("data-error");
-
-    if (errorMessage && errorMessage.trim() !== "") {
-        Swal.fire({
-            icon: 'error',
-            title: 'خطا',
-            text: errorMessage,
-            confirmButtonText: 'باشه'
-        });
+    if (!toggleButton || !passwordInput) {
+        return;
     }
-});
 
-/* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT */
+    toggleButton.addEventListener("click", function () {
+        const isPassword =
+            passwordInput.type === "password";
 
-function showSuccessAlert(title,text='موفق') {
+        passwordInput.type =
+            isPassword ? "text" : "password";
+    });
+}
+
+
+/* =========================================================
+   PRODUCT MODAL
+========================================================= */
+
+function initializeProductModal() {
+    const modal =
+        document.getElementById("modal");
+
+    const modalBody =
+        document.getElementById("modalBody");
+
+    const closeButton =
+        document.getElementById("closeModal");
+
+    if (!modal || !modalBody) {
+        return;
+    }
+
+    document.querySelectorAll(".openModal")
+        .forEach(button => {
+
+            button.addEventListener("click", async function () {
+
+                const productId =
+                    Number(this.dataset.productId);
+
+                if (!productId || productId <= 0) {
+                    return;
+                }
+
+                modal.style.display = "block";
+
+                modalBody.innerHTML =
+                    '<div class="text-center">در حال دریافت اطلاعات...</div>';
+
+                try {
+                    const response =
+                        await fetch(
+                            `/Product/GetProduct?id=${productId}`,
+                            {
+                                method: "GET",
+                                headers: {
+                                    "X-Requested-With":
+                                        "XMLHttpRequest"
+                                }
+                            }
+                        );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "دریافت اطلاعات محصول ناموفق بود."
+                        );
+                    }
+
+                    const html =
+                        await response.text();
+
+                    modalBody.innerHTML = html;
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    modalBody.innerHTML =
+                        "خطا در دریافت اطلاعات محصول";
+                }
+            });
+        });
+
+    if (closeButton) {
+        closeButton.addEventListener(
+            "click",
+            function () {
+                modal.style.display = "none";
+            }
+        );
+    }
+
+    window.addEventListener(
+        "click",
+        function (event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+    );
+}
+
+
+/* =========================================================
+   BASKET
+========================================================= */
+
+async function AddToBasket() {
+
+    const productIdElement =
+        document.getElementById("productId");
+
+    const qtyElement =
+        document.getElementById("countInput");
+
+    if (!productIdElement || !qtyElement) {
+        return;
+    }
+
+    const productId =
+        Number(productIdElement.value);
+
+    const qty =
+        Number(qtyElement.value);
+
+    if (!productId || productId <= 0) {
+        showFailAlert(
+            "خطا",
+            "محصول نامعتبر است."
+        );
+        return;
+    }
+
+    if (!qty || qty <= 0) {
+        showFailAlert(
+            "خطا",
+            "تعداد محصول نامعتبر است."
+        );
+        return;
+    }
+
+    const token =
+        getAntiForgeryToken();
+
+    if (!token) {
+        showFailAlert(
+            "خطا",
+            "توکن امنیتی یافت نشد."
+        );
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                "/Order/AddToBasket",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        "RequestVerificationToken":
+                            token,
+
+                        "X-Requested-With":
+                            "XMLHttpRequest"
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        qty: qty
+                    })
+                }
+            );
+
+        const data =
+            await parseResponse(response);
+
+        if (!data.res) {
+            showFailAlert(
+                "خطا",
+                data.msg || "افزودن به سبد خرید انجام نشد."
+            );
+            return;
+        }
+
+        showSuccessAlert(
+            "",
+            data.msg || "محصول به سبد خرید اضافه شد."
+        );
+
+        await updateCartBadge();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showFailAlert(
+            "خطا",
+            error?.msg ||
+            "خطای غیرمنتظره‌ای رخ داد."
+        );
+    }
+}
+
+
+async function RemoveBasketItem(id) {
+
+    if (!id || id <= 0) {
+        return;
+    }
+
+    const token =
+        getAntiForgeryToken();
+
+    if (!token) {
+        showFailAlert(
+            "خطا",
+            "توکن امنیتی یافت نشد."
+        );
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                "/Order/RemoveBasketItem",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        "RequestVerificationToken":
+                            token,
+
+                        "X-Requested-With":
+                            "XMLHttpRequest"
+                    },
+                    body: JSON.stringify({
+                        basketItemId: id
+                    })
+                }
+            );
+
+        const data =
+            await parseResponse(response);
+
+        if (!data.res) {
+            showFailAlert(
+                "خطا",
+                data.msg || "حذف محصول انجام نشد."
+            );
+            return;
+        }
+
+        const row =
+            document.getElementById(
+                "Basket_" + id
+            );
+
+        if (row) {
+            row.remove();
+        }
+
+        await updateCartBadge();
+
+        showSuccessAlert(
+            "",
+            data.msg || "محصول حذف شد."
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showFailAlert(
+            "خطا",
+            error?.msg ||
+            "حذف محصول انجام نشد."
+        );
+    }
+}
+
+
+/* =========================================================
+   CHECKOUT
+========================================================= */
+
+function validateCheckOutForm() {
+
+    const addressElement =
+        document.getElementById("address");
+
+    const mobileElement =
+        document.getElementById("mobile");
+
+    if (!addressElement || !mobileElement) {
+        return false;
+    }
+
+    const address =
+        addressElement.value.trim();
+
+    const mobile =
+        mobileElement.value.trim();
+
+    const mobileRegex =
+        /^09\d{9}$/;
+
+    if (!address) {
+
+        showFailAlert(
+            "خطا",
+            "لطفاً آدرس را وارد کنید."
+        );
+
+        return false;
+    }
+
+    if (address.length < 10) {
+
+        showFailAlert(
+            "خطا",
+            "آدرس وارد شده خیلی کوتاه است."
+        );
+
+        return false;
+    }
+
+    if (!mobileRegex.test(mobile)) {
+
+        showFailAlert(
+            "خطا",
+            "شماره موبایل وارد شده معتبر نیست."
+        );
+
+        return false;
+    }
+
+    return true;
+}
+
+
+/* =========================================================
+   CART BADGE
+========================================================= */
+
+async function updateCartBadge() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/Order/GetBasketCount",
+                {
+                    method: "GET",
+                    headers: {
+                        "X-Requested-With":
+                            "XMLHttpRequest"
+                    }
+                }
+            );
+
+        if (!response.ok) {
+            return;
+        }
+
+        const count =
+            await response.json();
+
+        const badgeDesktop =
+            document.getElementById(
+                "cart-badge-desktop"
+            );
+
+        const badgeMobile =
+            document.getElementById(
+                "cart-badge-mobile"
+            );
+
+        if (badgeDesktop) {
+            badgeDesktop.textContent =
+                count;
+
+            badgeDesktop.setAttribute(
+                "data-count",
+                count
+            );
+        }
+
+        if (badgeMobile) {
+            badgeMobile.textContent =
+                count;
+
+            badgeMobile.setAttribute(
+                "data-count",
+                count
+            );
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Failed to update basket badge:",
+            error
+        );
+    }
+}
+
+
+/* =========================================================
+   COMMENTS
+========================================================= */
+
+async function addComment() {
+
+    const productIdElement =
+        document.getElementById("productId");
+
+    const commentTextElement =
+        document.getElementById("commentText");
+
+    if (!productIdElement ||
+        !commentTextElement) {
+        return;
+    }
+
+    const productId =
+        Number(productIdElement.value);
+
+    const commentText =
+        commentTextElement.value.trim();
+
+    const token =
+        getAntiForgeryToken();
+
+    if (!productId || productId <= 0) {
+        showFailAlert(
+            "خطا",
+            "محصول نامعتبر است."
+        );
+        return;
+    }
+
+    if (!commentText) {
+        showFailAlert(
+            "خطا",
+            "متن نظر نمی‌تواند خالی باشد."
+        );
+        return;
+    }
+
+    if (commentText.length > 500) {
+        showFailAlert(
+            "خطا",
+            "متن نظر نمی‌تواند بیشتر از 500 کاراکتر باشد."
+        );
+        return;
+    }
+
+    if (!token) {
+        showFailAlert(
+            "خطا",
+            "توکن امنیتی یافت نشد."
+        );
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                "/Product/AddProductComment",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        "RequestVerificationToken":
+                            token,
+
+                        "X-Requested-With":
+                            "XMLHttpRequest"
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        text: commentText
+                    })
+                }
+            );
+
+        const data =
+            await parseResponse(response);
+
+        if (!data.res) {
+            showFailAlert(
+                "خطا",
+                data.msg || "ثبت نظر انجام نشد."
+            );
+            return;
+        }
+
+        showSuccessAlert(
+            "",
+            data.msg || "نظر شما ثبت شد."
+        );
+
+        setTimeout(
+            () => location.reload(),
+            800
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showFailAlert(
+            "خطا",
+            error?.msg ||
+            "خطای غیرمنتظره‌ای رخ داد."
+        );
+    }
+}
+
+
+/* =========================================================
+   LOGIN ERROR
+========================================================= */
+
+function showLoginError() {
+
+    const loginErrorDiv =
+        document.getElementById("loginError");
+
+    if (!loginErrorDiv) {
+        return;
+    }
+
+    const errorMessage =
+        loginErrorDiv.dataset.error;
+
+    if (!errorMessage ||
+        !errorMessage.trim()) {
+        return;
+    }
+
+    Swal.fire({
+        icon: "error",
+        title: "خطا",
+        text: errorMessage,
+        confirmButtonText: "باشه"
+    });
+}
+
+
+/* =========================================================
+   SWEET ALERT
+========================================================= */
+
+function showSuccessAlert(
+    title = "",
+    text = "عملیات با موفقیت انجام شد."
+) {
     Swal.fire({
         title: title,
         text: text,
-        icon: 'success',
+        icon: "success",
         showConfirmButton: false,
-        timer: 1000
+        timer: 1200
     });
 }
 
-function showFailAlert(title,text='ناموفق') {
+
+function showFailAlert(
+    title = "خطا",
+    text = "عملیات ناموفق بود."
+) {
     Swal.fire({
         title: title,
         text: text,
-        icon: 'error',
-        confirmButtonText: 'باشه'
+        icon: "error",
+        confirmButtonText: "باشه"
     });
 }
 
 
-// Run on page load
-document.addEventListener('DOMContentLoaded', updateCartBadge);
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        initializeQuantityInput();
+
+        initializePasswordToggle();
+
+        initializeProductModal();
+
+        showLoginError();
+
+        updateCartBadge();
+    }
+);

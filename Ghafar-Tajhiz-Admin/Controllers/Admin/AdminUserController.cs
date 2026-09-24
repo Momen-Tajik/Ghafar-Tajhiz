@@ -1,13 +1,13 @@
-﻿using DataAccess.Models;
+﻿using DataAccess.Data;
+using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using DataAccess.Data;
 
 namespace Ghafar_Tajhiz_Admin.Controllers.Admin
 {
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class AdminUserController : Controller
     {
         private readonly UserManager<User> _userManager;
@@ -24,17 +24,23 @@ namespace Ghafar_Tajhiz_Admin.Controllers.Admin
             _context = context;
         }
 
-        // GET: /AdminUser/Index
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            var users = _userManager.Users.ToList();
+            var users = await _userManager.Users
+                .AsNoTracking()
+                .OrderBy(u => u.Id)
+                .ToListAsync();
 
             return View(users);
         }
 
-        // GET: /AdminUser/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
+            if (id <= 0)
+                return NotFound();
+
             var user = await _userManager.FindByIdAsync(id.ToString());
 
             if (user == null)
@@ -50,21 +56,18 @@ namespace Ghafar_Tajhiz_Admin.Controllers.Admin
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
+            if (id <= 0)
+                return NotFound();
+
             var user = await _userManager.FindByIdAsync(id.ToString());
 
             if (user == null)
                 return NotFound();
 
-            var roles = await _roleManager.Roles.ToListAsync();
-
-            var currentRoles = await _userManager.GetRolesAsync(user);
-
-            ViewBag.Roles = roles;
-            ViewBag.CurrentRole = currentRoles.FirstOrDefault();
+            await LoadEditData(user);
 
             return View(user);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -77,60 +80,62 @@ namespace Ghafar_Tajhiz_Admin.Controllers.Admin
             string? newPassword,
             string? confirmPassword)
         {
-            // پیدا کردن کاربر
+            if (id <= 0)
+                return NotFound();
+
             var user = await _userManager.FindByIdAsync(id.ToString());
 
             if (user == null)
                 return NotFound();
 
+            role = role?.Trim();
 
-            // ==========================================
-            // 1. بررسی رمز عبور جدید
-            // ==========================================
+            // فقط Roleهای موجود در سیستم پذیرفته شوند.
+            if (!string.IsNullOrWhiteSpace(role) &&
+                !await _roleManager.RoleExistsAsync(role))
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    "نقش انتخاب شده معتبر نیست.");
+
+                await LoadEditData(user);
+                return View(user);
+            }
 
             if (!string.IsNullOrWhiteSpace(newPassword))
             {
                 if (newPassword != confirmPassword)
                 {
                     ModelState.AddModelError(
-                        "",
+                        string.Empty,
                         "رمز عبور جدید و تکرار آن یکسان نیست.");
 
                     await LoadEditData(user);
-
                     return View(user);
                 }
             }
 
+            user.FullName = string.IsNullOrWhiteSpace(fullName)
+                ? null
+                : fullName.Trim();
 
-            // ==========================================
-            // 2. بروزرسانی اطلاعات کاربر
-            // ==========================================
+            user.PhoneNumber = string.IsNullOrWhiteSpace(phoneNumber)
+                ? null
+                : phoneNumber.Trim();
 
-            user.FullName = fullName;
-            user.PhoneNumber = phoneNumber;
-            user.Email = email;
+            user.Email = string.IsNullOrWhiteSpace(email)
+                ? null
+                : email.Trim();
 
             var updateResult = await _userManager.UpdateAsync(user);
 
             if (!updateResult.Succeeded)
             {
-                foreach (var error in updateResult.Errors)
-                {
-                    ModelState.AddModelError(
-                        "",
-                        error.Description);
-                }
+                AddIdentityErrors(updateResult);
 
                 await LoadEditData(user);
-
                 return View(user);
             }
-
-
-            // ==========================================
-            // 3. تغییر رمز عبور
-            // ==========================================
 
             if (!string.IsNullOrWhiteSpace(newPassword))
             {
@@ -145,95 +150,76 @@ namespace Ghafar_Tajhiz_Admin.Controllers.Admin
 
                 if (!passwordResult.Succeeded)
                 {
-                    foreach (var error in passwordResult.Errors)
-                    {
-                        ModelState.AddModelError(
-                            "",
-                            error.Description);
-                    }
+                    AddIdentityErrors(passwordResult);
 
                     await LoadEditData(user);
-
                     return View(user);
                 }
             }
-
-
-            // ==========================================
-            // 4. تغییر Role
-            // ==========================================
 
             if (!string.IsNullOrWhiteSpace(role))
             {
                 var currentRoles =
                     await _userManager.GetRolesAsync(user);
 
-                if (currentRoles.Any())
-                {
-                    var removeResult =
-                        await _userManager.RemoveFromRolesAsync(
-                            user,
-                            currentRoles);
+                var roleChanged =
+                    currentRoles.Count != 1 ||
+                    !currentRoles.Contains(role);
 
-                    if (!removeResult.Succeeded)
+                if (roleChanged)
+                {
+                    if (currentRoles.Any())
                     {
-                        foreach (var error in removeResult.Errors)
+                        var removeResult =
+                            await _userManager.RemoveFromRolesAsync(
+                                user,
+                                currentRoles);
+
+                        if (!removeResult.Succeeded)
                         {
-                            ModelState.AddModelError(
-                                "",
-                                error.Description);
+                            AddIdentityErrors(removeResult);
+
+                            await LoadEditData(user);
+                            return View(user);
                         }
+                    }
+
+                    var addRoleResult =
+                        await _userManager.AddToRoleAsync(
+                            user,
+                            role);
+
+                    if (!addRoleResult.Succeeded)
+                    {
+                        AddIdentityErrors(addRoleResult);
 
                         await LoadEditData(user);
-
                         return View(user);
                     }
                 }
-
-
-                var addRoleResult =
-                    await _userManager.AddToRoleAsync(
-                        user,
-                        role);
-
-                if (!addRoleResult.Succeeded)
-                {
-                    foreach (var error in addRoleResult.Errors)
-                    {
-                        ModelState.AddModelError(
-                            "",
-                            error.Description);
-                    }
-
-                    await LoadEditData(user);
-
-                    return View(user);
-                }
             }
 
-
-            // ==========================================
-            // پایان
-            // ==========================================
+            TempData["Success"] = "اطلاعات کاربر با موفقیت بروزرسانی شد.";
 
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: /AdminUser/Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            if (id <= 0)
+                return NotFound();
+
             var user = await _userManager.FindByIdAsync(id.ToString());
 
             if (user == null)
                 return NotFound();
 
-
-            // جلوگیری از حذف حساب خودش
             var currentUser = await _userManager.GetUserAsync(User);
 
-            if (currentUser != null && user.Id == currentUser.Id)
+            if (currentUser != null &&
+                user.Id == currentUser.Id)
             {
                 TempData["Error"] =
                     "شما نمی‌توانید حساب خودتان را حذف کنید.";
@@ -241,35 +227,29 @@ namespace Ghafar_Tajhiz_Admin.Controllers.Admin
                 return RedirectToAction(nameof(Index));
             }
 
-
-            // بررسی وجود سبد خرید
             var hasBasket = await _context.Baskets
+                .AsNoTracking()
                 .AnyAsync(b => b.UserId == user.Id);
 
             if (hasBasket)
             {
                 TempData["Error"] =
-                    "این کاربر دارای سبد خرید است و امکان حذف او وجود ندارد.";
+                    "این کاربر دارای سابقه سبد خرید/سفارش است و حذف مستقیم او مجاز نیست.";
 
                 return RedirectToAction(nameof(Index));
             }
 
-
-            // حذف کاربر
             var result = await _userManager.DeleteAsync(user);
 
             if (!result.Succeeded)
             {
-                TempData["Error"] = "حذف کاربر انجام نشد.";
+                AddIdentityErrors(result);
 
-                foreach (var error in result.Errors)
-                {
-                    TempData["Error"] += $" {error.Description}";
-                }
+                TempData["Error"] =
+                    "حذف کاربر انجام نشد.";
 
                 return RedirectToAction(nameof(Index));
             }
-
 
             TempData["Success"] =
                 "کاربر با موفقیت حذف شد.";
@@ -279,14 +259,28 @@ namespace Ghafar_Tajhiz_Admin.Controllers.Admin
 
         private async Task LoadEditData(User user)
         {
-            var roles = await _roleManager.Roles.ToListAsync();
+            ViewBag.Roles =
+                await _roleManager.Roles
+                    .AsNoTracking()
+                    .OrderBy(r => r.Name)
+                    .ToListAsync();
 
             var currentRoles =
                 await _userManager.GetRolesAsync(user);
 
-            ViewBag.Roles = roles;
-            ViewBag.CurrentRole = currentRoles.FirstOrDefault();
+            ViewBag.CurrentRole =
+                currentRoles.FirstOrDefault();
         }
 
+        private void AddIdentityErrors(
+            IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    error.Description);
+            }
+        }
     }
 }

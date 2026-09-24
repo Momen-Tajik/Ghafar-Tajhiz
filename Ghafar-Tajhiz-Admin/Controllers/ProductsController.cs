@@ -1,155 +1,175 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BusinessLogic.CategoryServices;
+using BusinessLogic.ProductServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using DataAccess.Data;
-using DataAccess.Models;
-using BusinessLogic.ProductServices;
-using BusinessLogic.CategoryServices;
 
 namespace Ghafar_Tajhiz_Admin.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ProductsController : Controller
     {
         private readonly ProductService _productService;
         private readonly CategoryService _categoryService;
 
-        public ProductsController(ProductService productService, CategoryService categoryService)
+        public ProductsController(
+            ProductService productService,
+            CategoryService categoryService)
         {
             _productService = productService;
             _categoryService = categoryService;
         }
 
-
-
-        // GET: Products
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var data =await _productService.GetProductsWithCategory();
-            return View(data);
+            var products =
+                await _productService.GetProductsWithCategory();
+
+            return View(products);
         }
 
-        // GET: Products/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
+            if (id <= 0)
                 return NotFound();
-            }
 
-            var products = await _productService.GetProductsWithCategory(p=>p.ProductId==id);
-            var product = products.FirstOrDefault();
+            var products =
+                await _productService.GetProductsWithCategory();
+
+            var product =
+                products.FirstOrDefault(p =>
+                    p.ProductId == id);
+
             if (product == null)
-            {
                 return NotFound();
-            }
 
             return View(product);
         }
 
-        // GET: Products/Create
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
-            ViewData["CategoryId"] = new SelectList(await _categoryService.GetCategories(), "CategoryId", "CategoryName");
+            await LoadCategories();
+
             return View();
         }
 
-        // POST: Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,ProductName,ProductDescription,Price,StockQuantity,ImageUrl,IsAvailable,CategoryId")] ProductDto productDto)
+        public async Task<IActionResult> Create(
+            ProductDto productDto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                productDto.CreateDate = DateTime.Now;
-                await _productService.CreateProduct(productDto);
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CategoryId"] = new SelectList(await _categoryService.GetCategories(), "CategoryId", "CategoryName", productDto.CategoryId);
-            return View(productDto);
-        }
-
-        // GET: Products/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
+                await LoadCategories(productDto.CategoryId);
+                return View(productDto);
             }
 
-            var product = await _productService.GetProductDtoById(id.Value);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            ViewData["CategoryId"] = new SelectList(await _categoryService.GetCategories(), "CategoryId", "CategoryName", product.CategoryId);
-            return View(product);
-        }
+            await _productService.CreateProduct(productDto);
 
-        // POST: Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,ProductDescription,Price,StockQuantity,ImageUrl,IsAvailable,CategoryId")] ProductDto product)
-        {
-            if (id != product.ProductId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    await _productService.UpdateProduct(product);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CategoryId"] = new SelectList(await _categoryService.GetCategories(), "CategoryId", "CategoryName", product.CategoryId);
-            return View(product);
-        }
-
-        // GET: Products/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-                return NotFound();
-
-            var product = (await _productService.GetProductsWithCategory(p => p.ProductId == id))
-                          .FirstOrDefault();
-
-            if (product == null)
-                return NotFound();
-
-            return View(product);
-        }
-
-        // POST: Products/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int ProductId)
-        {
-            var product = (await _productService.GetProductsWithCategory(p => p.ProductId == ProductId))
-                          .FirstOrDefault();
-
-            if (product == null)
-                return NotFound();
-
-            await _productService.DeleteProduct(product);
+            TempData["Success"] =
+                "محصول با موفقیت ایجاد شد.";
 
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id <= 0)
+                return NotFound();
 
+            var product =
+                await _productService.GetProductDtoById(id);
+
+            if (product == null)
+                return NotFound();
+
+            await LoadCategories(product.CategoryId);
+
+            return View(product);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(
+            int id,
+            ProductDto product)
+        {
+            if (id != product.ProductId)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+            {
+                await LoadCategories(product.CategoryId);
+                return View(product);
+            }
+
+            var result =
+                await _productService.UpdateProduct(product);
+
+            if (!result)
+                return NotFound();
+
+            TempData["Success"] =
+                "محصول با موفقیت بروزرسانی شد.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id <= 0)
+                return NotFound();
+
+            var products =
+                await _productService.GetProductsWithCategory();
+
+            var product =
+                products.FirstOrDefault(p =>
+                    p.ProductId == id);
+
+            if (product == null)
+                return NotFound();
+
+            return View(product);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(
+            int productId)
+        {
+            if (productId <= 0)
+                return NotFound();
+
+            var result =
+                await _productService.DeleteProduct(productId);
+
+            if (!result)
+                return NotFound();
+
+            TempData["Success"] =
+                "محصول با موفقیت حذف شد.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task LoadCategories(
+            int? selectedCategoryId = null)
+        {
+            var categories =
+                await _categoryService.GetCategories();
+
+            ViewData["CategoryId"] =
+                new SelectList(
+                    categories,
+                    "CategoryId",
+                    "CategoryName",
+                    selectedCategoryId);
+        }
     }
 }
