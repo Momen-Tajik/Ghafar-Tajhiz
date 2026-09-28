@@ -5,8 +5,15 @@
 }
 
 <div class="page-header">
-    <h1>حذف دسته‌بندی</h1>
-    <p>این عملیات غیرقابل بازگشت است</p>
+
+    <h1>
+        حذف دسته‌بندی
+    </h1>
+
+    <p>
+        این عملیات غیرقابل بازگشت است
+    </p>
+
 </div>
 
 <div class="admin-card admin-warning">
@@ -16,29 +23,62 @@
     </div>
 
     <div class="admin-warning-text">
-        با حذف این دسته‌بندی، اطلاعات مربوط به آن از سیستم حذف خواهد شد.
+        در صورتی که این دسته‌بندی محصول داشته باشد،
+        حذف آن توسط محدودیت دیتابیس جلوگیری خواهد شد.
     </div>
 
     <div class="details-list">
+
         <div class="details-item">
-            <div class="details-label">نام دسته‌بندی:</div>
-            <div class="details-value">@Model.CategoryName</div>
+
+            <div class="details-label">
+                نام دسته‌بندی:
+            </div>
+
+            <div class="details-value">
+                @Model.CategoryName
+            </div>
+
         </div>
 
         <div class="details-item">
-            <div class="details-label">توضیحات:</div>
+
+            <div class="details-label">
+                توضیحات:
+            </div>
+
             <div class="details-value">
+
                 @(string.IsNullOrWhiteSpace(Model.CategoryDescription)
                     ? "—"
                     : Model.CategoryDescription)
+
             </div>
+
         </div>
+
     </div>
 
-    <form asp-action="DeleteConfirmed" method="post" class="form-actions">
-        <input type="hidden" name="id" value="@Model.CategoryId" />
-        <button type="submit" class="form-button danger">حذف دسته‌بندی</button>
-        <a asp-action="Index" class="form-button secondary">انصراف</a>
+    <form asp-action="DeleteConfirmed"
+          method="post"
+          class="form-actions">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden"
+               name="id"
+               value="@Model.CategoryId" />
+
+        <button type="submit"
+                class="form-button danger">
+            حذف دسته‌بندی
+        </button>
+
+        <a asp-action="Index"
+           class="form-button secondary">
+            انصراف
+        </a>
+
     </form>
 
 </div>

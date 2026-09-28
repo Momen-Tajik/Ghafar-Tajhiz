@@ -25,23 +25,19 @@ a {
     }
 
 
-/* Navbar */ /* Navbar *//* Navbar */
-/* Navbar *//* Navbar */ /* Navbar */
-/* Navbar */ /* Navbar *//* Navbar */
+/* ================= NAVBAR ================= */ /* Navbar wrapper */
 
-
-/* Navbar wrapper */
 .nav {
     position: sticky;
     top: 0;
     z-index: 1000;
     background-color: #1e1e1ed4;
     color: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    position: relative; /* خیلی مهم برای absolute */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
 }
-
 /* ================= DESKTOP ================= */
+
 .desktopnavbar {
     display: flex;
     align-items: center;
@@ -49,17 +45,30 @@ a {
     padding: 0 20px;
     direction: rtl;
 }
+    /* لینک‌ها + دکمه خروج */
 
-    .desktopnavbar a {
+    .desktopnavbar a, .desktopnavbar .nav-link-button {
         position: relative;
         padding: 0 20px;
         line-height: 80px;
         font-size: 15px;
         text-decoration: none;
         color: white;
+        font-family: inherit;
     }
+    /* دکمه Logout */
 
-        .desktopnavbar a::after {
+    .desktopnavbar .nav-link-button {
+        background: none;
+        border: none;
+        margin: 0;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+        /* Hover underline */
+
+        .desktopnavbar a::after, .desktopnavbar .nav-link-button::after {
             content: "";
             position: absolute;
             bottom: 0;
@@ -70,10 +79,19 @@ a {
             transition: 0.3s;
             transform: translateX(-50%);
         }
+        /* Hover */
 
-        .desktopnavbar a:hover::after {
+        .desktopnavbar a:hover::after, .desktopnavbar .nav-link-button:hover::after {
             width: 100%;
         }
+    /* جلوگیری از تفاوت فرم با لینک‌ها */
+
+    .desktopnavbar form {
+        display: inline;
+        margin: 0;
+        padding: 0;
+    }
+    /* Logo */
 
     .desktopnavbar .logo {
         margin-right: auto;
@@ -83,11 +101,11 @@ a {
 
 .mobilenavbar {
     display: none;
-    width: 100%; /* مهم */
+    width: 100%;
     height: 70px;
     padding: 0 15px;
     align-items: center;
-    justify-content: space-between; /* این همونی هست که میخوای */
+    justify-content: space-between;
 }
 
     .mobilenavbar i {
@@ -98,19 +116,14 @@ a {
 .mobile-logo {
     height: 45px;
 }
+/* ================= MOBILE MENU ================= */
 
-.mobile-logo {
-    height: 45px;
-}
-
-/* Mobile menu style when opened */
 @media (max-width: 635px) {
-
     .desktopnavbar {
         display: none;
         flex-direction: column;
         position: absolute;
-        top: 70px; /* دقیق برابر با mobilenavbar */
+        top: 70px;
         right: 0;
         width: 100%;
         background-color: #1e1e1ed4;
@@ -123,21 +136,26 @@ a {
         .desktopnavbar .logo {
             display: none;
         }
+        /* لینک و دکمه در موبایل */
 
-        .desktopnavbar a {
+        .desktopnavbar a, .desktopnavbar .nav-link-button {
             width: 100%;
             text-align: center;
             line-height: 50px;
             padding: 10px 0;
+            box-sizing: border-box;
+        }
+        /* فرم Logout هم کل عرض را بگیرد */
+
+        .desktopnavbar form {
+            width: 100%;
         }
 
     .mobilenavbar {
-        display: flex; /* فقط داخل موبایل فعال شود */
+        display: flex;
     }
 }
-
-/* header */
-
+/* ================= HEADER ================= */
 
 .stock-message {
     display: block;
@@ -149,6 +167,7 @@ a {
     padding: 5px;
     width: 80px;
     text-align: center;
+    direction: ltr;
 }
 
     .quantity-input:disabled {
@@ -160,13 +179,7 @@ a {
     opacity: 0.5;
     cursor: not-allowed;
 }
-
-/* استایل برای اعداد فارسی در input */
-.quantity-input {
-    direction: ltr;
-    text-align: center;
-}
-
+/* ================= MY HEADER ================= */
 
 .myHeader {
     display: flex;
@@ -190,23 +203,22 @@ a {
     object-fit: cover;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
+/* ================= RESPONSIVE HEADER ================= */
 
-@media(max-width:1080px) {
+@media (max-width: 1080px) {
     .myHeader {
         flex-direction: column;
     }
 }
 
-@media(max-width:800px) {
+@media (max-width: 800px) {
     .myHeader {
         flex-direction: column;
         margin: 25px;
     }
 }
 
-/* Products */
-
-.productsContainer {
+/* ================= PRODUCTS ================= */ .productsContainer {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -218,10 +230,10 @@ a {
     flex-direction: column;
     flex: 0 0 calc(25% - 40px);
     box-sizing: border-box;
-    margin: 0px;
+    margin: 0;
     padding: 20px;
     transition: box-shadow 0.3s ease;
-    border-radius: 0px;
+    border-radius: 0;
 }
 
     .productsItems:hover {
@@ -234,18 +246,49 @@ a {
     border-radius: 20px;
 }
 
-.productsInfo .infoBtn {
-    color: #FF7043;
-    font-size:1.5rem;
-
-}
-    .productsInfo .infoBtn:hover {
-        color: #E64A19;
-        font-size: 1.7rem;
-    }
 .productsInfo {
     margin: 10px;
 }
+    /* ================= INFO BUTTON ================= */ /* خود button */
+
+    .productsInfo .openModal {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        margin: 0;
+        border: none;
+        outline: none;
+        background: transparent;
+        cursor: pointer;
+        line-height: 1;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    /* آیکون */
+
+    .productsInfo .infoBtn {
+        display: block;
+        color: #FF7043;
+        font-size: 1.5rem;
+        line-height: 1;
+        transition: color 0.25s ease, transform 0.25s ease;
+    }
+    /* Hover */
+
+    .productsInfo .openModal:hover .infoBtn {
+        color: #E64A19;
+        transform: scale(1.15);
+    }
+    /* Focus برای دسترسی بهتر */
+
+    .productsInfo .openModal:focus-visible {
+        outline: 2px solid #FF7043;
+        outline-offset: 3px;
+    }
+/* ================= PRODUCT BUTTON ================= */
 
 .btnProduct {
     display: block;
@@ -265,6 +308,7 @@ a {
         background-color: #E64A19;
         box-shadow: 0 5px 15px rgba(255, 112, 67, 0.3);
     }
+/* ================= RESPONSIVE ================= */
 
 @media (max-width: 1165px) {
     .productsItems {
@@ -305,7 +349,6 @@ a {
         margin: 10px;
     }
 }
-
 /* Footer */
 
 .footer {

@@ -15,15 +15,11 @@
             }
 
             <div class="productsInfo">
-                <div style="display:flex;justify-content:space-between;align-items:center">
-                    <h5>@item.ProductName</h5>
-
-                    <button type="button"
-                            class="openModal"
-                            data-product-id="@item.ProductId"
-                            aria-label="مشاهده اطلاعات محصول">
-                        <i class="infoBtn fa fa-info-circle"></i>
-                    </button>
+                <div style="display:flex;justify-content:space-between;align-items:center"> 
+                    <h5>@item.ProductName</h5> 
+                    <button type="button" class="openModal" data-product-id="@item.ProductId" aria-label="مشاهده اطلاعات محصول"> 
+                        <i class="infoBtn fa fa-info-circle"></i> 
+                    </button> 
                 </div>
 
                 <p>@item.Price.ToString("N0") تومان</p>

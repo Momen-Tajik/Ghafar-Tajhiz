@@ -10,71 +10,150 @@
     <p>بررسی وضعیت سفارش‌های ثبت‌شده</p>
 </div>
 
-
 <div class="admin-card" style="margin-bottom:15px;">
-    <form method="get" class="form-row">
-        <input name="search" value="@ViewBag.Search" class="form-input" placeholder="جستجو نام، موبایل، آدرس، محصول..." />
 
-        <select name="sort" class="form-select">
-            <option value="paiddate" selected="@(ViewBag.Sort=="paiddate")">جدیدترین</option>
-            <option value="oldest" selected="@(ViewBag.Sort=="oldest")">قدیمی‌ترین</option>
-            <option value="status" selected="@(ViewBag.Sort=="status")">بر اساس وضعیت</option>
+    <form method="get"
+          class="form-row">
+
+        <input name="search"
+               value="@ViewBag.Search"
+               class="form-input"
+               placeholder="جستجو نام، موبایل، آدرس، محصول..." />
+
+        <select name="sort"
+                class="form-select">
+
+            <option value="paiddate"
+                    selected="@(ViewBag.Sort == "paiddate" ? "selected" : null)">
+                جدیدترین
+            </option>
+
+            <option value="oldest"
+                    selected="@(ViewBag.Sort == "oldest" ? "selected" : null)">
+                قدیمی‌ترین
+            </option>
+
+            <option value="status"
+                    selected="@(ViewBag.Sort == "status" ? "selected" : null)">
+                بر اساس وضعیت
+            </option>
+
         </select>
 
-        <button type="submit" class="form-button">جستجو</button>
+        <button type="submit"
+                class="form-button">
+            جستجو
+        </button>
+
     </form>
+
 </div>
 
-
+<form id="stateForm">
+    @Html.AntiForgeryToken()
+</form>
 
 <div class="admin-card">
-    <table class="admin-table">
-        <thead>
-            <tr>
-                <th>نام</th>
-                <th>شماره تماس</th>
-                <th>تاریخ پرداخت</th>
-                <th>محصولات</th>
-                <th>وضعیت</th>
-                <th>عملیات</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.UserName</td>
-                    <td>@item.MobileNumber</td>
-                    <td>@item.PaidDate</td>
-                    <td>@string.Join(" + ", item.items)</td>
 
-                    <td>
-                        @switch (item.Status)
-                        {
-                            case BasketStatus.Paid:
-                                <span class="badge badge-warning">پرداخت شده</span>
-                                break;
-                            case BasketStatus.Shipped:
-                                <span class="badge badge-success">ارسال شده</span>
-                                break;
-                            case BasketStatus.Cancelled:
-                                <span class="badge badge-danger">لغو شده</span>
-                                break;
-                        }
-                    </td>
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            سفارشی پیدا نشد.
+        </div>
+    }
+    else
+    {
+        <div class="table-scroll">
 
-                    <td>
-                        <div class="action-group">
-                            <a onclick="State(@item.AdminOrderId, true)" class="action-btn action-accept">
-                                <i class="fa fa-check"></i>
-                            </a>
-                            <a onclick="State(@item.AdminOrderId, false)" class="action-btn action-cancel">
-                                <i class="fa fa-times"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+            <table class="admin-table">
+
+                <thead>
+                    <tr>
+                        <th>نام</th>
+                        <th>شماره تماس</th>
+                        <th>تاریخ پرداخت</th>
+                        <th>محصولات</th>
+                        <th>وضعیت</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                @item.UserName
+                            </td>
+
+                            <td>
+                                @item.MobileNumber
+                            </td>
+
+                            <td>
+                                @item.PaidDate.ToString("yyyy/MM/dd HH:mm")
+                            </td>
+
+                            <td>
+                                @string.Join(" + ", item.items)
+                            </td>
+
+                            <td>
+                                @switch (item.Status)
+                                {
+                                    case BasketStatus.Paid:
+                                        <span class="badge badge-warning">
+                                            پرداخت شده
+                                        </span>
+                                        break;
+
+                                    case BasketStatus.Shipped:
+                                        <span class="badge badge-success">
+                                            ارسال شده
+                                        </span>
+                                        break;
+
+                                    case BasketStatus.Cancelled:
+                                        <span class="badge badge-danger">
+                                            لغو شده
+                                        </span>
+                                        break;
+                                }
+                            </td>
+
+                            <td>
+                                <div class="action-group">
+
+                                    @if (item.Status == BasketStatus.Paid)
+                                    {
+                                        <button type="button"
+                                                onclick="State(@item.AdminOrderId, true)"
+                                                class="action-btn action-accept"
+                                                title="ارسال سفارش">
+                                            <i class="fa fa-check"></i>
+                                        </button>
+
+                                        <button type="button"
+                                                onclick="State(@item.AdminOrderId, false)"
+                                                class="action-btn action-cancel"
+                                                title="لغو سفارش">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    }
+
+                                </div>
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
 </div>

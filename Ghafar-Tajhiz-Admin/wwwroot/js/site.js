@@ -1,28 +1,97 @@
-﻿function State(basketItemId, status) {
-    const data = {
-        BasketItemId: basketItemId,
-        Status: status      
-    };
+﻿function getAntiForgeryToken() {
+    const token = document.querySelector(
+        'input[name="__RequestVerificationToken"]'
+    );
 
-    fetch('/Orders/SetStateCommand', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    })
-        .then(res => res.json())
-        .then(data => {
-            showSuccessAlert('', 'وضعیت سفارش با موفقیت تغیر کرد');
-            setTimeout(() => window.location.reload(), 1000);
-        })
-        .catch(err => {
-            console.error(err.message);
-            showFailAlert('خطا', 'عملیات با شکست مواجه شد');
-        });
+    return token ? token.value : null;
 }
 
-/* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT *//* SWEET ALERT */
 
-function showSuccessAlert(title, text = 'موفق') {
+async function State(basketId, status) {
+    if (!basketId || basketId <= 0) {
+        showFailAlert(
+            'خطا',
+            'شناسه سفارش نامعتبر است.'
+        );
+
+        return;
+    }
+
+    const token = getAntiForgeryToken();
+
+    if (!token) {
+        showFailAlert(
+            'خطا',
+            'توکن امنیتی پیدا نشد.'
+        );
+
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            '/Orders/SetStateCommand',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    BasketId: basketId,
+                    Status: status
+                })
+            }
+        );
+
+        const contentType =
+            response.headers.get('content-type') || '';
+
+        let data;
+
+        if (contentType.includes('application/json')) {
+            data = await response.json();
+        } else {
+            throw new Error(
+                'پاسخ نامعتبر از سرور دریافت شد.'
+            );
+        }
+
+        if (!response.ok || !data.res) {
+            throw new Error(
+                data.msg || 'تغییر وضعیت سفارش انجام نشد.'
+            );
+        }
+
+        showSuccessAlert(
+            '',
+            data.msg || 'وضعیت سفارش با موفقیت تغییر کرد.'
+        );
+
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+
+    } catch (error) {
+        console.error(error);
+
+        showFailAlert(
+            'خطا',
+            error.message || 'عملیات با شکست مواجه شد.'
+        );
+    }
+}
+
+
+/* =========================================================
+   SWEET ALERT
+========================================================= */
+
+function showSuccessAlert(
+    title = '',
+    text = 'عملیات با موفقیت انجام شد.'
+) {
     Swal.fire({
         title: title,
         text: text,
@@ -32,7 +101,11 @@ function showSuccessAlert(title, text = 'موفق') {
     });
 }
 
-function showFailAlert(title, text = 'ناموفق') {
+
+function showFailAlert(
+    title = 'خطا',
+    text = 'عملیات ناموفق بود.'
+) {
     Swal.fire({
         title: title,
         text: text,

@@ -14,27 +14,39 @@
 
         <div class="detail-item">
             <span class="label">نام محصول</span>
-            <span class="value">@Model.ProductName</span>
+            <span class="value">
+                @Model.ProductName
+            </span>
         </div>
 
         <div class="detail-item">
             <span class="label">توضیحات</span>
-            <span class="value">@Model.ProductDescription</span>
+            <span class="value">
+                @(string.IsNullOrWhiteSpace(Model.ProductDescription)
+                    ? "—"
+                    : Model.ProductDescription)
+            </span>
         </div>
 
         <div class="detail-item">
             <span class="label">قیمت</span>
-            <span class="value">@Model.Price</span>
+            <span class="value">
+                @Model.Price.ToString("N0") تومان
+            </span>
         </div>
 
         <div class="detail-item">
             <span class="label">موجودی</span>
-            <span class="value">@Model.StockQuantity</span>
+            <span class="value">
+                @Model.StockQuantity
+            </span>
         </div>
 
         <div class="detail-item">
             <span class="label">دسته‌بندی</span>
-            <span class="value">@Model.Category?.CategoryName</span>
+            <span class="value">
+                @Model.Category?.CategoryName
+            </span>
         </div>
 
         <div class="detail-item">
@@ -46,23 +58,52 @@
 
         <div class="detail-item">
             <span class="label">تاریخ ایجاد</span>
-            <span class="value">@Model.CreateDate</span>
+            <span class="value">
+                @Model.CreateDate.ToString("yyyy/MM/dd")
+            </span>
         </div>
 
         <div class="detail-item image-item">
-            <span class="label">تصویر</span>
-            <span class="value">
-                <img src="/api/FileUpload/GetFile?filename=@Model.ImageUrl"
-                     alt="Product Image"
-                     class="details-image" />
+
+            <span class="label">
+                تصویر
             </span>
+
+            <span class="value">
+
+                @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                {
+                    <img src="/api/FileUpload/GetFile?fileName=@Uri.EscapeDataString(Model.ImageUrl)"
+                         alt="@Model.ProductName"
+                         class="details-image"
+                         loading="lazy" />
+                }
+                else
+                {
+                    <span>
+                        بدون تصویر
+                    </span>
+                }
+
+            </span>
+
         </div>
 
     </div>
 
     <div class="form-actions">
-        <a asp-action="Edit" asp-route-id="@Model.ProductId" class="form-button primary">ویرایش</a>
-        <a asp-action="Index" class="form-button secondary">بازگشت</a>
+
+        <a asp-action="Edit"
+           asp-route-id="@Model.ProductId"
+           class="form-button primary">
+            ویرایش
+        </a>
+
+        <a asp-action="Index"
+           class="form-button secondary">
+            بازگشت
+        </a>
+
     </div>
 
 </div>
