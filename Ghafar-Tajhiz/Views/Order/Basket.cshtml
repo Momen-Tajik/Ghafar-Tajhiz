@@ -14,6 +14,7 @@
         سبد خرید شما
     </h1>
 
+
     @if (!Model.Any())
     {
         <div class="empty-cart">
@@ -32,9 +33,14 @@
     }
     else
     {
+        <!-- =====================================================
+             Cart Items
+             ===================================================== -->
+
         <table class="cart-table">
 
             <thead>
+
                 <tr>
                     <th>محصول</th>
                     <th>قیمت واحد</th>
@@ -42,7 +48,9 @@
                     <th>جمع</th>
                     <th>حذف</th>
                 </tr>
+
             </thead>
+
 
             <tbody>
 
@@ -54,6 +62,7 @@
                     <tr id="Basket_@item.BasketItemId">
 
                         <td>
+
                             <div style="display:flex;align-items:center;">
 
                                 @if (!string.IsNullOrWhiteSpace(
@@ -70,32 +79,43 @@
                                 </span>
 
                             </div>
+
                         </td>
+
 
                         <td>
                             @item.UnitPrice.ToString("N0")
                             تومان
                         </td>
 
+
                         <td>
+
                             <div class="quantity-control">
                                 @item.Qty
                             </div>
+
                         </td>
 
+
                         <td>
+
                             <strong>
                                 @itemTotal.ToString("N0")
                                 تومان
                             </strong>
+
                         </td>
 
+
                         <td>
+
                             <button type="button"
                                     onclick="RemoveBasketItem(@item.BasketItemId)"
                                     class="remove-btn">
                                 حذف
                             </button>
+
                         </td>
 
                     </tr>
@@ -105,39 +125,92 @@
 
         </table>
 
+
+        <!-- =====================================================
+             Checkout / Payment
+             ===================================================== -->
+
         <form asp-action="Pay"
               asp-controller="Order"
               method="post"
+              enctype="multipart/form-data"
               id="payForm">
 
             @Html.AntiForgeryToken()
+
 
             <div asp-validation-summary="ModelOnly"
                  class="text-danger mb-3">
             </div>
 
+
             <div class="cart-summary">
 
+
+                <!-- Address -->
+
                 <div class="summary-row">
+
+                    <label for="address">
+                        آدرس تحویل
+                    </label>
 
                     <textarea id="address"
                               name="Address"
-                              style="width:stretch;direction:rtl;height:100px"
+                              required
+                              style="width:100%;direction:rtl;height:100px"
                               class="text-opacity-100"
-                              placeholder="آدرس..."></textarea>
+                              placeholder="آدرس کامل خود را وارد کنید..."></textarea>
 
                 </div>
+
+
+                <!-- Mobile -->
 
                 <div class="summary-row">
 
+                    <label for="mobile">
+                        شماره موبایل
+                    </label>
+
                     <input id="mobile"
                            name="Mobile"
-                           style="width:stretch;height:50px"
+                           required
+                           style="width:100%;height:50px"
                            type="text"
                            inputmode="numeric"
+                           maxlength="11"
                            placeholder="09xxxxxxxxx" />
 
                 </div>
+
+
+                <!-- Receipt -->
+
+                <div class="summary-row">
+
+                    <label for="receipt">
+                        رسید پرداخت
+                    </label>
+
+                    <input id="receipt"
+                           name="Receipt"
+                           type="file"
+                           class="form-control"
+                           accept=".jpg,.jpeg,.png,.webp"
+                           required />
+
+                    <small class="text-muted">
+                        تصویر رسید پرداخت را آپلود کنید.
+                        فرمت‌های مجاز:
+                        JPG، JPEG، PNG، WEBP
+                        - حداکثر 5 مگابایت
+                    </small>
+
+                </div>
+
+
+                <!-- Total -->
 
                 <div class="summary-row">
 
@@ -152,10 +225,15 @@
 
                 </div>
 
+
+                <!-- Submit -->
+
                 <button type="submit"
                         class="checkout-btn"
                         onclick="return validateCheckOutForm()">
-                    پرداخت و تکمیل سفارش
+
+                    ارسال رسید و ثبت سفارش
+
                 </button>
 
             </div>

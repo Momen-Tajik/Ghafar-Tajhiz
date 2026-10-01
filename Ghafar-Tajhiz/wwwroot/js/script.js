@@ -354,20 +354,35 @@ async function AddToBasket() {
                 }
             );
 
+        // کاربر لاگین نیست
+        if (response.status === 401) {
+
+            showFailAlert(
+                "نیاز به ورود",
+                "ابتدا وارد حساب کاربری خود شوید."
+            );
+
+            return;
+        }
+
         const data =
             await parseResponse(response);
 
         if (!data.res) {
+
             showFailAlert(
                 "خطا",
-                data.msg || "افزودن به سبد خرید انجام نشد."
+                data.msg ||
+                "افزودن به سبد خرید انجام نشد."
             );
+
             return;
         }
 
         showSuccessAlert(
             "",
-            data.msg || "محصول به سبد خرید اضافه شد."
+            data.msg ||
+            "محصول به سبد خرید اضافه شد."
         );
 
         await updateCartBadge();
@@ -477,9 +492,16 @@ function validateCheckOutForm() {
     const mobileElement =
         document.getElementById("mobile");
 
-    if (!addressElement || !mobileElement) {
+    const receiptElement =
+        document.getElementById("receipt");
+
+
+    if (!addressElement ||
+        !mobileElement ||
+        !receiptElement) {
         return false;
     }
+
 
     const address =
         addressElement.value.trim();
@@ -487,8 +509,17 @@ function validateCheckOutForm() {
     const mobile =
         mobileElement.value.trim();
 
+    const receipt =
+        receiptElement.files[0];
+
+
     const mobileRegex =
         /^09\d{9}$/;
+
+
+    // ==============================
+    // Address
+    // ==============================
 
     if (!address) {
 
@@ -500,6 +531,7 @@ function validateCheckOutForm() {
         return false;
     }
 
+
     if (address.length < 10) {
 
         showFailAlert(
@@ -510,6 +542,11 @@ function validateCheckOutForm() {
         return false;
     }
 
+
+    // ==============================
+    // Mobile
+    // ==============================
+
     if (!mobileRegex.test(mobile)) {
 
         showFailAlert(
@@ -519,6 +556,68 @@ function validateCheckOutForm() {
 
         return false;
     }
+
+
+    // ==============================
+    // Receipt
+    // ==============================
+
+    if (!receipt) {
+
+        showFailAlert(
+            "خطا",
+            "لطفاً رسید پرداخت را انتخاب کنید."
+        );
+
+        return false;
+    }
+
+
+    // ==============================
+    // File Type
+    // ==============================
+
+    const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    ];
+
+
+    if (!allowedTypes.includes(receipt.type)) {
+
+        showFailAlert(
+            "خطا",
+            "فرمت رسید باید JPG، PNG یا WEBP باشد."
+        );
+
+        receiptElement.value = "";
+
+        return false;
+    }
+
+
+    // ==============================
+    // File Size
+    // Maximum 5 MB
+    // ==============================
+
+    const maxFileSize =
+        5 * 1024 * 1024;
+
+
+    if (receipt.size > maxFileSize) {
+
+        showFailAlert(
+            "خطا",
+            "حجم رسید نمی‌تواند بیشتر از 5 مگابایت باشد."
+        );
+
+        receiptElement.value = "";
+
+        return false;
+    }
+
 
     return true;
 }
@@ -603,8 +702,7 @@ async function addComment() {
     const commentTextElement =
         document.getElementById("commentText");
 
-    if (!productIdElement ||
-        !commentTextElement) {
+    if (!productIdElement || !commentTextElement) {
         return;
     }
 
@@ -656,16 +754,13 @@ async function addComment() {
                 "/Product/AddProductComment",
                 {
                     method: "POST",
+
                     headers: {
-                        "Content-Type":
-                            "application/json",
-
-                        "RequestVerificationToken":
-                            token,
-
-                        "X-Requested-With":
-                            "XMLHttpRequest"
+                        "Content-Type": "application/json",
+                        "RequestVerificationToken": token,
+                        "X-Requested-With": "XMLHttpRequest"
                     },
+
                     body: JSON.stringify({
                         productId: productId,
                         text: commentText
@@ -673,20 +768,55 @@ async function addComment() {
                 }
             );
 
+        // =========================
+        // کاربر لاگین نیست
+        // =========================
+        if (response.status === 401) {
+
+            let message =
+                "لطفاً ابتدا وارد حساب کاربری شوید.";
+
+            try {
+                const errorData =
+                    await response.json();
+
+                if (errorData.msg) {
+                    message = errorData.msg;
+                }
+            }
+            catch {
+                // اگر JSON نبود، همان پیام پیش‌فرض استفاده می‌شود
+            }
+
+            showFailAlert(
+                "نیاز به ورود",
+                message
+            );
+
+            return;
+        }
+
+        // =========================
+        // سایر پاسخ‌ها
+        // =========================
         const data =
             await parseResponse(response);
 
         if (!data.res) {
+
             showFailAlert(
                 "خطا",
-                data.msg || "ثبت نظر انجام نشد."
+                data.msg ||
+                "ثبت نظر انجام نشد."
             );
+
             return;
         }
 
         showSuccessAlert(
             "",
-            data.msg || "نظر شما ثبت شد."
+            data.msg ||
+            "نظر شما با موفقیت ثبت شد."
         );
 
         setTimeout(
@@ -694,19 +824,20 @@ async function addComment() {
             800
         );
 
-    } catch (error) {
+    }
+    catch (error) {
 
-        console.error(error);
+        console.error(
+            "AddComment Error:",
+            error
+        );
 
         showFailAlert(
             "خطا",
-            error?.msg ||
             "خطای غیرمنتظره‌ای رخ داد."
         );
     }
 }
-
-
 /* =========================================================
    LOGIN ERROR
 ========================================================= */

@@ -6,9 +6,21 @@
 }
 
 <div class="page-header">
-    <h1>مدیریت سفارش‌ها</h1>
-    <p>بررسی وضعیت سفارش‌های ثبت‌شده</p>
+
+    <h1>
+        مدیریت سفارش‌ها
+    </h1>
+
+    <p>
+        بررسی وضعیت سفارش‌های ثبت‌شده
+    </p>
+
 </div>
+
+
+<!-- =========================================================
+     Search / Filter
+     ========================================================= -->
 
 <div class="admin-card" style="margin-bottom:15px;">
 
@@ -19,6 +31,47 @@
                value="@ViewBag.Search"
                class="form-input"
                placeholder="جستجو نام، موبایل، آدرس، محصول..." />
+
+
+        <select name="status"
+                class="form-select">
+
+            <option value="">
+                همه وضعیت‌ها
+            </option>
+
+            <option value="PendingPayment"
+                    selected="@(ViewBag.Status == BasketStatus.PendingPayment ? "selected" : null)">
+                در انتظار پرداخت
+            </option>
+
+            <option value="AwaitingPaymentVerification"
+                    selected="@(ViewBag.Status == BasketStatus.AwaitingPaymentVerification ? "selected" : null)">
+                در انتظار بررسی پرداخت
+            </option>
+
+            <option value="PaymentApproved"
+                    selected="@(ViewBag.Status == BasketStatus.PaymentApproved ? "selected" : null)">
+                پرداخت تأیید شد
+            </option>
+
+            <option value="PaymentRejected"
+                    selected="@(ViewBag.Status == BasketStatus.PaymentRejected ? "selected" : null)">
+                پرداخت رد شد
+            </option>
+
+            <option value="Shipped"
+                    selected="@(ViewBag.Status == BasketStatus.Shipped ? "selected" : null)">
+                ارسال شده
+            </option>
+
+            <option value="Cancelled"
+                    selected="@(ViewBag.Status == BasketStatus.Cancelled ? "selected" : null)">
+                لغو شده
+            </option>
+
+        </select>
+
 
         <select name="sort"
                 class="form-select">
@@ -40,6 +93,7 @@
 
         </select>
 
+
         <button type="submit"
                 class="form-button">
             جستجو
@@ -49,9 +103,19 @@
 
 </div>
 
+
+<!-- Anti Forgery -->
+
 <form id="stateForm">
+
     @Html.AntiForgeryToken()
+
 </form>
+
+
+<!-- =========================================================
+     Orders Table
+     ========================================================= -->
 
 <div class="admin-card">
 
@@ -68,15 +132,41 @@
             <table class="admin-table">
 
                 <thead>
+
                     <tr>
-                        <th>نام</th>
-                        <th>شماره تماس</th>
-                        <th>تاریخ پرداخت</th>
-                        <th>محصولات</th>
-                        <th>وضعیت</th>
-                        <th>عملیات</th>
+
+                        <th>
+                            نام
+                        </th>
+
+                        <th>
+                            شماره تماس
+                        </th>
+
+                        <th>
+                            تاریخ پرداخت
+                        </th>
+
+                        <th>
+                            محصولات
+                        </th>
+
+                        <th>
+                            رسید
+                        </th>
+
+                        <th>
+                            وضعیت
+                        </th>
+
+                        <th>
+                            عملیات
+                        </th>
+
                     </tr>
+
                 </thead>
+
 
                 <tbody>
 
@@ -84,69 +174,249 @@
                     {
                         <tr>
 
+                            <!-- User -->
+
                             <td>
                                 @item.UserName
                             </td>
+
+
+                            <!-- Mobile -->
 
                             <td>
                                 @item.MobileNumber
                             </td>
 
-                            <td>
-                                @item.PaidDate.ToString("yyyy/MM/dd HH:mm")
-                            </td>
+
+                            <!-- Paid Date -->
 
                             <td>
-                                @string.Join(" + ", item.items)
+
+                                @if (item.PaidDate.HasValue)
+                                {
+                                    @item.PaidDate.Value.ToString(
+                                             "yyyy/MM/dd HH:mm")
+                                }
+                                else
+                                {
+                                    <span>
+                                        -
+                                    </span>
+                                }
+
                             </td>
 
+
+                            <!-- Products -->
+
                             <td>
+
+                                @if (item.Items != null &&
+                               item.Items.Any())
+                                {
+                                    @string.Join(" + ", item.Items)
+                                }
+                                else
+                                {
+                                    <span>
+                                        -
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <!-- Receipt -->
+
+                            <td>
+
+                                @if (!string.IsNullOrWhiteSpace(
+                               item.ReceiptImage))
+                                {
+                                    <a href="/api/FileUpload/GetFile?fileName=@Uri.EscapeDataString("receipts/" + item.ReceiptImage)"
+                                       target="_blank"
+                                       class="action-btn action-view"
+                                       title="مشاهده رسید">
+
+                                        <i class="fa fa-eye"></i>
+
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>
+                                        ندارد
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <!-- Status -->
+
+                            <td>
+
                                 @switch (item.Status)
                                 {
-                                    case BasketStatus.Paid:
+                                    case BasketStatus.PendingPayment:
+
                                         <span class="badge badge-warning">
-                                            پرداخت شده
+                                            در انتظار پرداخت
                                         </span>
+
                                         break;
 
+
+                                    case BasketStatus.AwaitingPaymentVerification:
+
+                                        <span class="badge badge-warning">
+                                            در انتظار بررسی پرداخت
+                                        </span>
+
+                                        break;
+
+
+                                    case BasketStatus.PaymentApproved:
+
+                                        <span class="badge badge-success">
+                                            پرداخت تأیید شد
+                                        </span>
+
+                                        break;
+
+
+                                    case BasketStatus.PaymentRejected:
+
+                                        <span class="badge badge-danger">
+                                            پرداخت رد شد
+                                        </span>
+
+                                        break;
+
+
                                     case BasketStatus.Shipped:
+
                                         <span class="badge badge-success">
                                             ارسال شده
                                         </span>
+
                                         break;
 
+
                                     case BasketStatus.Cancelled:
+
                                         <span class="badge badge-danger">
                                             لغو شده
                                         </span>
+
+                                        break;
+
+
+                                    default:
+
+                                        <span class="badge">
+                                            نامشخص
+                                        </span>
+
                                         break;
                                 }
+
                             </td>
 
+
+                            <!-- Actions -->
+
                             <td>
+
                                 <div class="action-group">
 
-                                    @if (item.Status == BasketStatus.Paid)
+                                    <!-- مشاهده جزئیات -->
+
+                                    <a asp-controller="Orders"
+                                       asp-action="Details"
+                                       asp-route-id="@item.AdminOrderId"
+                                       class="action-btn action-view"
+                                       title="مشاهده جزئیات">
+
+                                        <i class="fa fa-eye"></i>
+
+                                    </a>
+
+
+                                    <!-- تأیید / رد پرداخت -->
+                                    @if (item.Status ==
+                                   BasketStatus.AwaitingPaymentVerification)
                                     {
                                         <button type="button"
                                                 onclick="State(@item.AdminOrderId, true)"
                                                 class="action-btn action-accept"
-                                                title="ارسال سفارش">
+                                                title="تأیید پرداخت">
+
                                             <i class="fa fa-check"></i>
+
                                         </button>
+
 
                                         <button type="button"
                                                 onclick="State(@item.AdminOrderId, false)"
                                                 class="action-btn action-cancel"
-                                                title="لغو سفارش">
+                                                title="رد پرداخت">
+
                                             <i class="fa fa-times"></i>
+
+                                        </button>
+                                    }
+
+
+                                    <!-- ارسال سفارش -->
+                                    @if (item.Status ==
+                                   BasketStatus.PaymentApproved)
+                                    {
+                                        <button type="button"
+                                                onclick="ShipOrder(@item.AdminOrderId)"
+                                                class="action-btn action-accept"
+                                                title="ارسال سفارش">
+
+                                            <i class="fa fa-truck"></i>
+
                                         </button>
                                     }
 
                                 </div>
+
                             </td>
 
                         </tr>
+
+
+                        <!-- =================================================
+                             Rejection Reason
+                             ================================================= -->
+                        @if (item.Status ==
+                       BasketStatus.PaymentRejected &&
+                       !string.IsNullOrWhiteSpace(
+                       item.PaymentRejectionReason))
+                        {
+                            <tr>
+
+                                <td colspan="7">
+
+                                    <div class="alert alert-danger"
+                                         style="margin:0;">
+
+                                        <strong>
+                                            دلیل رد پرداخت:
+                                        </strong>
+
+                                        @item.PaymentRejectionReason
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
                     }
 
                 </tbody>

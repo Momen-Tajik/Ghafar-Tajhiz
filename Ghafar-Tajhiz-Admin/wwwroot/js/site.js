@@ -114,6 +114,39 @@ function showFailAlert(
     });
 }
 
+   // Receipt SweetAlert
+
+            function showReceipt(receiptUrl) {
+
+                Swal.fire({
+
+                    title: "رسید پرداخت",
+
+                    imageUrl: receiptUrl,
+
+                    imageAlt: "رسید پرداخت",
+
+                    width: "900px",
+
+                    showCloseButton: true,
+
+                    showConfirmButton: false,
+
+                    allowOutsideClick: true,
+
+                    allowEscapeKey: true,
+
+                    background: "#ffffff",
+
+                    customClass: {
+                        popup: "receipt-swal-popup",
+                        image: "receipt-swal-image"
+                    }
+
+                });
+
+    }
+
 
 function refreshPage() {
     window.location.reload();

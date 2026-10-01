@@ -67,5 +67,20 @@ namespace Ghafar_Tajhiz_Admin.Controllers
                 msg = "وضعیت سفارش با موفقیت تغییر کرد."
             });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            if (id <= 0)
+                return NotFound();
+
+            var order =
+                await _basketService.GetAdminOrderDetail(id);
+
+            if (order == null)
+                return NotFound();
+
+            return View(order);
+        }
     }
 }

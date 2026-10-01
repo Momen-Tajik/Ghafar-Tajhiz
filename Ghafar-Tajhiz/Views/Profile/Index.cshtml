@@ -12,9 +12,7 @@
 
         <div class="user-card">
 
-            <h3>
-                اطلاعات کاربر
-            </h3>
+            <h3>اطلاعات کاربر</h3>
 
             <p>
                 <strong>نام کاربری:</strong>
@@ -37,8 +35,10 @@
 
     </aside>
 
+
     <section class="user-orders">
 
+        <!-- فیلتر -->
         <form method="get">
 
             <input type="text"
@@ -52,9 +52,24 @@
                     همه
                 </option>
 
-                <option value="Paid"
-                        selected="@(Model.Status == BasketStatus.Paid ? "selected" : null)">
-                    پرداخت شده
+                <option value="PendingPayment"
+                        selected="@(Model.Status == BasketStatus.PendingPayment ? "selected" : null)">
+                    در انتظار پرداخت
+                </option>
+
+                <option value="AwaitingPaymentVerification"
+                        selected="@(Model.Status == BasketStatus.AwaitingPaymentVerification ? "selected" : null)">
+                    در انتظار بررسی پرداخت
+                </option>
+
+                <option value="PaymentApproved"
+                        selected="@(Model.Status == BasketStatus.PaymentApproved ? "selected" : null)">
+                    پرداخت تأیید شد
+                </option>
+
+                <option value="PaymentRejected"
+                        selected="@(Model.Status == BasketStatus.PaymentRejected ? "selected" : null)">
+                    پرداخت رد شد
                 </option>
 
                 <option value="Shipped"
@@ -68,6 +83,9 @@
                 </option>
 
             </select>
+
+
+            <!-- مرتب سازی -->
 
             <select name="sort">
 
@@ -88,11 +106,13 @@
 
             </select>
 
+
             <button type="submit">
                 اعمال فیلتر
             </button>
 
         </form>
+
 
         @if (!Model.Orders.Any())
         {
@@ -113,41 +133,82 @@
                             @order.BasketId
                         </span>
 
+
                         @switch (order.Status)
                         {
-                            case BasketStatus.Paid:
-                                <span class="order-status paid">
-                                    پرداخت شده
+                            case BasketStatus.PendingPayment:
+
+                                <span class="order-status pending">
+                                    در انتظار پرداخت
                                 </span>
+
                                 break;
 
+
+                            case BasketStatus.AwaitingPaymentVerification:
+
+                                <span class="order-status pending">
+                                    در انتظار بررسی پرداخت
+                                </span>
+
+                                break;
+
+
+                            case BasketStatus.PaymentApproved:
+
+                                <span class="order-status paid">
+                                    پرداخت تأیید شد
+                                </span>
+
+                                break;
+
+
+                            case BasketStatus.PaymentRejected:
+
+                                <span class="order-status cancelled">
+                                    پرداخت رد شد
+                                </span>
+
+                                break;
+
+
                             case BasketStatus.Shipped:
+
                                 <span class="order-status shipped">
                                     ارسال شده
                                 </span>
+
                                 break;
 
+
                             case BasketStatus.Cancelled:
+
                                 <span class="order-status cancelled">
                                     لغو شده
                                 </span>
+
                                 break;
 
+
                             default:
+
                                 <span class="order-status">
-                                    در انتظار پرداخت
+                                    نامشخص
                                 </span>
+
                                 break;
                         }
 
                     </div>
 
+
+                    <!-- اطلاعات سفارش -->
+
                     <div class="order-meta">
 
                         <span>
                             @(order.PaidDate.HasValue
-                                ? order.PaidDate.Value.ToString(
-                                    "HH:mm - yyyy/MM/dd")
+                                ? order.PaidDate.Value.ToString("HH:mm - yyyy/MM/dd")
                                 : "-")
                         </span>
 
@@ -165,14 +226,20 @@
 
                     </div>
 
+
+                    <!-- محصولات -->
+
                     <div class="order-items">
 
                         @if (order.BasketItems.Any())
                         {
+                            decimal orderTotal = 0;
+
                             foreach (var item in order.BasketItems)
                             {
-                                var itemTotal =
-                                    item.Qty * item.UnitPrice;
+                                var itemTotal = item.Qty * item.UnitPrice;
+
+                                orderTotal += itemTotal;
 
                                 <div class="order-item">
 
@@ -199,14 +266,8 @@
                                 </div>
                             }
 
-                            
-                                decimal orderTotal = 0;
 
-                                foreach (var item in order.BasketItems)
-                                {
-                                    orderTotal += item.Qty * item.UnitPrice;
-                                }
-                            
+                            <!-- جمع کل -->
 
                             <div class="order-items">
 

@@ -1,4 +1,5 @@
 ﻿using DataAccess.Data;
+using DataAccess.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLogic.BasketItemServices
@@ -12,13 +13,15 @@ namespace BusinessLogic.BasketItemServices
             _context = context;
         }
 
-        public async Task<bool> RemoveBasketItem(int basketItemId, int userId)
+        public async Task<bool> RemoveBasketItem(
+            int basketItemId,
+            int userId)
         {
             var basketItem = await _context.BasketItems
                 .FirstOrDefaultAsync(i =>
                     i.BasketItemId == basketItemId &&
                     i.Basket.UserId == userId &&
-                    i.Basket.Status == DataAccess.Enums.BasketStatus.Pending);
+                    i.Basket.Status == BasketStatus.PendingPayment);
 
             if (basketItem == null)
                 return false;

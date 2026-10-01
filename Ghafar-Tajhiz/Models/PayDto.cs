@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ghafar_Tajhiz.Models
 {
@@ -11,10 +12,15 @@ namespace Ghafar_Tajhiz.Models
             ErrorMessage = "آدرس باید بین 10 تا 500 کاراکتر باشد")]
         public string Address { get; set; } = string.Empty;
 
+
         [Required(ErrorMessage = "شماره موبایل الزامی است")]
         [RegularExpression(
             @"^09[0-9]{9}$",
             ErrorMessage = "فرمت شماره موبایل نامعتبر است")]
         public string Mobile { get; set; } = string.Empty;
+
+
+        [Required(ErrorMessage = "آپلود رسید الزامی است")]
+        public IFormFile? Receipt { get; set; }
     }
 }

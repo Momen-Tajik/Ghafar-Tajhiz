@@ -18,41 +18,28 @@ namespace Ghafar_Tajhiz_Admin.Controllers
                     "FileUpload:StoragePath is not configured.");
         }
 
-        [AllowAnonymous]
         [HttpGet("GetFile")]
-        public IActionResult GetFile(string fileName)
+        public IActionResult DownloadFile(string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
                 return BadRequest("نام فایل ارسال نشده است.");
 
-            var safeFileName =
-                Path.GetFileName(fileName);
-
-            if (!string.Equals(
-                    safeFileName,
-                    fileName,
-                    StringComparison.Ordinal))
-            {
-                return BadRequest("نام فایل نامعتبر است.");
-            }
-
-            var fullPath =
-                Path.Combine(_storagePath, safeFileName);
+            var fullPath = Path.Combine(_storagePath, fileName);
 
             if (!System.IO.File.Exists(fullPath))
                 return NotFound("File Not Found");
 
             var extension =
-                Path.GetExtension(safeFileName);
+                Path.GetExtension(fullPath)
+                    .ToLowerInvariant();
 
-            var contentType =
-                extension.ToLowerInvariant() switch
-                {
-                    ".jpg" or ".jpeg" => "image/jpeg",
-                    ".png" => "image/png",
-                    ".webp" => "image/webp",
-                    _ => "application/octet-stream"
-                };
+            var contentType = extension switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".webp" => "image/webp",
+                _ => "application/octet-stream"
+            };
 
             return PhysicalFile(
                 fullPath,

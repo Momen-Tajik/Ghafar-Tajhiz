@@ -21,11 +21,21 @@ namespace Ghafar_Tajhiz.Controllers
             _basketItemService = basketItemService;
         }
 
+
+        // =========================================================
+        // Index
+        // =========================================================
+
         [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
+
+
+        // =========================================================
+        // Add To Basket
+        // =========================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -41,6 +51,7 @@ namespace Ghafar_Tajhiz.Controllers
                 });
             }
 
+
             var userId = GetCurrentUserId();
 
             if (!userId.HasValue)
@@ -52,10 +63,12 @@ namespace Ghafar_Tajhiz.Controllers
                 });
             }
 
+
             var result = await _basketService.AddToBasket(
                 model.ProductId,
                 model.Qty,
                 userId.Value);
+
 
             if (!result)
             {
@@ -66,12 +79,18 @@ namespace Ghafar_Tajhiz.Controllers
                 });
             }
 
+
             return Ok(new
             {
                 res = true,
                 msg = "محصول با موفقیت به سبد خرید اضافه شد."
             });
         }
+
+
+        // =========================================================
+        // Basket
+        // =========================================================
 
         [HttpGet]
         public async Task<IActionResult> Basket()
@@ -81,17 +100,26 @@ namespace Ghafar_Tajhiz.Controllers
             if (!userId.HasValue)
                 return Unauthorized();
 
-            var data = await _basketService.GetUserBasket(userId.Value);
+
+            var data =
+                await _basketService.GetUserBasket(userId.Value);
+
 
             return View(data);
         }
+
+
+        // =========================================================
+        // Remove Basket Item
+        // =========================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveBasketItem(
             [FromBody] RemoveBasketItemDto model)
         {
-            if (model == null || model.BasketItemId <= 0)
+            if (model == null ||
+                model.BasketItemId <= 0)
             {
                 return BadRequest(new
                 {
@@ -99,6 +127,7 @@ namespace Ghafar_Tajhiz.Controllers
                     msg = "شناسه سبد خرید نامعتبر است."
                 });
             }
+
 
             var userId = GetCurrentUserId();
 
@@ -111,9 +140,12 @@ namespace Ghafar_Tajhiz.Controllers
                 });
             }
 
-            var result = await _basketItemService.RemoveBasketItem(
-                model.BasketItemId,
-                userId.Value);
+
+            var result =
+                await _basketItemService.RemoveBasketItem(
+                    model.BasketItemId,
+                    userId.Value);
+
 
             if (!result)
             {
@@ -124,6 +156,7 @@ namespace Ghafar_Tajhiz.Controllers
                 });
             }
 
+
             return Ok(new
             {
                 res = true,
@@ -131,28 +164,88 @@ namespace Ghafar_Tajhiz.Controllers
             });
         }
 
+
+        // =========================================================
+        // Submit Payment + Receipt
+        // =========================================================
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Pay(PayDto model)
+        public async Task<IActionResult> Pay(
+            [FromForm] PayDto model)
         {
             if (!ModelState.IsValid)
-                return RedirectToAction("Basket");
+            {
+                TempData["Error"] =
+                    "اطلاعات وارد شده صحیح نیست.";
+
+                return RedirectToAction(nameof(Basket));
+            }
+
 
             var userId = GetCurrentUserId();
 
             if (!userId.HasValue)
                 return Unauthorized();
 
-            var result = await _basketService.Pay(
-                model.Mobile,
-                model.Address,
-                userId.Value);
 
-            if (!result)
-                return RedirectToAction("Basket");
+            if (model.Receipt == null ||
+                model.Receipt.Length == 0)
+            {
+                TempData["Error"] =
+                    "لطفاً رسید پرداخت را آپلود کنید.";
 
-            return RedirectToAction("Index", "Profile");
+                return RedirectToAction(nameof(Basket));
+            }
+
+
+            try
+            {
+                var result =
+                    await _basketService.Pay(
+                        model.Mobile,
+                        model.Address,
+                        model.Receipt,
+                        userId.Value);
+
+
+                if (!result)
+                {
+                    TempData["Error"] =
+                        "ثبت سفارش انجام نشد.";
+
+                    return RedirectToAction(nameof(Basket));
+                }
+
+
+                TempData["Success"] =
+                    "رسید با موفقیت ثبت شد و سفارش در انتظار بررسی پرداخت است.";
+
+
+                return RedirectToAction(
+                    "Index",
+                    "Profile");
+            }
+            catch (ArgumentException ex)
+            {
+                TempData["Error"] = ex.Message;
+
+                return RedirectToAction(
+                    nameof(Basket));
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
+
+                return RedirectToAction(
+                    nameof(Basket));
+            }
         }
+
+
+        // =========================================================
+        // Basket Count
+        // =========================================================
 
         [AllowAnonymous]
         [HttpGet]
@@ -163,19 +256,34 @@ namespace Ghafar_Tajhiz.Controllers
             if (!userId.HasValue)
                 return Ok(0);
 
+
             var count =
-                await _basketService.GetBasketItemCountAsync(userId.Value);
+                await _basketService.GetBasketItemCountAsync(
+                    userId.Value);
+
 
             return Ok(count);
         }
 
+
+        // =========================================================
+        // Current User ID
+        // =========================================================
+
         private int? GetCurrentUserId()
         {
-            var claim = User.FindFirstValue(
-                ClaimTypes.NameIdentifier);
+            var claim =
+                User.FindFirstValue(
+                    ClaimTypes.NameIdentifier);
 
-            if (int.TryParse(claim, out var userId))
+
+            if (int.TryParse(
+                    claim,
+                    out var userId))
+            {
                 return userId;
+            }
+
 
             return null;
         }
