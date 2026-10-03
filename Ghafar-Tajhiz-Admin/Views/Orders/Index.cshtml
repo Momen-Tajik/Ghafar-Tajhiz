@@ -151,9 +151,6 @@
                             محصولات
                         </th>
 
-                        <th>
-                            رسید
-                        </th>
 
                         <th>
                             وضعیت
@@ -226,31 +223,7 @@
                             </td>
 
 
-                            <!-- Receipt -->
-
-                            <td>
-
-                                @if (!string.IsNullOrWhiteSpace(
-                               item.ReceiptImage))
-                                {
-                                    <a href="/api/FileUpload/GetFile?fileName=@Uri.EscapeDataString("receipts/" + item.ReceiptImage)"
-                                       target="_blank"
-                                       class="action-btn action-view"
-                                       title="مشاهده رسید">
-
-                                        <i class="fa fa-eye"></i>
-
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span>
-                                        ندارد
-                                    </span>
-                                }
-
-                            </td>
-
+                          
 
                             <!-- Status -->
 
