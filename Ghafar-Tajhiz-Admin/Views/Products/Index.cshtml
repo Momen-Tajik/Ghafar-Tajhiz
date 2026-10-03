@@ -5,99 +5,171 @@
 }
 
 <div class="page-header">
-    <h1>مدیریت محصولات</h1>
-    <p>لیست محصولات ثبت‌شده در فروشگاه</p>
+
+    <h1>
+        مدیریت محصولات
+    </h1>
+
+    <p>
+        لیست محصولات ثبت‌شده در فروشگاه
+    </p>
+
 </div>
 
 <div class="admin-card">
 
     <div style="margin-bottom:16px;">
-        <a asp-action="Create" class="form-button">
+
+        <a asp-action="Create"
+           class="form-button">
+
             <i class="fa fa-plus"></i>
             افزودن محصول جدید
+
         </a>
+
     </div>
 
-    <div class="table-scroll">
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>نام محصول</th>
-                    <th>توضیحات</th>
-                    <th>قیمت</th>
-                    <th>موجودی</th>
-                    <th>تصویر</th>
-                    <th>وضعیت</th>
-                    <th>تاریخ ایجاد</th>
-                    <th>دسته‌بندی</th>
-                    <th>عملیات</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            هنوز محصولی ثبت نشده است.
+        </div>
+    }
+    else
+    {
+        <div class="table-scroll">
+
+            <table class="admin-table">
+
+                <thead>
                     <tr>
-                        <td>@item.ProductName</td>
-
-                        <td>
-                            @(item.ProductDescription?.Length > 50
-                                ? item.ProductDescription.Substring(0, 50) + "..."
-                                : item.ProductDescription)
-                        </td>
-
-                        <td>@item.Price.ToString("N0") تومان</td>
-
-                        <td>@item.StockQuantity</td>
-
-                        <td>
-                            <img class="product-image"
-                                 src="api/FileUpload/GetFile?filename=@item.ImageUrl"
-                                 alt="@item.ProductName" />
-                        </td>
-
-                        <td>
-                            @if (item.IsAvailable)
-                            {
-                                <span class="boolean-true">فعال</span>
-                            }
-                            else
-                            {
-                                <span class="boolean-false">غیرفعال</span>
-                            }
-                        </td>
-
-                        <td>@item.CreateDate.ToString("yyyy/MM/dd")</td>
-
-                        <td>@item.Category?.CategoryName</td>
-
-                        <td>
-                            <div class="action-group">
-                                <a asp-action="Edit"
-                                   asp-route-id="@item.ProductId"
-                                   class="action-btn action-edit"
-                                   title="ویرایش">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-
-                                <a asp-action="Details"
-                                   asp-route-id="@item.ProductId"
-                                   class="action-btn action-view"
-                                   title="جزئیات">
-                                    <i class="fa fa-eye"></i>
-                                </a>
-
-                                <a asp-action="Delete"
-                                   asp-route-id="@item.ProductId"
-                                   class="action-btn action-delete"
-                                   title="حذف">
-                                    <i class="fa fa-trash"></i>
-                                </a>
-                            </div>
-                        </td>
+                        <th>نام محصول</th>
+                        <th>توضیحات</th>
+                        <th>قیمت</th>
+                        <th>موجودی</th>
+                        <th>تصویر</th>
+                        <th>وضعیت</th>
+                        <th>تاریخ ایجاد</th>
+                        <th>دسته‌بندی</th>
+                        <th>عملیات</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                @item.ProductName
+                            </td>
+
+                            <td>
+                                @{
+                                    var description =
+                                    item.ProductDescription ?? "";
+
+                                    var shortDescription =
+                                    description.Length > 50
+                                    ? description[..50] + "..."
+                                    : description;
+                                }
+
+                                @(string.IsNullOrWhiteSpace(shortDescription)
+                                    ? "—"
+                                    : shortDescription)
+                            </td>
+
+                            <td>
+                                @item.Price.ToString("N0") تومان
+                            </td>
+
+                            <td>
+                                @item.StockQuantity
+                            </td>
+
+                            <td>
+
+                                @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                                {
+                                    <img class="product-image"
+                                         src="/api/FileUpload/GetFile?fileName=@Uri.EscapeDataString(item.ImageUrl)"
+                                         alt="@item.ProductName"
+                                         loading="lazy" />
+                                }
+                                else
+                                {
+                                    <span>
+                                        —
+                                    </span>
+                                }
+
+                            </td>
+
+                            <td>
+
+                                @if (item.IsAvailable)
+                                {
+                                    <span class="boolean-true">
+                                        فعال
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="boolean-false">
+                                        غیرفعال
+                                    </span>
+                                }
+
+                            </td>
+
+                            <td>
+                                @item.CreateDate.ToString("yyyy/MM/dd")
+                            </td>
+
+                            <td>
+                                @item.Category?.CategoryName
+                            </td>
+
+                            <td>
+
+                                <div class="action-group">
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.ProductId"
+                                       class="action-btn action-edit"
+                                       title="ویرایش">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+
+                                    <a asp-action="Details"
+                                       asp-route-id="@item.ProductId"
+                                       class="action-btn action-view"
+                                       title="جزئیات">
+                                        <i class="fa fa-eye"></i>
+                                    </a>
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@item.ProductId"
+                                       class="action-btn action-delete"
+                                       title="حذف">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
 
 </div>

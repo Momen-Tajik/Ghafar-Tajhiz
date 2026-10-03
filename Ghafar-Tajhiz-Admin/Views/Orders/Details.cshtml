@@ -1,0 +1,667 @@
+﻿@using DataAccess.Enums
+@using BusinessLogic.BasketServices.Models
+@model AdminOrderDetailDto
+
+@{
+    ViewData["Title"] = "جزئیات سفارش";
+
+    var orderTotal = Model.Items?.Sum(x => x.Qty * x.UnitPrice) ?? 0;
+
+    string? receiptUrl = null;
+
+    if (!string.IsNullOrWhiteSpace(Model.ReceiptImage))
+    {
+        receiptUrl =
+            $"/api/FileUpload/GetFile?fileName={Uri.EscapeDataString("receipts/" + Model.ReceiptImage)}";
+    }
+}
+
+
+<div class="page-header">
+
+    <h1>
+        جزئیات سفارش #@Model.BasketId
+    </h1>
+
+    <p>
+        مشاهده اطلاعات کامل سفارش
+    </p>
+
+</div>
+
+
+<!-- =========================================================
+     Customer Information
+     ========================================================= -->
+
+<div class="admin-card">
+
+    <div class="card-header">
+
+        <h3>
+            اطلاعات مشتری
+        </h3>
+
+    </div>
+
+
+    <div class="details-grid">
+
+        <!-- User Name -->
+
+        <div class="detail-item">
+
+            <div class="label">
+                نام
+            </div>
+
+            <div class="value">
+                @Model.UserName
+            </div>
+
+        </div>
+
+
+        <!-- Mobile -->
+
+        <div class="detail-item">
+
+            <div class="label">
+                شماره موبایل
+            </div>
+
+            <div class="value"
+                 dir="ltr">
+
+                @Model.MobileNumber
+
+            </div>
+
+        </div>
+
+
+        <!-- Address -->
+
+        <div class="detail-item">
+
+            <div class="label">
+                آدرس
+            </div>
+
+            <div class="value">
+
+                @(string.IsNullOrWhiteSpace(Model.Address)
+                    ? "-"
+                    : Model.Address)
+
+            </div>
+
+        </div>
+
+
+        <!-- Created -->
+
+        <div class="detail-item">
+
+            <div class="label">
+                تاریخ ثبت سفارش
+            </div>
+
+            <div class="value">
+
+                @Model.Created.ToString(
+                         "yyyy/MM/dd HH:mm")
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     Payment Information
+     ========================================================= -->
+
+<div class="admin-card">
+
+    <div class="card-header">
+
+        <h3>
+            اطلاعات پرداخت
+        </h3>
+
+    </div>
+
+
+    <div class="details-grid">
+
+        <!-- Status -->
+
+        <div class="detail-item">
+
+            <div class="label">
+                وضعیت
+            </div>
+
+            <div class="value">
+
+                @switch (Model.Status)
+                {
+                    case BasketStatus.PendingPayment:
+
+                        <span class="badge badge-warning">
+                            در انتظار پرداخت
+                        </span>
+
+                        break;
+
+
+                    case BasketStatus.AwaitingPaymentVerification:
+
+                        <span class="badge badge-warning">
+                            در انتظار بررسی پرداخت
+                        </span>
+
+                        break;
+
+
+                    case BasketStatus.PaymentApproved:
+
+                        <span class="badge badge-success">
+                            پرداخت تأیید شد
+                        </span>
+
+                        break;
+
+
+                    case BasketStatus.PaymentRejected:
+
+                        <span class="badge badge-danger">
+                            پرداخت رد شد
+                        </span>
+
+                        break;
+
+
+                    case BasketStatus.Shipped:
+
+                        <span class="badge badge-success">
+                            ارسال شده
+                        </span>
+
+                        break;
+
+
+                    case BasketStatus.Cancelled:
+
+                        <span class="badge badge-danger">
+                            لغو شده
+                        </span>
+
+                        break;
+
+
+                    default:
+
+                        <span class="badge">
+                            نامشخص
+                        </span>
+
+                        break;
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- Paid Date -->
+
+        <div class="detail-item">
+
+            <div class="label">
+                تاریخ پرداخت
+            </div>
+
+            <div class="value">
+
+                @if (Model.PaidDate.HasValue)
+                {
+                    @Model.PaidDate.Value.ToString(
+                             "yyyy/MM/dd HH:mm")
+                }
+                else
+                {
+                    <span>
+                        -
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- Receipt Uploaded -->
+
+        <div class="detail-item">
+
+            <div class="label">
+                تاریخ ارسال رسید
+            </div>
+
+            <div class="value">
+
+                @if (Model.ReceiptUploadedAt.HasValue)
+                {
+                    @Model.ReceiptUploadedAt.Value.ToString(
+                             "yyyy/MM/dd HH:mm")
+                }
+                else
+                {
+                    <span>
+                        -
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- Payment Verified -->
+
+        <div class="detail-item">
+
+            <div class="label">
+                تاریخ بررسی پرداخت
+            </div>
+
+            <div class="value">
+
+                @if (Model.PaymentVerifiedAt.HasValue)
+                {
+                    @Model.PaymentVerifiedAt.Value.ToString(
+                             "yyyy/MM/dd HH:mm")
+                }
+                else
+                {
+                    <span>
+                        -
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         Receipt
+         ===================================================== -->
+
+    <div class="receipt-section">
+
+        <h4>
+            رسید پرداخت
+        </h4>
+
+
+        @if (!string.IsNullOrWhiteSpace(receiptUrl))
+        {
+            <div class="receipt-preview">
+
+                <div class="receipt-thumbnail-wrapper"
+                     onclick="showReceipt('@receiptUrl')">
+
+                    <img src="@receiptUrl"
+                         alt="رسید پرداخت"
+                         class="receipt-thumbnail" />
+
+                    <div class="receipt-overlay">
+
+                        <i class="fa fa-search-plus"></i>
+
+                        <span>
+                            مشاهده رسید
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <p class="receipt-hint">
+                    برای مشاهده تصویر کامل روی رسید کلیک کنید.
+                </p>
+
+            </div>
+        }
+        else
+        {
+            <div class="receipt-empty">
+
+                <i class="fa fa-file-image-o"></i>
+
+                <span>
+                    رسیدی ثبت نشده است.
+                </span>
+
+            </div>
+        }
+
+    </div>
+
+
+    <!-- =====================================================
+         Rejection Reason
+         ===================================================== -->
+    @if (Model.Status == BasketStatus.PaymentRejected &&
+    !string.IsNullOrWhiteSpace(Model.PaymentRejectionReason))
+    {
+        <div class="alert alert-danger">
+
+            <strong>
+                دلیل رد پرداخت:
+            </strong>
+
+            <span>
+                @Model.PaymentRejectionReason
+            </span>
+
+        </div>
+    }
+
+</div>
+
+
+<!-- =========================================================
+     Order Items
+     ========================================================= -->
+
+<div class="admin-card">
+
+    <div class="card-header">
+
+        <h3>
+            محصولات سفارش
+        </h3>
+
+    </div>
+
+
+    <div class="table-scroll">
+
+        <table class="admin-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        محصول
+                    </th>
+
+                    <th>
+                        قیمت واحد
+                    </th>
+
+                    <th>
+                        تعداد
+                    </th>
+
+                    <th>
+                        جمع
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                @if (Model.Items != null &&
+                Model.Items.Any())
+                {
+                    foreach (var item in Model.Items)
+                    {
+                        <tr>
+
+                            <!-- Product -->
+
+                            <td>
+
+                                <div class="order-product">
+
+                                    @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                                    {
+                                        <img src="/api/FileUpload/GetFile?fileName=@Uri.EscapeDataString(item.ImageUrl)"
+                                             alt="@item.ProductName"
+                                             class="details-image"
+                                             loading="lazy" />
+                                    }
+
+
+                                    <span>
+                                        @item.ProductName
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- Unit Price -->
+
+                            <td>
+
+                                @item.UnitPrice.ToString("N0")
+                                تومان
+
+                            </td>
+
+
+                            <!-- Quantity -->
+
+                            <td>
+
+                                @item.Qty
+
+                            </td>
+
+
+                            <!-- Total -->
+
+                            <td>
+
+                                <strong>
+                                    @((item.Qty * item.UnitPrice).ToString("N0"))
+                                    تومان
+                                </strong>
+
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+
+                        <td colspan="4"
+                            style="text-align:center;">
+
+                            محصولی برای این سفارش وجود ندارد.
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- =====================================================
+         Order Total
+         ===================================================== -->
+
+    <div class="order-total">
+
+        <strong>
+            جمع کل:
+        </strong>
+
+        <strong>
+            @orderTotal.ToString("N0")
+            تومان
+        </strong>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     Actions
+     ========================================================= -->
+
+<div class="admin-card">
+
+    <div class="action-group">
+
+
+        <!-- Approve / Reject Payment -->
+        @if (Model.Status ==
+        BasketStatus.AwaitingPaymentVerification)
+        {
+            <div class="payment-actions">
+
+                <!-- Approve -->
+
+                <button type="button"
+                        onclick="State(@Model.BasketId, true)"
+                        class="payment-action-btn payment-approve">
+
+                    <i class="fa fa-check"></i>
+
+                    <span>
+                        تأیید پرداخت
+                    </span>
+
+                </button>
+
+
+                <!-- Reject -->
+
+                <button type="button"
+                        onclick="State(@Model.BasketId, false)"
+                        class="payment-action-btn payment-reject">
+
+                    <i class="fa fa-times"></i>
+
+                    <span>
+                        رد پرداخت
+                    </span>
+
+                </button>
+
+            </div>
+        }
+
+
+        <!-- Ship Order -->
+        @if (Model.Status ==
+        BasketStatus.PaymentApproved)
+        {
+            <button type="button"
+                    onclick="ShipOrder(@Model.BasketId)"
+                    class="payment-action-btn payment-approve">
+
+                <i class="fa fa-truck"></i>
+
+                <span>
+                    ارسال سفارش
+                </span>
+
+            </button>
+        }
+
+
+        <!-- Back -->
+
+        <a asp-controller="Orders"
+           asp-action="Index"
+           class="back-orders-btn">
+
+            <i class="fa fa-arrow-right"></i>
+
+            <span>
+                بازگشت به سفارش‌ها
+            </span>
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     Anti Forgery
+     ========================================================= -->
+
+<form id="stateForm">
+
+    @Html.AntiForgeryToken()
+
+</form>
+
+
+<!-- =========================================================
+     Receipt SweetAlert
+     ========================================================= -->
+
+<script>
+
+    function showReceipt(receiptUrl) {
+
+        Swal.fire({
+
+            title: "رسید پرداخت",
+
+            imageUrl: receiptUrl,
+
+            imageAlt: "رسید پرداخت",
+
+            width: "900px",
+
+            showCloseButton: true,
+
+            showConfirmButton: false,
+
+            allowOutsideClick: true,
+
+            allowEscapeKey: true,
+
+            background: "#ffffff",
+
+            customClass: {
+                popup: "receipt-swal-popup",
+                image: "receipt-swal-image"
+            }
+
+        });
+
+    }
+
+</script>

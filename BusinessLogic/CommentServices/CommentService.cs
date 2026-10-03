@@ -1,43 +1,62 @@
-﻿using BusinessLogic.ProductServices;
+﻿using DataAccess.Data;
 using DataAccess.Models;
-using DataAccess.Repositories.CommentRepo;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogic.CommentServices
 {
     public class CommentService
     {
-        private readonly ICommentRepository _commentRepository;
+        private readonly GhafarTajhizShopDbContext _context;
 
-        public CommentService(ICommentRepository commentRepository)
+        public CommentService(GhafarTajhizShopDbContext context)
         {
-            _commentRepository = commentRepository;
+            _context = context;
         }
 
-        public async Task<bool> CreateComment(string text, int productId , string userName)
+        public async Task<bool> CreateComment(
+            string text,
+            int productId,
+            int userId)
         {
-            var comment = new Comment()
-            {
-                Text=text,
-                ProductId=productId,
-                UserName=userName,
-                Created = DateTime.Now,
+            if (string.IsNullOrWhiteSpace(text))
+                return false;
 
+            var productExists = await _context.Products
+                .AnyAsync(p => p.ProductId == productId);
+
+            if (!productExists)
+                return false;
+
+            var comment = new Comment
+            {
+                Text = text.Trim(),
+                ProductId = productId,
+                UserId = userId,
+                Created = DateTime.Now
             };
 
-            await _commentRepository.Add(comment);
+            await _context.Comments.AddAsync(comment);
+            await _context.SaveChangesAsync();
+
             return true;
         }
 
-        public async Task<bool> RemoveComment(int id)
+        public async Task<bool> RemoveComment(
+            int commentId,
+            int userId)
         {
-            //var comment = await _commentRepository.GetAll(a => a.CommentId == id).FirstOrDefaultAsync();
-            await _commentRepository.Delete(id);
+            var comment = await _context.Comments
+                .FirstOrDefaultAsync(c =>
+                    c.CommentId == commentId &&
+                    c.UserId == userId);
+
+            if (comment == null)
+                return false;
+
+            _context.Comments.Remove(comment);
+
+            await _context.SaveChangesAsync();
+
             return true;
         }
     }

@@ -1,11 +1,6 @@
 ﻿using DataAccess.Data;
 using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.Repositories.CategoryRepo
 {
@@ -17,40 +12,33 @@ namespace DataAccess.Repositories.CategoryRepo
         {
             _context = context;
         }
-        public async Task Add(Category category)
+
+        public async Task<IReadOnlyList<Category>> GetAllAsync()
         {
-            _context.Categories.Add(category);
-             await _context.SaveChangesAsync();
+            return await _context.Categories
+                .AsNoTracking()
+                .ToListAsync();
         }
 
-        public async Task Delete(int id)
+        public async Task<Category?> GetByIdAsync(int id)
         {
-            var c = await GetById(id);
-            _context.Categories.Remove(c);
-            await _context.SaveChangesAsync();
+            return await _context.Categories
+                .FirstOrDefaultAsync(c => c.CategoryId == id);
         }
 
-        public async Task Delete(Category category)
+        public async Task AddAsync(Category category)
         {
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
+            await _context.Categories.AddAsync(category);
         }
 
-        public async Task<IEnumerable<Category>> GetAll()
-        {
-            var data= await _context.Categories.ToListAsync();
-            return data;
-        }
-
-        public async Task<Category> GetById(int id)
-        {
-            return await _context.Categories.FindAsync(id);
-        }
-
-        public async Task Update(Category category)
+        public void Update(Category category)
         {
             _context.Categories.Update(category);
-            await _context.SaveChangesAsync();
+        }
+
+        public void Delete(Category category)
+        {
+            _context.Categories.Remove(category);
         }
     }
 }

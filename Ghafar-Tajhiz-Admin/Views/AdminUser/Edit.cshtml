@@ -6,13 +6,22 @@
 
 <div class="container mt-4">
 
-    <h2>ویرایش کاربر</h2>
+    <h2>
+        ویرایش کاربر
+    </h2>
 
-    <form asp-action="Edit" method="post">
+    <form asp-action="Edit"
+          method="post">
 
         @Html.AntiForgeryToken()
 
-        <input type="hidden" name="id" value="@Model.Id" />
+        <input type="hidden"
+               name="id"
+               value="@Model.Id" />
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger mb-3">
+        </div>
 
         <div class="mb-3">
 
@@ -27,7 +36,6 @@
 
         </div>
 
-
         <div class="mb-3">
 
             <label class="form-label">
@@ -37,10 +45,10 @@
             <input type="text"
                    name="phoneNumber"
                    value="@Model.PhoneNumber"
-                   class="form-control" />
+                   class="form-control"
+                   dir="ltr" />
 
         </div>
-
 
         <div class="mb-3">
 
@@ -51,10 +59,10 @@
             <input type="email"
                    name="email"
                    value="@Model.Email"
-                   class="form-control" />
+                   class="form-control"
+                   dir="ltr" />
 
         </div>
-
 
         <div class="mb-3">
 
@@ -62,12 +70,17 @@
                 Role
             </label>
 
-            <select name="role" class="form-select">
+            <select name="role"
+                    class="form-select">
+
+                <option value="">
+                    بدون تغییر
+                </option>
 
                 @foreach (var role in ViewBag.Roles)
                 {
                     <option value="@role.Name"
-                            selected="@(role.Name == ViewBag.CurrentRole)">
+                            selected="@(role.Name == ViewBag.CurrentRole ? "selected" : null)">
                         @role.Name
                     </option>
                 }
@@ -91,14 +104,15 @@
             <input type="password"
                    name="newPassword"
                    class="form-control"
-                   autocomplete="new-password" />
+                   autocomplete="new-password"
+                   minlength="6"
+                   maxlength="100" />
 
             <small class="text-muted">
                 در صورت خالی گذاشتن، رمز عبور تغییر نمی‌کند.
             </small>
 
         </div>
-
 
         <div class="mb-3">
 
@@ -109,7 +123,9 @@
             <input type="password"
                    name="confirmPassword"
                    class="form-control"
-                   autocomplete="new-password" />
+                   autocomplete="new-password"
+                   minlength="6"
+                   maxlength="100" />
 
         </div>
 

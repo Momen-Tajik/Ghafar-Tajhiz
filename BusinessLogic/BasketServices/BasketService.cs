@@ -1,232 +1,603 @@
 ﻿using BusinessLogic.BasketServices.Models;
+using BusinessLogic.FileUpload;
+using DataAccess.Data;
 using DataAccess.Enums;
 using DataAccess.Models;
-using DataAccess.Repositories.BasketItemRepo;
-using DataAccess.Repositories.BasketRepo;
-using DataAccess.Repositories.ProductRepo;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogic.BasketServices
 {
     public class BasketService
     {
-        private readonly IBasketRepository _basketRepository;
-        private readonly IProductRepository _productRepository;
-        private readonly IBasketItemRepository _basketItemRepository;
+        private readonly GhafarTajhizShopDbContext _context;
+        private readonly IFileUploadService _fileUploadService;
 
-        public BasketService(IBasketRepository basketRepository, IProductRepository productRepository, IBasketItemRepository basketItemRepository)
+        public BasketService(
+            GhafarTajhizShopDbContext context,
+            IFileUploadService fileUploadService)
         {
-            _basketRepository = basketRepository;
-            _productRepository = productRepository;
-            _basketItemRepository = basketItemRepository;
+            _context = context;
+            _fileUploadService = fileUploadService;
         }
 
-        public async Task<bool> AddToBasket(int productId, int qty, int userId)
+
+        // =========================================================
+        // Add Product To Basket
+        // =========================================================
+
+        public async Task<bool> AddToBasket(
+            int productId,
+            int qty,
+            int userId)
         {
-            var basket = await _basketRepository
-                .GetAll(a => a.UserId == userId && a.Status == BasketStatus.Pending)
-                .FirstOrDefaultAsync();
+            if (qty <= 0)
+                return false;
+
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p =>
+                    p.ProductId == productId &&
+                    p.IsAvailable);
+
+            if (product == null)
+                return false;
+
+
+            var basket = await _context.Baskets
+                .Include(b => b.BasketItems)
+                .FirstOrDefaultAsync(b =>
+                    b.UserId == userId &&
+                    b.Status == BasketStatus.PendingPayment);
 
             if (basket == null)
             {
                 basket = new Basket
                 {
                     UserId = userId,
-                    Status = BasketStatus.Pending,
-                    Created = DateTime.Now,
-                };
-
-                await _basketRepository.Add(basket);
-            }
-
-            var product = await _productRepository.GetById(productId);
-
-            var basketItem = await _basketItemRepository
-                .GetAll(a => a.BasketId == basket.BasketId && a.ProductId == productId)
-                .FirstOrDefaultAsync();
-
-            if (basketItem != null)
-            {
-                basketItem.Qty += qty;
-                basketItem.UnitPrice = product.Price * basketItem.Qty;
-
-                await _basketItemRepository.Update(basketItem);
-            }
-            else
-            {
-                basketItem = new BasketItem
-                {
-                    BasketId = basket.BasketId,
-                    ProductId = product.ProductId,
-                    Qty = qty,
-                    UnitPrice = product.Price * qty,
+                    Status = BasketStatus.PendingPayment,
                     Created = DateTime.Now
                 };
 
-                await _basketItemRepository.Add(basketItem);
+                _context.Baskets.Add(basket);
             }
+
+
+            var basketItem = basket.BasketItems
+                .FirstOrDefault(i =>
+                    i.ProductId == productId);
+
+            var newQuantity =
+                (basketItem?.Qty ?? 0) + qty;
+
+
+            if (newQuantity > product.StockQuantity)
+                return false;
+
+
+            if (basketItem == null)
+            {
+                basketItem = new BasketItem
+                {
+                    ProductId = product.ProductId,
+                    Qty = qty,
+                    UnitPrice = product.Price,
+                    Created = DateTime.Now
+                };
+
+                basket.BasketItems.Add(basketItem);
+            }
+            else
+            {
+                basketItem.Qty = newQuantity;
+
+                // قیمت واحد
+                basketItem.UnitPrice = product.Price;
+            }
+
+
+            await _context.SaveChangesAsync();
 
             return true;
         }
 
 
+        // =========================================================
+        // Get Current Basket
+        // =========================================================
+
         public async Task<List<BasketItem>> GetUserBasket(int userId)
         {
-            var basketItems = await _basketItemRepository.GetAll(a => a.Basket.UserId == userId && a.Basket.Status == BasketStatus.Pending)
-                .Include(a => a.Basket).Include(a => a.Product).ToListAsync();
-            return basketItems;
+            return await _context.BasketItems
+                .AsNoTracking()
+                .Where(i =>
+                    i.Basket.UserId == userId &&
+                    i.Basket.Status == BasketStatus.PendingPayment)
+                .Include(i => i.Product)
+                .ToListAsync();
         }
 
-        public async Task<bool> Pay(string mobile, string address, int userId)
+
+        // =========================================================
+        // Submit Payment / Upload Receipt
+        // =========================================================
+        // فعلاً این متد اطلاعات سفارش را ذخیره می‌کند
+        // و وضعیت را به AwaitingPaymentVerification می‌برد.
+        //
+        // ذخیره فایل رسید باید در بخش Upload Receipt انجام شود.
+        // =========================================================
+        public async Task<bool> Pay(
+            string mobile,
+            string address,
+            IFormFile receipt,
+            int userId)
         {
-            var basket = await _basketRepository.GetAll(a => a.UserId == userId && a.Status == BasketStatus.Pending).FirstOrDefaultAsync();
+            if (receipt == null || receipt.Length == 0)
+                return false;
+
+
+            var basket = await _context.Baskets
+                .Include(b => b.BasketItems)
+                .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(b =>
+                    b.UserId == userId &&
+                    b.Status == BasketStatus.PendingPayment);
+
+
+            if (basket == null ||
+                basket.BasketItems.Count == 0)
+            {
+                return false;
+            }
+
+
+            // بررسی موجودی
+            foreach (var item in basket.BasketItems)
+            {
+                if (item.Product == null ||
+                    !item.Product.IsAvailable ||
+                    item.Qty > item.Product.StockQuantity)
+                {
+                    return false;
+                }
+            }
+
+
+            // آپلود رسید
+            var receiptFileName =
+                await _fileUploadService.UploadReceiptAsync(receipt);
+
+
+            basket.Address = address;
+
+            basket.MobileNumber = mobile;
+
+            basket.ReceiptImage =
+                receiptFileName;
+
+            basket.ReceiptUploadedAt =
+                DateTime.Now;
+
+            basket.PaymentVerifiedAt = null;
+
+            basket.PaymentRejectionReason = null;
+
+            basket.PaidDate = null;
+
+            basket.Status =
+                BasketStatus.AwaitingPaymentVerification;
+
+
+            await _context.SaveChangesAsync();
+
+
+            return true;
+        }
+
+
+        // =========================================================
+        // Get User Orders
+        // =========================================================
+
+        public async Task<List<Basket>> GetUserOrders(
+            int userId,
+            string? search,
+            BasketStatus? status,
+            string sort = "paiddate")
+        {
+            var query = _context.Baskets
+                .AsNoTracking()
+                .Where(b => b.UserId == userId)
+                .Include(b => b.BasketItems)
+                .ThenInclude(i => i.Product)
+                .AsQueryable();
+
+
+            // وقتی فیلتر وضعیت انتخاب نشده
+            // سبد موقت را نمایش نده
+            if (status.HasValue)
+            {
+                query = query.Where(b =>
+                    b.Status == status.Value);
+            }
+            else
+            {
+                query = query.Where(b =>
+                    b.Status != BasketStatus.PendingPayment);
+            }
+
+
+            // Search
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var trimmedSearch = search.Trim();
+
+
+                if (int.TryParse(
+                    trimmedSearch,
+                    out var basketId))
+                {
+                    query = query.Where(b =>
+                        b.BasketId == basketId ||
+
+                        (b.MobileNumber != null &&
+                         b.MobileNumber.Contains(trimmedSearch)) ||
+
+                        (b.Address != null &&
+                         b.Address.Contains(trimmedSearch)) ||
+
+                        b.BasketItems.Any(i =>
+                            i.Product.ProductName
+                                .Contains(trimmedSearch)));
+                }
+                else
+                {
+                    query = query.Where(b =>
+
+                        (b.MobileNumber != null &&
+                         b.MobileNumber.Contains(trimmedSearch)) ||
+
+                        (b.Address != null &&
+                         b.Address.Contains(trimmedSearch)) ||
+
+                        b.BasketItems.Any(i =>
+                            i.Product.ProductName
+                                .Contains(trimmedSearch)));
+                }
+            }
+
+
+            query = sort.Trim()
+                .ToLowerInvariant() switch
+            {
+                "status" =>
+                    query.OrderByDescending(
+                        b => b.Status),
+
+                "oldest" =>
+                    query.OrderBy(
+                        b => b.Created),
+
+                _ =>
+                    query.OrderByDescending(
+                        b => b.Created)
+            };
+
+
+            return await query.ToListAsync();
+        }
+
+
+        // =========================================================
+        // Get Admin Orders
+        // =========================================================
+
+        public async Task<List<AdminOrderDto>> GetAdminBskets(
+            string? search,
+            string sort = "paiddate")
+        {
+            var query = _context.Baskets
+                .AsNoTracking()
+                .Where(b =>
+                    b.Status != BasketStatus.PendingPayment)
+                .Select(b => new AdminOrderDto
+                {
+                    AdminOrderId = b.BasketId,
+
+                    PaidDate = b.PaidDate,
+
+                    UserId = b.UserId,
+
+                    Address = b.Address ?? string.Empty,
+
+                    MobileNumber = b.MobileNumber ?? string.Empty,
+
+                    Status = b.Status,
+
+                    UserName = b.User!.FullName ?? string.Empty,
+
+                    Items = b.BasketItems
+                .Select(i => i.Product.ProductName)
+                .ToList(),
+
+                    ReceiptImage = b.ReceiptImage,
+
+                    ReceiptUploadedAt = b.ReceiptUploadedAt,
+
+                    PaymentVerifiedAt = b.PaymentVerifiedAt,
+
+                    PaymentRejectionReason = b.PaymentRejectionReason
+                });
+
+
+            // Search
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var trimmedSearch =
+                    search.Trim();
+
+                query = query.Where(o =>
+                    o.UserName.Contains(trimmedSearch) ||
+                    o.MobileNumber.Contains(trimmedSearch) ||
+                    o.Address.Contains(trimmedSearch) ||
+                    o.Items.Any(p =>
+                        p.Contains(trimmedSearch)));
+            }
+
+
+            query = sort.Trim()
+                .ToLowerInvariant() switch
+            {
+                "status" =>
+                    query.OrderByDescending(
+                        o => o.Status),
+
+                "oldest" =>
+                    query.OrderBy(
+                        o => o.PaidDate),
+
+                _ =>
+                    query.OrderByDescending(
+                        o => o.PaidDate)
+            };
+
+
+            return await query.ToListAsync();
+        }
+
+
+        // =========================================================
+        // Get Last User Order
+        // =========================================================
+
+        public async Task<Basket?> GetLastUserOrder(
+            int userId)
+        {
+            return await _context.Baskets
+                .AsNoTracking()
+                .Where(b =>
+                    b.UserId == userId &&
+                    b.Status != BasketStatus.PendingPayment)
+                .OrderByDescending(
+                    b => b.Created)
+                .FirstOrDefaultAsync();
+        }
+
+
+        // =========================================================
+        // Basket Item Count
+        // =========================================================
+
+        public async Task<int> GetBasketItemCountAsync(
+            int userId)
+        {
+            return await _context.BasketItems
+                .Where(i =>
+                    i.Basket.UserId == userId &&
+                    i.Basket.Status ==
+                        BasketStatus.PendingPayment)
+                .SumAsync(i => i.Qty);
+        }
+
+
+        // =========================================================
+        // Approve / Reject Payment
+        // =========================================================
+
+        public async Task<bool> SetState(
+            int basketId,
+            bool approved)
+        {
+            var basket = await _context.Baskets
+                .Include(b => b.BasketItems)
+                .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(b =>
+                    b.BasketId == basketId);
+
 
             if (basket == null)
                 return false;
 
-            basket.Address = address;
-            basket.PaidDate = DateTime.Now;
-            basket.Status = BasketStatus.Paid;
-            basket.MobileNumber = mobile;
 
-            await _basketRepository.Update(basket);
-            return true;
-        }
-
-        public async Task<List<Basket>> GetUserBskets(int userId)
-        {
-            var baskets = await _basketRepository.GetAll(a => a.UserId == userId && a.Status != BasketStatus.Pending)
-                .Include(a => a.BasketItems).ThenInclude(a => a.Product).AsNoTracking().ToListAsync();
-            return baskets;
-        }
+            // فقط سفارش‌هایی که منتظر بررسی هستند
+            // قابل تأیید یا رد هستند.
+            if (basket.Status !=
+                BasketStatus.AwaitingPaymentVerification)
+            {
+                return false;
+            }
 
 
-        public async Task<List<AdminOrderDto>> GetAdminBskets(string? search, string sort = "paiddate")
-        {
-            var query = _basketRepository.GetAll(b => b.Status != BasketStatus.Pending)
-                .Include(b => b.User)
-                .Include(b => b.BasketItems)
-                    .ThenInclude(bi => bi.Product)
-                .Select(b => new AdminOrderDto
+            // =====================================================
+            // Reject Payment
+            // =====================================================
+
+            if (!approved)
+            {
+                basket.Status =
+                    BasketStatus.PaymentRejected;
+
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+
+
+            // =====================================================
+            // Approve Payment
+            // =====================================================
+
+            foreach (var item in basket.BasketItems)
+            {
+                if (item.Product == null ||
+                    !item.Product.IsAvailable ||
+                    item.Qty > item.Product.StockQuantity)
                 {
-                    AdminOrderId = b.BasketId,
-                    PaidDate = b.PaidDate ?? DateTime.MinValue,
-                    UserId = b.UserId,
-                    Address = b.Address ?? "",
-                    MobileNumber = b.MobileNumber ?? "",
-                    Status = b.Status,
-                    UserName = b.User.FullName,
-                    items = b.BasketItems.Select(i => i.Product.ProductName).ToList()
-                });
-
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query.Where(o =>
-                    o.UserName.Contains(search) ||
-                    o.MobileNumber.Contains(search) ||
-                    o.Address.Contains(search) ||
-                    o.items.Any(p => p.Contains(search))
-                );
+                    return false;
+                }
             }
 
-            query = sort.ToLower() switch
+
+            // کم کردن موجودی فقط بعد از تأیید پرداخت
+            foreach (var item in basket.BasketItems)
             {
-                "status" => query.OrderByDescending(o => o.Status),
-                "oldest" => query.OrderBy(o => o.PaidDate),
-                "paiddate" => query.OrderByDescending(o => o.PaidDate),
-                _ => query.OrderByDescending(o => o.PaidDate)
-            };
+                item.Product.StockQuantity -= item.Qty;
 
-            return await query.AsNoTracking().ToListAsync();
-        }
-
-
-        public async Task<List<Basket>> GetUserOrders(int userId, string? search, BasketStatus? status, string sort = "paiddate")
-        {
-            var query = _basketRepository
-             .GetAll(b => b.UserId == userId )
-            .Include(b => b.BasketItems)
-            .ThenInclude(bi => bi.Product)
-            .AsQueryable();
-
-            // 🔍 FILTER STATUS
-            if (status.HasValue)
-            {
-                query = query.Where(b => b.Status == status);
+                if (item.Product.StockQuantity == 0)
+                {
+                    item.Product.IsAvailable = false;
+                }
             }
 
-            // 🔎 SEARCH
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query.Where(b =>
-                    b.BasketId.ToString().Contains(search) ||
-                    (b.MobileNumber != null && b.MobileNumber.Contains(search)) ||
-                    (b.Address != null && b.Address.Contains(search)) ||
-                    b.BasketItems.Any(i => i.Product.ProductName.Contains(search))
-                );
-            }
 
-            // 🔃 SORT
-            query = sort.ToLower() switch
-            {
-                "status" => query.OrderByDescending(b => b.Status),
-                "oldest" => query.OrderBy(b => b.PaidDate),
-                "paiddate" => query.OrderByDescending(b => b.PaidDate),
-                _ => query.OrderByDescending(b => b.PaidDate)
-            };
+            basket.Status =
+                BasketStatus.PaymentApproved;
 
-            return await query.AsNoTracking().ToListAsync();
-        }
+            basket.PaidDate =
+                DateTime.Now;
 
 
-        public async Task<Basket?> GetLastUserOrder(int userId)
-        {
-            return await _basketRepository
-                .GetAll(b => b.UserId == userId && b.Status != BasketStatus.Pending)
-                .OrderByDescending(b => b.PaidDate)
-                .AsNoTracking()
-                .FirstOrDefaultAsync();
-        }
-        public async Task<int> GetBasketItemCountAsync(int userId)
-        {
-            // Find the user's pending basket (only one such basket can exist)
-            var basket = await _basketRepository
-                .GetAll(b => b.UserId == userId && b.Status == BasketStatus.Pending)
-                .Include(b => b.BasketItems)          // include items to sum their quantities
-                .FirstOrDefaultAsync();
-
-            // No basket or no items -> count is 0
-            if (basket == null || basket.BasketItems == null)
-                return 0;
-
-            // Sum all quantities
-            return basket.BasketItems.Sum(bi => bi.Qty);
-        }
-
-        public async Task<bool> SetState(int basketId, bool value)
-        {
-            var basket = await _basketRepository.GetById(basketId);
-
-            if (value)
-            {
-                basket.Status = BasketStatus.Shipped;
-            }
-            else
-            {
-                basket.Status = BasketStatus.Cancelled;
-            }
-
-            await _basketRepository.Update(basket);
+            await _context.SaveChangesAsync();
 
             return true;
+        }
 
+
+        // =========================================================
+        // Ship Order
+        // =========================================================
+
+        public async Task<bool> ShipOrder(
+            int basketId)
+        {
+            var basket = await _context.Baskets
+                .FirstOrDefaultAsync(b =>
+                    b.BasketId == basketId);
+
+
+            if (basket == null)
+                return false;
+
+
+            // فقط سفارش تأیید شده قابل ارسال است
+            if (basket.Status !=
+                BasketStatus.PaymentApproved)
+            {
+                return false;
+            }
+
+
+            basket.Status =
+                BasketStatus.Shipped;
+
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+
+        // =========================================================
+        // Cancel Order
+        // =========================================================
+
+        public async Task<bool> CancelOrder(
+            int basketId)
+        {
+            var basket = await _context.Baskets
+                .FirstOrDefaultAsync(b =>
+                    b.BasketId == basketId);
+
+
+            if (basket == null)
+                return false;
+
+
+            if (basket.Status == BasketStatus.Shipped ||
+                basket.Status == BasketStatus.Cancelled)
+            {
+                return false;
+            }
+
+
+            basket.Status =
+                BasketStatus.Cancelled;
+
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+        
+        public async Task<AdminOrderDetailDto?> GetAdminOrderDetail(int basketId)
+        {
+            return await _context.Baskets
+                .AsNoTracking()
+                .Where(b => b.BasketId == basketId)
+                .Select(b => new AdminOrderDetailDto
+                {
+                    BasketId = b.BasketId,
+
+                    UserId = b.UserId,
+
+                    UserName = b.User!.FullName ?? string.Empty,
+
+                    MobileNumber = b.MobileNumber ?? string.Empty,
+
+                    Address = b.Address ?? string.Empty,
+
+                    Status = b.Status,
+
+                    Created = b.Created,
+
+                    PaidDate = b.PaidDate,
+
+                    ReceiptUploadedAt = b.ReceiptUploadedAt,
+
+                    PaymentVerifiedAt = b.PaymentVerifiedAt,
+
+                    ReceiptImage = b.ReceiptImage,
+
+                    PaymentRejectionReason =
+                        b.PaymentRejectionReason,
+
+                    Items = b.BasketItems
+                        .Select(i => new AdminOrderDetailItemDto
+                        {
+                            ProductId = i.ProductId,
+
+                            ProductName =
+                                i.Product.ProductName,
+
+                            ImageUrl =
+                                i.Product.ImageUrl,
+
+                            Qty = i.Qty,
+
+                            UnitPrice = i.UnitPrice
+                        })
+                        .ToList()
+                })
+                .FirstOrDefaultAsync();
         }
     }
 }

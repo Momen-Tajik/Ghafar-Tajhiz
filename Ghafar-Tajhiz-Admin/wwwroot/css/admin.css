@@ -1,4 +1,7 @@
-/* ================= Font ================= */
+/* =========================================================
+   Font
+   ========================================================= */
+
 @font-face {
     font-family: myFont;
     src: url("../assets/fonts/vazir-font-v16.1.0/Vazir-Regular.ttf");
@@ -7,17 +10,40 @@
 
 @font-face {
     font-family: myFont;
-    src: url("../asstes/fonts/vazir-font-v16.1.0/Vazir-Bold.ttf");
+    src: url("../assets/fonts/vazir-font-v16.1.0/Vazir-Bold.ttf");
     font-weight: 700;
 }
 
-body, button, input, textarea, select {
+
+/* =========================================================
+   Global Font
+   ========================================================= */
+
+html,
+body,
+button,
+input,
+textarea,
+select,
+a {
     font-family: "myFont", sans-serif !important;
 }
 
-/* ================= Reset ================= */
+
+/* =========================================================
+   Reset
+   ========================================================= */
+
 * {
     box-sizing: border-box;
+}
+
+html {
+    direction: rtl;
+}
+
+body {
+    margin: 0;
 }
 
 a {
@@ -25,52 +51,78 @@ a {
     color: inherit;
 }
 
+button {
+    font-family: inherit;
+}
+
 body.admin-body {
     margin: 0;
-    background: #FAFAFA;
+    background: #f7f7f8;
     color: #212121;
     direction: rtl;
 }
 
-/* ================= Layout ================= */
+
+/* =========================================================
+   Layout
+   ========================================================= */
+
 .admin-navbar {
     height: 56px;
-    background: #1e1e1ed4;
+    background: rgba(30, 30, 30, 0.95);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
     .admin-navbar .title {
         font-size: 16px;
-        font-weight: bold;
+        font-weight: 700;
     }
 
     .admin-navbar .logout {
-        padding: 6px 12px;
-        border: 1px solid #fff;
-        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 14px;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 7px;
         font-size: 13px;
         color: #fff;
+        transition: all 0.2s ease;
     }
 
         .admin-navbar .logout:hover {
             background: #fff;
-            color: #1e1e1ed4;
+            color: #1e1e1e;
         }
+
+
+/* =========================================================
+   Admin Container
+   ========================================================= */
 
 .admin-container {
     display: flex;
     min-height: calc(100vh - 56px);
 }
 
-/* ================= Sidebar ================= */
+
+/* =========================================================
+   Sidebar
+   ========================================================= */
+
 .admin-sidebar {
     width: 230px;
-    background: #1E1E1E;
-    color: #B0BEC5;
+    flex-shrink: 0;
+    background: #1e1e1e;
+    color: #b0bec5;
 }
 
     .admin-sidebar ul {
@@ -85,81 +137,141 @@ body.admin-body {
         gap: 10px;
         padding: 12px 20px;
         font-size: 14px;
-        color: #B0BEC5;
+        color: #b0bec5;
+        transition: background-color 0.2s ease, color 0.2s ease;
     }
 
         .admin-sidebar li a:hover,
         .admin-sidebar li a.active {
-            background: #FF7043;
+            background: #ff7043;
             color: #fff;
         }
 
-/* ================= Content ================= */
+
+/* =========================================================
+   Content
+   ========================================================= */
+
 .admin-content {
     flex: 1;
+    min-width: 0;
     padding: 24px;
 }
 
-.page-header h1 {
-    margin: 0;
-    font-size: 22px;
+
+/* =========================================================
+   Page Header
+   ========================================================= */
+
+.page-header {
+    margin-bottom: 20px;
 }
 
-.page-header p {
-    margin-top: 6px;
-    color: #666;
-    font-size: 14px;
-}
+    .page-header h1 {
+        margin: 0;
+        font-size: 23px;
+        font-weight: 700;
+        color: #222;
+    }
 
-/* ================= Cards ================= */
+    .page-header p {
+        margin: 7px 0 0;
+        color: #777;
+        font-size: 14px;
+    }
+
+
+/* =========================================================
+   Cards
+   ========================================================= */
+
 .admin-card {
     background: #fff;
+    border: 1px solid #ececec;
     border-radius: 12px;
-    border: 1px solid #eee;
-    padding: 16px;
-    box-shadow: 0 5px 15px rgba(0,0,0,.08);
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
 }
 
-/* ================= Forms ================= */
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+    .card-header h3 {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 700;
+        color: #292929;
+    }
+
+
+/* =========================================================
+   Forms
+   ========================================================= */
+
 .form-row {
     display: flex;
+    align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
 .form-input,
 .form-select,
 .form-textarea {
     flex: 1;
+    min-width: 160px;
     padding: 10px 12px;
     border: 1px solid #ddd;
-    border-radius: 6px;
+    border-radius: 7px;
+    background: #fff;
+    color: #333;
     font-size: 14px;
-}
-
-.form-textarea {
-    resize: vertical;
-    min-height: 90px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
     .form-input:focus,
     .form-textarea:focus,
     .form-select:focus {
         outline: none;
-        border-color: #FF7043;
-        box-shadow: 0 0 0 2px rgba(255,112,67,.2);
+        border-color: #ff7043;
+        box-shadow: 0 0 0 3px rgba(255, 112, 67, 0.12);
     }
 
+.form-textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
 .form-button {
-    padding: 10px 20px;
-    background: #FF7043;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 9px 18px;
+    background: #ff7043;
     border: none;
+    border-radius: 7px;
     color: #fff;
-    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
     .form-button:hover {
-        background: #E64A19;
+        background: #e64a19;
+    }
+
+    .form-button:active {
+        transform: translateY(1px);
     }
 
     .form-button.secondary {
@@ -171,136 +283,443 @@ body.admin-body {
         }
 
     .form-button.danger {
-        background: #F44336;
+        background: #f44336;
     }
 
         .form-button.danger:hover {
-            background: #C62828;
+            background: #c62828;
         }
 
-/* ================= Tables ================= */
+
+/* =========================================================
+   Tables
+   ========================================================= */
+
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
 .admin-table {
     width: 100%;
+    min-width: 850px;
     border-collapse: collapse;
 }
 
     .admin-table th,
     .admin-table td {
-        padding: 12px;
-        border-bottom: 1px solid #eee;
+        padding: 13px 12px;
+        border-bottom: 1px solid #eeeeee;
         text-align: right;
         font-size: 14px;
+        vertical-align: middle;
     }
 
     .admin-table th {
-        background: #FAFAFA;
-        font-weight: bold;
+        background: #fafafa;
         color: #333;
+        font-weight: 700;
     }
 
-    .admin-table tr:hover {
-        background: #FFF3E0;
+    .admin-table tbody tr {
+        transition: background-color 0.15s ease;
     }
 
-/* ================= Badges ================= */
+        .admin-table tbody tr:hover {
+            background: #fff8f4;
+        }
+
+        .admin-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+
+/* =========================================================
+   Badges
+   ========================================================= */
+
 .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 27px;
     padding: 4px 10px;
-    border-radius: 12px;
+    border-radius: 999px;
     font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
 .badge-warning {
-    background: #FFF3E0;
-    color: #E64A19;
+    background: #fff3e0;
+    color: #e64a19;
 }
 
 .badge-success {
-    background: #E8F5E9;
-    color: #2E7D32;
+    background: #e8f5e9;
+    color: #2e7d32;
 }
 
 .badge-danger {
-    background: #FDECEA;
-    color: #C62828;
+    background: #fdecea;
+    color: #c62828;
 }
 
-/* ================= Actions ================= */
+
+/* =========================================================
+   Actions
+   ========================================================= */
+
 .action-group {
     display: flex;
-    gap: 6px;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
 }
+
+
+/* Small Icon Button */
 
 .action-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    display: flex;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    border: none;
+    border-radius: 7px;
     color: #fff;
     font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.15s ease, filter 0.2s ease;
 }
 
+    .action-btn:hover {
+        filter: brightness(0.92);
+        transform: translateY(-1px);
+    }
+
+    .action-btn:active {
+        transform: translateY(0);
+    }
+
 .action-edit {
-    background: #FF7043;
+    background: #ff7043;
 }
 
 .action-view {
-    background: #607D8B;
+    background: #607d8b;
 }
 
 .action-delete,
 .action-cancel {
-    background: #F44336;
+    background: #f44336;
 }
 
 .action-accept {
-    background: #4CAF50;
+    background: #4caf50;
 }
 
-/* ================= Footer ================= */
-.admin-footer {
-    text-align: center;
-    padding: 12px;
+
+/* =========================================================
+   Payment Actions
+   ========================================================= */
+
+.payment-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.payment-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 145px;
+    min-height: 44px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+    .payment-action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
+    }
+
+    .payment-action-btn:active {
+        transform: translateY(0);
+    }
+
+    .payment-action-btn i {
+        font-size: 14px;
+    }
+
+.payment-approve {
+    background: #198754;
+}
+
+    .payment-approve:hover {
+        background: #157347;
+    }
+
+.payment-reject {
+    background: #dc3545;
+}
+
+    .payment-reject:hover {
+        background: #bb2d3b;
+    }
+
+
+/* =========================================================
+   Back To Orders
+   ========================================================= */
+
+.back-orders-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 165px;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    color: #444;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+    .back-orders-btn:hover {
+        background: #f7f7f7;
+        border-color: #ccc;
+        color: #222;
+        transform: translateY(-1px);
+        text-decoration: none;
+    }
+
+    .back-orders-btn i {
+        font-size: 13px;
+    }
+
+
+/* =========================================================
+   Details Grid
+   ========================================================= */
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 10px;
+}
+
+.detail-item {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 14px;
+    background: #fafafa;
+    border: 1px solid #eeeeee;
+    border-radius: 9px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+    .detail-item:hover {
+        background: #fff;
+        border-color: #e4e4e4;
+    }
+
+    .detail-item .label {
+        font-size: 12px;
+        color: #858585;
+    }
+
+    .detail-item .value {
+        color: #2f2f2f;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.7;
+        word-break: break-word;
+    }
+
+
+/* =========================================================
+   Receipt Section
+   ========================================================= */
+
+.receipt-section {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #eeeeee;
+}
+
+    .receipt-section h4 {
+        margin: 0 0 12px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .receipt-section > span {
+        color: #777;
+        font-size: 13px;
+    }
+
+
+/* Receipt Preview Button */
+
+.receipt-view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 7px;
+    background: #607d8b;
+    color: #fff;
     font-size: 13px;
-    color: #777;
-    border-top: 1px solid #eee;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
-/* ================= Utilities ================= */
+    .receipt-view-btn:hover {
+        background: #546e7a;
+        color: #fff;
+        transform: translateY(-1px);
+        text-decoration: none;
+    }
+
+
+/* =========================================================
+   Details Image
+   ========================================================= */
+
+.details-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e5e5e5;
+    background: #fafafa;
+}
+
+    .details-image:hover {
+        opacity: 0.92;
+    }
+
+
+/* =========================================================
+   Product Images
+   ========================================================= */
+
 .product-image {
     width: 80px;
     height: 60px;
     object-fit: cover;
-    border-radius: 6px;
+    border-radius: 7px;
     border: 1px solid #eee;
+    background: #fafafa;
 }
 
-.boolean-true {
-    color: #4CAF50;
-    font-weight: bold;
+
+/* =========================================================
+   Order Items
+   ========================================================= */
+
+.order-item-product {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .order-item-product span {
+        font-size: 14px;
+    }
+
+
+/* =========================================================
+   Order Total
+   ========================================================= */
+
+.order-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+    padding: 16px 0 4px;
+    border-top: 1px solid #ddd;
+    font-size: 15px;
+}
+
+    .order-total strong:last-child {
+        color: #e64a19;
+        font-size: 17px;
+        white-space: nowrap;
+    }
+
+
+/* =========================================================
+   Rejection Alert
+   ========================================================= */
+
+.alert {
+    border-radius: 8px;
+    padding: 13px 15px;
+    margin-top: 18px;
     font-size: 13px;
+    line-height: 1.8;
 }
 
-.boolean-false {
-    color: #F44336;
-    font-weight: bold;
-    font-size: 13px;
+.alert-danger {
+    background: #fdecea;
+    border: 1px solid #f5c2c0;
+    color: #b3261e;
 }
 
-.table-scroll {
-    overflow-x: auto;
-}
+    .alert-danger strong {
+        margin-left: 5px;
+    }
+
+
+/* =========================================================
+   Empty State
+   ========================================================= */
 
 .empty-state {
     text-align: center;
-    padding: 32px;
+    padding: 40px 20px;
     color: #777;
     font-size: 14px;
 }
 
-/* ================= Admin Form Layout ================= */
+
+/* =========================================================
+   Admin Forms
+   ========================================================= */
+
 .admin-form {
+    width: 100%;
     max-width: 500px;
     display: flex;
     flex-direction: column;
@@ -313,27 +732,28 @@ body.admin-body {
 }
 
     .form-group label {
+        margin-bottom: 7px;
+        color: #374151;
         font-size: 13px;
         font-weight: 600;
-        margin-bottom: 6px;
-        color: #374151;
     }
 
 .validation-error {
+    margin-top: 5px;
+    color: #f44336;
     font-size: 12px;
-    color: #F44336;
-    margin-top: 4px;
 }
 
 .two-columns {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
 }
 
 .file-input {
-    padding: 8px;
+    padding: 9px;
     border: 1px dashed #ccc;
+    border-radius: 7px;
     background: #fafafa;
 }
 
@@ -349,33 +769,407 @@ body.admin-body {
     height: 16px;
 }
 
-/* ================= Details & Danger Pages ================= */
-.details-grid {
-    display: grid;
-    grid-template-columns: repeat(2,1fr);
-    gap: 16px;
-    margin-bottom: 24px;
-}
 
-.detail-item {
-    background: #fafafa;
-    padding: 12px;
-    border-radius: 6px;
-}
-
-    .detail-item .label {
-        font-size: 12px;
-        color: #777;
-        margin-bottom: 4px;
-    }
-
-    .detail-item .value {
-        font-weight: 600;
-    }
+/* =========================================================
+   Details Image / Generic Image
+   ========================================================= */
 
 .details-image,
 .image-item img {
     max-width: 140px;
-    border-radius: 6px;
+    border-radius: 7px;
     border: 1px solid #ddd;
+}
+
+
+/* =========================================================
+   Boolean
+   ========================================================= */
+
+.boolean-true {
+    color: #4caf50;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.boolean-false {
+    color: #f44336;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   Footer
+   ========================================================= */
+
+.admin-footer {
+    text-align: center;
+    padding: 14px;
+    border-top: 1px solid #eee;
+    color: #777;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   Responsive - Tablet
+   ========================================================= */
+
+@media (max-width: 992px) {
+
+    .admin-sidebar {
+        width: 200px;
+    }
+
+    .admin-content {
+        padding: 20px;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        align-items: stretch;
+    }
+
+    .form-input,
+    .form-select {
+        min-width: 0;
+    }
+}
+
+
+/* =========================================================
+   Responsive - Mobile
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .admin-container {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+    }
+
+        .admin-sidebar ul {
+            display: flex;
+            overflow-x: auto;
+            padding: 8px;
+            gap: 4px;
+        }
+
+        .admin-sidebar li {
+            flex-shrink: 0;
+        }
+
+            .admin-sidebar li a {
+                padding: 10px 14px;
+                border-radius: 7px;
+                font-size: 13px;
+            }
+
+    .admin-content {
+        padding: 15px;
+    }
+
+    .page-header h1 {
+        font-size: 20px;
+    }
+
+    .admin-card {
+        padding: 14px;
+        border-radius: 10px;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-input,
+    .form-select,
+    .form-button {
+        width: 100%;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-actions {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .payment-action-btn,
+    .back-orders-btn {
+        width: 100%;
+    }
+
+    .action-group {
+        align-items: stretch;
+    }
+
+    .order-total {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+        .order-total strong:last-child {
+            text-align: left;
+        }
+}
+
+
+/* =========================================================
+   Responsive - Small Mobile
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .admin-navbar {
+        padding: 0 12px;
+    }
+
+        .admin-navbar .title {
+            font-size: 14px;
+        }
+
+        .admin-navbar .logout {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+    .admin-content {
+        padding: 12px;
+    }
+
+    .page-header h1 {
+        font-size: 18px;
+    }
+
+    .page-header p {
+        font-size: 12px;
+    }
+
+    .detail-item {
+        padding: 12px;
+    }
+
+        .detail-item .value {
+            font-size: 13px;
+        }
+
+    .payment-action-btn {
+        min-height: 42px;
+        font-size: 13px;
+    }
+
+    .back-orders-btn {
+        min-height: 42px;
+        font-size: 13px;
+    }
+}
+
+
+/* =========================================================
+   Receipt Preview
+   ========================================================= */
+
+.receipt-preview {
+    margin-top: 8px;
+}
+
+.receipt-thumbnail-wrapper {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #f8f8f8;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .receipt-thumbnail-wrapper:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+    }
+
+.receipt-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+
+/* Overlay */
+
+.receipt-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.48);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.receipt-thumbnail-wrapper:hover .receipt-overlay {
+    opacity: 1;
+}
+
+.receipt-overlay i {
+    font-size: 24px;
+}
+
+
+/* Hint */
+
+.receipt-hint {
+    margin: 10px 0 0;
+    color: #777;
+    font-size: 12px;
+}
+
+
+/* Empty Receipt */
+
+.receipt-empty {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #777;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   SweetAlert Receipt
+   ========================================================= */
+
+.receipt-swal-popup {
+    border-radius: 14px !important;
+    padding: 15px !important;
+}
+
+.receipt-swal-image {
+    max-width: 100% !important;
+    max-height: 75vh !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    border-radius: 8px !important;
+    margin: 10px auto 0 !important;
+}
+
+
+/* =========================================================
+   Order Product
+   ========================================================= */
+
+.order-product {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+    .order-product span {
+        font-size: 14px;
+    }
+
+
+/* =========================================================
+   Order Total
+   ========================================================= */
+
+.order-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+    padding: 16px 0 4px;
+    border-top: 1px solid #ddd;
+    font-size: 15px;
+}
+
+    .order-total strong:last-child {
+        color: #e64a19;
+        font-size: 17px;
+        white-space: nowrap;
+    }
+
+
+/* =========================================================
+   Back Button
+   ========================================================= */
+
+.back-orders-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 165px;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    color: #444;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+    .back-orders-btn:hover {
+        background: #f7f7f7;
+        border-color: #ccc;
+        color: #222;
+        transform: translateY(-1px);
+        text-decoration: none;
+    }
+
+
+/* =========================================================
+   Mobile
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .receipt-thumbnail-wrapper {
+        width: 150px;
+        height: 150px;
+    }
+
+    .receipt-swal-popup {
+        width: 95% !important;
+    }
+
+    .receipt-swal-image {
+        max-height: 70vh !important;
+    }
+
+    .order-product {
+        gap: 8px;
+    }
+
+    .details-image {
+        width: 50px;
+        height: 50px;
+    }
 }

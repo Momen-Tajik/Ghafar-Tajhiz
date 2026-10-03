@@ -5,39 +5,78 @@
 }
 
 <div class="page-header">
-    <h1>ایجاد دسته‌بندی جدید</h1>
-    <p>اطلاعات دسته‌بندی را وارد کنید</p>
+
+    <h1>
+        ایجاد دسته‌بندی جدید
+    </h1>
+
+    <p>
+        اطلاعات دسته‌بندی را وارد کنید
+    </p>
+
 </div>
 
 <div class="admin-card">
 
-    <form asp-action="Create" method="post" class="admin-form">
+    <form asp-action="Create"
+          method="post"
+          class="admin-form">
 
-        <div asp-validation-summary="ModelOnly" class="validation-error"></div>
+        @Html.AntiForgeryToken()
 
-        <div class="form-group">
-            <label asp-for="CategoryName">نام دسته‌بندی</label>
-            <input asp-for="CategoryName" class="form-input" />
-            <span asp-validation-for="CategoryName" class="validation-error"></span>
+        <div asp-validation-summary="ModelOnly"
+             class="validation-error">
         </div>
 
         <div class="form-group">
-            <label asp-for="CategoryDescription">توضیحات</label>
-            <textarea asp-for="CategoryDescription" class="form-textarea"></textarea>
-            <span asp-validation-for="CategoryDescription" class="validation-error"></span>
+
+            <label asp-for="CategoryName">
+                نام دسته‌بندی
+            </label>
+
+            <input asp-for="CategoryName"
+                   class="form-input" />
+
+            <span asp-validation-for="CategoryName"
+                  class="validation-error">
+            </span>
+
+        </div>
+
+        <div class="form-group">
+
+            <label asp-for="CategoryDescription">
+                توضیحات
+            </label>
+
+            <textarea asp-for="CategoryDescription"
+                      class="form-textarea">
+            </textarea>
+
+            <span asp-validation-for="CategoryDescription"
+                  class="validation-error">
+            </span>
+
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="form-button">
+
+            <button type="submit"
+                    class="form-button">
                 ذخیره
             </button>
 
-            <a asp-action="Index" class="form-button secondary">
+            <a asp-action="Index"
+               class="form-button secondary">
                 بازگشت
             </a>
+
         </div>
 
     </form>
 
 </div>
 
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,4 +1,5 @@
 ﻿using DataAccess.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,16 +18,20 @@ namespace Ghafar_Tajhiz_Admin.Controllers
             _signInManager = signInManager;
         }
 
-
-        // GET: /AdminAccount/Login
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult Login()
         {
+            if (User.Identity?.IsAuthenticated == true &&
+                User.IsInRole("Admin"))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             return View();
         }
 
-
-        // POST: /AdminAccount/Login
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(
@@ -43,10 +48,10 @@ namespace Ghafar_Tajhiz_Admin.Controllers
                 return View();
             }
 
+            phoneNumber = phoneNumber.Trim();
 
-            // چون در سیستم اصلی:
-            // UserName = PhoneNumber
-            var user = await _userManager.FindByNameAsync(phoneNumber);
+            var user =
+                await _userManager.FindByNameAsync(phoneNumber);
 
             if (user == null)
             {
@@ -56,11 +61,8 @@ namespace Ghafar_Tajhiz_Admin.Controllers
                 return View();
             }
 
-
-            // بررسی Admin بودن کاربر
-            var isAdmin = await _userManager.IsInRoleAsync(
-                user,
-                "Admin");
+            var isAdmin =
+                await _userManager.IsInRoleAsync(user, "Admin");
 
             if (!isAdmin)
             {
@@ -70,14 +72,12 @@ namespace Ghafar_Tajhiz_Admin.Controllers
                 return View();
             }
 
-
-            // ورود
-            var result = await _signInManager.PasswordSignInAsync(
-                user.UserName!,
-                password,
-                rememberMe,
-                lockoutOnFailure: true);
-
+            var result =
+                await _signInManager.PasswordSignInAsync(
+                    user,
+                    password,
+                    rememberMe,
+                    lockoutOnFailure: true);
 
             if (result.Succeeded)
             {
@@ -85,7 +85,6 @@ namespace Ghafar_Tajhiz_Admin.Controllers
                     "Index",
                     "Home");
             }
-
 
             if (result.IsLockedOut)
             {
@@ -95,16 +94,15 @@ namespace Ghafar_Tajhiz_Admin.Controllers
                 return View();
             }
 
-
             TempData["LoginError"] =
                 "شماره موبایل یا رمز عبور اشتباه است.";
 
             return View();
         }
 
-
-        // GET: /AdminAccount/Logout
-        [HttpGet]
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
@@ -112,8 +110,7 @@ namespace Ghafar_Tajhiz_Admin.Controllers
             return RedirectToAction(nameof(Login));
         }
 
-
-        // GET: /AdminAccount/AccessDenied
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult AccessDenied()
         {

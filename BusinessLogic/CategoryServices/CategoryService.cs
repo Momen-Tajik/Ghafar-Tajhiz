@@ -1,45 +1,69 @@
-﻿using DataAccess.Models;
-using DataAccess.Repositories.CategoryRepo;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DataAccess.Data;
+using DataAccess.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLogic.CategoryServices
 {
     public class CategoryService
     {
-        private readonly ICategoryRepository _categoryRepo;
-        public CategoryService(ICategoryRepository categoryRepository)
+        private readonly GhafarTajhizShopDbContext _context;
+
+        public CategoryService(GhafarTajhizShopDbContext context)
         {
-            _categoryRepo= categoryRepository;
+            _context = context;
         }
 
-        public async Task CreatCategory(Category category) 
+        public async Task CreateCategory(Category category)
         {
-            await _categoryRepo.Add(category);
+            await _context.Categories.AddAsync(category);
+            await _context.SaveChangesAsync();
         }
-        public async Task<IEnumerable<Category>> GetCategories() 
+
+        public async Task<IReadOnlyList<Category>> GetCategories()
         {
-            return await _categoryRepo.GetAll();
+            return await _context.Categories
+                .AsNoTracking()
+                .OrderBy(c => c.CategoryName)
+                .ToListAsync();
         }
-        public async Task<Category> GetCategoryById(int id)
+
+        public async Task<Category?> GetCategoryById(int id)
         {
-            return await _categoryRepo.GetById(id);
+            return await _context.Categories
+                .FirstOrDefaultAsync(c => c.CategoryId == id);
         }
-        public async Task EditCategory(Category category)
+
+        public async Task<bool> EditCategory(Category category)
         {
-             await _categoryRepo.Update(category);
+            var existing = await _context.Categories
+                .FirstOrDefaultAsync(c =>
+                    c.CategoryId == category.CategoryId);
+
+            if (existing == null)
+                return false;
+
+            existing.CategoryName = category.CategoryName;
+            existing.CategoryDescription = category.CategoryDescription;
+
+            await _context.SaveChangesAsync();
+
+            return true;
         }
-        public async Task DeleteCategory(int id)
+
+        public async Task<bool> DeleteCategory(int id)
         {
-            await _categoryRepo.Delete(id);
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(c => c.CategoryId == id);
+
+            if (category == null)
+                return false;
+
+            // اگر Product داشته باشد، FK Restrict از حذف جلوگیری می‌کند.
+            _context.Categories.Remove(category);
+
+            await _context.SaveChangesAsync();
+
+            return true;
         }
-        public async Task DeleteCategory(Category category)
-        {
-            await _categoryRepo.Delete(category);
-        }
-        
     }
 }

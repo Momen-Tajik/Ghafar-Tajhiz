@@ -1,9 +1,10 @@
 ﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl">
-
 <head>
-
     <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
 
     <title>
         @ViewData["Title"] | پنل مدیریت
@@ -20,15 +21,12 @@
           asp-append-version="true" />
 
     <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+          href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
 
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 
-
 <body class="admin-body">
-
-
-    <!-- Navbar -->
 
     <header class="admin-navbar">
 
@@ -36,132 +34,96 @@
             پنل مدیریت Ghafar Tajhiz
         </div>
 
-        <a asp-controller="AdminAccount"
-           asp-action="Logout"
-           class="logout">
+        <form asp-controller="AdminAccount"
+              asp-action="Logout"
+              method="post"
+              style="display:inline;">
 
-            خروج
+            @Html.AntiForgeryToken()
 
-        </a>
+            <button type="submit"
+                    class="logout">
+                خروج
+            </button>
+
+        </form>
 
     </header>
 
-
-
     <div class="admin-container">
-
-
-        <!-- Sidebar -->
 
         <aside class="admin-sidebar">
 
             <ul>
 
                 <li>
-
                     <a asp-controller="Home"
                        asp-action="Index">
-
                         <i class="fa fa-dashboard"></i>
-
                         داشبورد
-
                     </a>
-
                 </li>
 
-
                 <li>
-
                     <a asp-controller="Categories"
                        asp-action="Index">
-
                         <i class="fa fa-list"></i>
-
                         دسته‌بندی‌ها
-
                     </a>
-
                 </li>
 
-
                 <li>
-
                     <a asp-controller="Products"
                        asp-action="Index">
-
                         <i class="fa fa-cube"></i>
-
                         محصولات
-
                     </a>
-
                 </li>
 
-
                 <li>
-
                     <a asp-controller="Orders"
                        asp-action="Index">
-
                         <i class="fa fa-shopping-cart"></i>
-
                         سفارش‌ها
-
                     </a>
-
                 </li>
 
-
                 <li>
-
                     <a asp-controller="AdminUser"
                        asp-action="Index">
-
                         <i class="fa fa-users"></i>
-
                         کاربران
-
                     </a>
-
                 </li>
 
             </ul>
 
         </aside>
 
-
-
-        <!-- Content -->
-
         <main class="admin-content">
-
             @RenderBody()
-
         </main>
-
 
     </div>
 
-
-
-    <!-- Footer -->
-
     <footer class="admin-footer">
-
         © ۱۴۰۴ - Ghafar Tajhiz
-
     </footer>
 
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="~/js/site.js"
             asp-append-version="true"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>
-
 </html>

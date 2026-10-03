@@ -11,58 +11,152 @@
 
 <div class="admin-card">
 
-    <form asp-action="Create" enctype="multipart/form-data" class="admin-form">
+    <form asp-action="Create"
+          method="post"
+          enctype="multipart/form-data"
+          class="admin-form">
 
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        @Html.AntiForgeryToken()
 
-        <div class="form-group">
-            <label asp-for="ProductName">نام محصول</label>
-            <input asp-for="ProductName" class="form-input" />
-            <span asp-validation-for="ProductName" class="text-danger"></span>
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger">
         </div>
 
         <div class="form-group">
-            <label asp-for="ProductDescription">توضیحات</label>
-            <textarea asp-for="ProductDescription" class="form-input"></textarea>
-            <span asp-validation-for="ProductDescription" class="text-danger"></span>
+
+            <label asp-for="ProductName">
+                نام محصول
+            </label>
+
+            <input asp-for="ProductName"
+                   class="form-input" />
+
+            <span asp-validation-for="ProductName"
+                  class="text-danger">
+            </span>
+
+        </div>
+
+        <div class="form-group">
+
+            <label asp-for="ProductDescription">
+                توضیحات
+            </label>
+
+            <textarea asp-for="ProductDescription"
+                      class="form-input"></textarea>
+
+            <span asp-validation-for="ProductDescription"
+                  class="text-danger">
+            </span>
+
         </div>
 
         <div class="two-columns">
+
             <div class="form-group">
-                <label asp-for="Price">قیمت</label>
-                <input asp-for="Price" class="form-input" />
-                <span asp-validation-for="Price" class="text-danger"></span>
+
+                <label asp-for="Price">
+                    قیمت
+                </label>
+
+                <input asp-for="Price"
+                       type="number"
+                       min="0"
+                       step="0.01"
+                       class="form-input" />
+
+                <span asp-validation-for="Price"
+                      class="text-danger">
+                </span>
+
             </div>
 
             <div class="form-group">
-                <label asp-for="StockQuantity">موجودی</label>
-                <input asp-for="StockQuantity" class="form-input" />
-                <span asp-validation-for="StockQuantity" class="text-danger"></span>
+
+                <label asp-for="StockQuantity">
+                    موجودی
+                </label>
+
+                <input asp-for="StockQuantity"
+                       type="number"
+                       min="0"
+                       class="form-input" />
+
+                <span asp-validation-for="StockQuantity"
+                      class="text-danger">
+                </span>
+
             </div>
+
         </div>
 
         <div class="form-group">
-            <label asp-for="CategoryId">دسته‌بندی</label>
-            <select asp-for="CategoryId" class="form-input" asp-items="ViewBag.CategoryId"></select>
-            <span asp-validation-for="CategoryId" class="text-danger"></span>
+
+            <label asp-for="CategoryId">
+                دسته‌بندی
+            </label>
+
+            <select asp-for="CategoryId"
+                    class="form-input"
+                    asp-items="ViewBag.CategoryId">
+
+                <option value="">
+                    انتخاب دسته‌بندی
+                </option>
+
+            </select>
+
+            <span asp-validation-for="CategoryId"
+                  class="text-danger">
+            </span>
+
         </div>
 
         <div class="form-group">
-            <label asp-for="ImageUrl">تصویر محصول</label>
-            <input asp-for="ImageUrl" type="file" class="form-input" />
-            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+
+            <label asp-for="ImageUrl">
+                تصویر محصول
+            </label>
+
+            <input asp-for="ImageUrl"
+                   type="file"
+                   accept=".jpg,.jpeg,.png,.webp"
+                   class="form-input" />
+
+            <span asp-validation-for="ImageUrl"
+                  class="text-danger">
+            </span>
+
         </div>
 
         <div class="form-group checkbox-group">
+
             <label>
-                <input asp-for="IsAvailable" /> فعال باشد
+                <input asp-for="IsAvailable" />
+                فعال باشد
             </label>
+
         </div>
 
         <div class="form-actions">
-            <input type="submit" value="ذخیره محصول" class="form-button primary" />
-            <a asp-action="Index" class="form-button secondary">بازگشت</a>
+
+            <button type="submit"
+                    class="form-button primary">
+                ذخیره محصول
+            </button>
+
+            <a asp-action="Index"
+               class="form-button secondary">
+                بازگشت
+            </a>
+
         </div>
 
     </form>
+
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

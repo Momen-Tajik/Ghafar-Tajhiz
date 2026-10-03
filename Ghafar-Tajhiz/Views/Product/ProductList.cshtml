@@ -6,31 +6,42 @@
 
     int currentPage = ViewBag.CurrentPage ?? 1;
     int totalPages = ViewBag.TotalPages ?? 1;
-    string search = ViewBag.Search ?? "";
-    string currentSort = ViewBag.Sort ?? "newest";
+
+    string search =
+        ViewBag.Search ?? string.Empty;
+
+    string currentSort =
+        ViewBag.Sort ?? "newest";
 }
 
-<!-- Search -->
 <div class="products-search">
-    <form asp-action="ProductList" method="get">
-        <input style="width:70%"
+
+    <form asp-action="ProductList"
+          method="get">
+
+        <input style="width:70%;"
                type="text"
                name="search"
                value="@search"
                placeholder="جستجوی محصول..." />
 
-        <button type="submit" class="btnProduct">
+        <button type="submit"
+                class="btnProduct">
             جستجو
         </button>
+
     </form>
+
 </div>
-<!-- Filtering -->
+
 <div class="filtering-section">
+
     <div class="filter-title">
         مرتب‌سازی بر اساس:
     </div>
 
     <div class="filter-buttons">
+
         <a asp-action="ProductList"
            asp-route-page="1"
            asp-route-search="@search"
@@ -62,12 +73,13 @@
            class="filter-btn @(currentSort == "lowestprice" ? "active" : "")">
             ارزان‌ترین
         </a>
+
     </div>
+
 </div>
 
-
-<!-- Products -->
 <div class="productsContainer">
+
     @if (!Model.Any())
     {
         <div class="products-empty">
@@ -76,22 +88,39 @@
     }
     else
     {
-        @foreach (var item in Model)
+        foreach (var item in Model)
         {
             <div class="productsItems">
-                <img class="productsImage"
-                     src="/api/FileUpload/GetFile?filename=@item.ImageName"
-                     alt="@item.ProductName" />
+
+                @if (!string.IsNullOrWhiteSpace(item.ImageName))
+                {
+                    <img class="productsImage"
+                         src="/api/FileUpload/GetFile?filename=@Uri.EscapeDataString(item.ImageName)"
+                         alt="@item.ProductName"
+                         loading="lazy" />
+                }
 
                 <div class="productsInfo">
-                    <div style="display:flex;justify-content:space-between; align-items:center">
-                        <h5>@item.ProductName </h5>
-                        <a class="openModal" data-product-id="@item.ProductId">
-                            <i class="infoBtn fa fa-info-circle"></i>
-                        </a>
-                    </div>
-                    <p>@item.Price.ToString("N0") تومان</p>
 
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+
+                        <h5>
+                            @item.ProductName
+                        </h5>
+
+                        <button type="button"
+                                class="openModal"
+                                data-product-id="@item.ProductId"
+                                aria-label="اطلاعات محصول">
+                            <i class="infoBtn fa fa-info-circle"></i>
+                        </button>
+
+                    </div>
+
+                    <p>
+                        @item.Price.ToString("N0")
+                        تومان
+                    </p>
 
                     <a asp-controller="Product"
                        asp-action="Index"
@@ -99,22 +128,25 @@
                        class="btnProduct">
                         مشاهده محصول
                     </a>
+
                 </div>
+
             </div>
         }
     }
+
 </div>
 
-<!-- Pagination -->
 @if (totalPages > 1)
 {
     <div class="pagination">
+
         @if (currentPage > 1)
         {
             <a asp-action="ProductList"
                asp-route-page="@(currentPage - 1)"
                asp-route-search="@search"
-               asp-route-sort="@ViewBag.Sort">
+               asp-route-sort="@currentSort">
                 قبلی
             </a>
         }
@@ -124,7 +156,7 @@
             <a asp-action="ProductList"
                asp-route-page="@i"
                asp-route-search="@search"
-               asp-route-sort="@ViewBag.Sort"
+               asp-route-sort="@currentSort"
                class="@(i == currentPage ? "active" : "")">
                 @i
             </a>
@@ -135,9 +167,10 @@
             <a asp-action="ProductList"
                asp-route-page="@(currentPage + 1)"
                asp-route-search="@search"
-               asp-route-sort="@ViewBag.Sort">
+               asp-route-sort="@currentSort">
                 بعدی
             </a>
         }
+
     </div>
 }

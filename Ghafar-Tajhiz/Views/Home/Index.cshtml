@@ -1,27 +1,37 @@
 ﻿@using DataAccess.Models
-@model List<Product>  
+@model IReadOnlyList<Product>
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "صفحه اصلی";
 }
 
-<!-- Header -->
 <header class="myHeader">
+
     <div class="headerItems">
-        <h1>آشپزخانه صنعتی‌ات رو حرفه‌ای‌تر بساز</h1>
+
+        <h1>
+            آشپزخانه صنعتی‌ات رو حرفه‌ای‌تر بساز
+        </h1>
+
         <p>
-            ما اینجاییم تا با بهترین تجهیزات آشپزخانه صنعتی، کارتو راحت‌تر و لذت‌بخش‌تر کنیم.
-            از جوجه‌گردان و فر گرفته تا انواع دستگاه‌های پخت و پز، همه چیز آماده‌ست تا کسب‌وکارت
+            ما اینجاییم تا با بهترین تجهیزات آشپزخانه صنعتی،
+            کارتو راحت‌تر و لذت‌بخش‌تر کنیم.
+            از جوجه‌گردان و فر گرفته تا انواع دستگاه‌های
+            پخت و پز، همه چیز آماده‌ست تا کسب‌وکارت
             رو سریع‌تر، مطمئن‌تر و جذاب‌تر پیش ببری.
-
-            با ما خیالت از کیفیت و خدمات راحت باشه!
         </p>
+
     </div>
 
     <div class="headerItems">
-        <img class="headerImage" src="~/asstes/img/ChatGPT Image Oct 12, 2025, 09_56_41 PM.png" alt="آشپزخانه صنعتی">
+
+        <img class="headerImage"
+             src="~/asstes/img/ChatGPT Image Oct 12, 2025, 09_56_41 PM.png"
+             alt="آشپزخانه صنعتی"
+             loading="lazy" />
+
     </div>
+
 </header>
 
-<!-- products -->
 @await Component.InvokeAsync("HomeProducts")
