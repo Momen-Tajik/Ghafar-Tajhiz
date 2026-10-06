@@ -8,11 +8,14 @@ namespace BusinessLogic.BasketServices.Models
 
         public int UserId { get; set; }
 
-        public string UserName { get; set; } = string.Empty;
+        public string UserName { get; set; }
+            = string.Empty;
 
-        public string MobileNumber { get; set; } = string.Empty;
+        public string MobileNumber { get; set; }
+            = string.Empty;
 
-        public string Address { get; set; } = string.Empty;
+        public string Address { get; set; }
+            = string.Empty;
 
         public BasketStatus Status { get; set; }
 
@@ -28,7 +31,8 @@ namespace BusinessLogic.BasketServices.Models
 
         public string? PaymentRejectionReason { get; set; }
 
-        public List<AdminOrderDetailItemDto> Items { get; set; } = new();
+        public List<AdminOrderDetailItemDto> Items { get; set; }
+            = new();
     }
 
 
@@ -36,7 +40,8 @@ namespace BusinessLogic.BasketServices.Models
     {
         public int ProductId { get; set; }
 
-        public string ProductName { get; set; } = string.Empty;
+        public string ProductName { get; set; }
+            = string.Empty;
 
         public string? ImageUrl { get; set; }
 

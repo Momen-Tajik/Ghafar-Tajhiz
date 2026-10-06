@@ -7,87 +7,128 @@ using BusinessLogic.ProductServices;
 using BusinessLogic.ProfileServices;
 using DataAccess.Data;
 using DataAccess.Models;
-using DataAccess.Repositories.BasketItemRepo;
-using DataAccess.Repositories.BasketRepo;
-using DataAccess.Repositories.CategoryRepo;
-using DataAccess.Repositories.CommentRepo;
-using DataAccess.Repositories.ProductRepo;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// =====================================================
+// MVC
+// =====================================================
+
 builder.Services.AddControllersWithViews();
+
+
+// =====================================================
+// Database
+// =====================================================
+
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "DefaultConnection is not configured.");
+}
 
 builder.Services.AddDbContext<GhafarTajhizShopDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-
+    options.UseSqlServer(connectionString);
 });
 
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+// =====================================================
+// Application Services
+// =====================================================
+
 builder.Services.AddScoped<CategoryService>();
-
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ProductService>();
-
+builder.Services.AddScoped<BasketService>();
+builder.Services.AddScoped<BasketItemService>();
+builder.Services.AddScoped<CommentService>();
+builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 
-builder.Services.AddScoped<IBasketRepository, BasketRepository>();
-builder.Services.AddScoped<BasketService>();
 
-builder.Services.AddScoped<IBasketItemRepository, BasketItemRepository>();
-builder.Services.AddScoped<BasketItemService>();
-
-builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-builder.Services.AddScoped<CommentService>();
-
-builder.Services.AddScoped<ProfileService>();
+// =====================================================
+// Identity
+// =====================================================
 
 builder.Services.AddIdentity<User, Role>(options =>
-
 {
+    // Password
+    options.Password.RequiredLength = 6;
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 4;
-    options.Password.RequiredUniqueChars = 0;
+    options.Password.RequiredUniqueChars = 1;
 
-    //lockout
+    // Lockout
+    options.Lockout.DefaultLockoutTimeSpan =
+        TimeSpan.FromMinutes(10);
 
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
     options.Lockout.MaxFailedAccessAttempts = 5;
+
     options.Lockout.AllowedForNewUsers = true;
+
+    // User
     options.User.RequireUniqueEmail = false;
 })
-    .AddEntityFrameworkStores<GhafarTajhizShopDbContext>()
-    .AddSignInManager<SignInManager<User>>()
-    .AddDefaultTokenProviders();
+.AddEntityFrameworkStores<GhafarTajhizShopDbContext>()
+.AddDefaultTokenProviders();
+
+
+// =====================================================
+// Authentication Cookie
+// =====================================================
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    //cookie setting
+    options.Cookie.Name = "GhafarTajhizCustomerCookie";
+
     options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+
+    options.Cookie.SecurePolicy =
+        CookieSecurePolicy.Always;
+
+    options.Cookie.SameSite =
+        SameSiteMode.Lax;
+
+    options.ExpireTimeSpan =
+        TimeSpan.FromMinutes(60);
+
+    options.SlidingExpiration = true;
+
     options.LoginPath = "/Account/Login";
-    options.AccessDeniedPath = "/Account/AccessDenid";
-    options.SlidingExpiration=true;
+
+    options.AccessDeniedPath =
+        "/Account/AccessDenied";
 });
 
 
+// =====================================================
+// Build
+// =====================================================
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
+// =====================================================
+// HTTP Pipeline
+// =====================================================
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -96,8 +137,14 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+
+// =====================================================
+// Routing
+// =====================================================
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
 
 app.Run();

@@ -2,198 +2,398 @@
     ViewData["Title"] = "درباره ما";
 }
 
-<section class="about-hero">
+<main class="about-page">
 
-    <div class="about-hero-content">
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
 
-        <span class="about-badge">
-            تجهیزات تاجیک
-        </span>
+    <section class="about-hero">
 
-        <h1>
-            درباره تجهیزات تاجیک
-        </h1>
+        <div class="about-hero-content">
 
-        <p>
-            همراه مطمئن شما در تأمین تجهیزات صنعتی،
-            رستورانی، فست‌فود و هتلی
-        </p>
+            <span class="about-badge">
+                تجهیزات تاجیک
+            </span>
 
-    </div>
-
-</section>
-
-<section class="about-introduction">
-
-    <div class="about-introduction-content">
-
-        <div class="about-section-title">
-            <span>درباره ما</span>
-
-            <h2>
-                تجهیزات تاجیک؛ کیفیت، اعتماد و تخصص
-            </h2>
-        </div>
-
-        <p>
-            مجموعه تجهیزات تاجیک با هدف ارائه تجهیزات باکیفیت
-            و قابل اعتماد برای کسب‌وکارهای مختلف فعالیت می‌کند.
-        </p>
-
-        <p>
-            از رستوران‌ها و فست‌فودها گرفته تا هتل‌ها و مجموعه‌های
-            صنعتی، هدف ما این است که نیاز مشتریان را به شکلی
-            حرفه‌ای و قابل اعتماد پاسخ دهیم.
-        </p>
-
-    </div>
-
-</section>
-
-<section class="about-values">
-
-    <div class="about-section-title center">
-
-        <span>ارزش‌های ما</span>
-
-        <h2>
-            چرا تجهیزات تاجیک؟
-        </h2>
-
-    </div>
-
-    <div class="about-values-grid">
-
-        <div class="about-value-card">
-            <div class="about-value-icon">
-                <i class="fa fa-check-circle"></i>
-            </div>
-
-            <h3>کیفیت محصولات</h3>
+            <h1>
+                تأمین مطمئن تجهیزات
+                برای کسب‌وکار شما
+            </h1>
 
             <p>
-                تلاش می‌کنیم محصولاتی با کیفیت مناسب و
-                استانداردهای قابل اعتماد ارائه کنیم.
+                همراه شما در انتخاب و تأمین تجهیزات
+                صنعتی، رستورانی، فست‌فود و هتلی
             </p>
+
+            <a asp-controller="Product"
+               asp-action="ProductList"
+               class="about-hero-btn">
+
+                مشاهده محصولات
+
+                <i class="fa fa-arrow-left"></i>
+
+            </a>
+
         </div>
 
-        <div class="about-value-card">
-            <div class="about-value-icon">
-                <i class="fa fa-users"></i>
+    </section>
+
+
+    <!-- =====================================================
+         INTRODUCTION
+         ===================================================== -->
+
+    <section class="about-introduction">
+
+        <div class="about-container">
+
+            <div class="about-introduction-grid">
+
+                <div class="about-introduction-text">
+
+                    <span class="about-section-label">
+                        درباره ما
+                    </span>
+
+                    <h2>
+                        تجهیزات تاجیک؛
+                        کیفیت، اعتماد و تخصص
+                    </h2>
+
+                    <p>
+                        مجموعه تجهیزات تاجیک با هدف ارائه تجهیزات
+                        باکیفیت و قابل اعتماد برای کسب‌وکارهای مختلف
+                        فعالیت می‌کند.
+                    </p>
+
+                    <p>
+                        از رستوران‌ها و فست‌فودها گرفته تا هتل‌ها و
+                        مجموعه‌های صنعتی، تلاش می‌کنیم نیاز مشتریان
+                        را با انتخاب محصولات مناسب و خدمات قابل اعتماد
+                        پاسخ دهیم.
+                    </p>
+
+                </div>
+
+
+                <div class="about-introduction-highlight">
+
+                    <div class="about-highlight-icon">
+                        <i class="fa fa-building"></i>
+                    </div>
+
+                    <h3>
+                        یک انتخاب مطمئن
+                    </h3>
+
+                    <p>
+                        هدف ما فقط فروش محصول نیست؛
+                        بلکه ایجاد یک تجربه مطمئن از انتخاب
+                        تا تأمین تجهیزات است.
+                    </p>
+
+                </div>
+
             </div>
 
-            <h3>پشتیبانی تخصصی</h3>
-
-            <p>
-                پاسخگویی و راهنمایی مشتریان برای ما اهمیت زیادی دارد.
-            </p>
         </div>
 
-        <div class="about-value-card">
-            <div class="about-value-icon">
-                <i class="fa fa-line-chart"></i>
+    </section>
+
+
+    <!-- =====================================================
+         VALUES
+         ===================================================== -->
+
+    <section class="about-values">
+
+        <div class="about-container">
+
+            <div class="about-section-title center">
+
+                <span>
+                    ارزش‌های ما
+                </span>
+
+                <h2>
+                    چرا تجهیزات تاجیک؟
+                </h2>
+
+                <p>
+                    اصولی که در مسیر همکاری با مشتریان
+                    به آن‌ها پایبند هستیم.
+                </p>
+
             </div>
 
-            <h3>تجربه و تخصص</h3>
 
-            <p>
-                با استفاده از دانش و تجربه تخصصی، راهکارهای
-                مناسب‌تری برای نیاز مشتریان ارائه می‌کنیم.
-            </p>
-        </div>
+            <div class="about-values-grid">
 
-        <div class="about-value-card">
-            <div class="about-value-icon">
-                <i class="fa fa-handshake-o"></i>
+                <div class="about-value-card">
+
+                    <div class="about-value-icon">
+                        <i class="fa fa-check-circle"></i>
+                    </div>
+
+                    <div class="about-value-number">
+                        01
+                    </div>
+
+                    <h3>
+                        کیفیت محصولات
+                    </h3>
+
+                    <p>
+                        تلاش می‌کنیم محصولاتی با کیفیت مناسب
+                        و استانداردهای قابل اعتماد ارائه کنیم.
+                    </p>
+
+                </div>
+
+
+                <div class="about-value-card">
+
+                    <div class="about-value-icon">
+                        <i class="fa fa-users"></i>
+                    </div>
+
+                    <div class="about-value-number">
+                        02
+                    </div>
+
+                    <h3>
+                        پشتیبانی تخصصی
+                    </h3>
+
+                    <p>
+                        پاسخگویی و راهنمایی مشتریان در انتخاب
+                        تجهیزات مناسب برای ما اهمیت زیادی دارد.
+                    </p>
+
+                </div>
+
+
+                <div class="about-value-card">
+
+                    <div class="about-value-icon">
+                        <i class="fa fa-line-chart"></i>
+                    </div>
+
+                    <div class="about-value-number">
+                        03
+                    </div>
+
+                    <h3>
+                        تجربه و تخصص
+                    </h3>
+
+                    <p>
+                        با استفاده از دانش و تجربه تخصصی،
+                        راهکارهای مناسب‌تری برای نیاز مشتریان
+                        ارائه می‌کنیم.
+                    </p>
+
+                </div>
+
+
+                <div class="about-value-card">
+
+                    <div class="about-value-icon">
+                        <i class="fa fa-handshake-o"></i>
+                    </div>
+
+                    <div class="about-value-number">
+                        04
+                    </div>
+
+                    <h3>
+                        اعتماد مشتری
+                    </h3>
+
+                    <p>
+                        رضایت و اعتماد مشتریان پایه اصلی
+                        فعالیت و همکاری بلندمدت ماست.
+                    </p>
+
+                </div>
+
             </div>
 
-            <h3>اعتماد مشتری</h3>
-
-            <p>
-                رضایت و اعتماد مشتریان پایه اصلی فعالیت مجموعه است.
-            </p>
         </div>
 
-    </div>
+    </section>
 
-</section>
 
-<section class="about-mission">
+    <!-- =====================================================
+         MISSION
+         ===================================================== -->
 
-    <div class="about-mission-content">
+    <section class="about-mission">
 
-        <div class="about-mission-text">
+        <div class="about-container">
 
-            <span class="about-small-title">
-                مأموریت ما
+            <div class="about-mission-content">
+
+                <div class="about-mission-text">
+
+                    <span class="about-small-title">
+                        مأموریت ما
+                    </span>
+
+                    <h2>
+                        ساختن یک تجربه مطمئن
+                        برای مشتری
+                    </h2>
+
+                    <p>
+                        مأموریت ما تنها فروش تجهیزات نیست.
+                    </p>
+
+                    <p>
+                        می‌خواهیم در انتخاب محصول مناسب،
+                        تأمین تجهیزات و ارائه خدمات، در کنار
+                        مشتریان خود باشیم و فرایندی ساده‌تر،
+                        شفاف‌تر و مطمئن‌تر ایجاد کنیم.
+                    </p>
+
+                    <a asp-controller="Product"
+                       asp-action="ProductList"
+                       class="about-text-link">
+
+                        مشاهده محصولات
+
+                        <i class="fa fa-long-arrow-left"></i>
+
+                    </a>
+
+                </div>
+
+
+                <div class="about-mission-list">
+
+                    <div class="about-mission-item">
+
+                        <div class="mission-item-icon">
+                            <i class="fa fa-star"></i>
+                        </div>
+
+                        <div>
+                            <strong>
+                                محصولات باکیفیت
+                            </strong>
+
+                            <span>
+                                انتخاب تجهیزات مناسب برای نیاز واقعی
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="about-mission-item">
+
+                        <div class="mission-item-icon">
+                            <i class="fa fa-cogs"></i>
+                        </div>
+
+                        <div>
+                            <strong>
+                                تجهیزات حرفه‌ای
+                            </strong>
+
+                            <span>
+                                مناسب برای محیط‌های کاری مختلف
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="about-mission-item">
+
+                        <div class="mission-item-icon">
+                            <i class="fa fa-headphones"></i>
+                        </div>
+
+                        <div>
+                            <strong>
+                                پشتیبانی مشتریان
+                            </strong>
+
+                            <span>
+                                همراهی در مسیر انتخاب و خرید
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="about-mission-item">
+
+                        <div class="mission-item-icon">
+                            <i class="fa fa-thumbs-up"></i>
+                        </div>
+
+                        <div>
+                            <strong>
+                                رضایت مشتری
+                            </strong>
+
+                            <span>
+                                تمرکز بر همکاری بلندمدت و قابل اعتماد
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CTA
+         ===================================================== -->
+
+    <section class="about-cta">
+
+        <div class="about-cta-content">
+
+            <span class="about-cta-label">
+                فروشگاه تجهیزات تاجیک
             </span>
 
             <h2>
-                ساختن یک تجربه مطمئن برای مشتری
+                تجهیز کسب‌وکار خود را شروع کنید
             </h2>
 
             <p>
-                مأموریت ما تنها فروش تجهیزات نیست.
+                محصولات و تجهیزات موجود را مشاهده کنید
+                و گزینه مناسب خود را انتخاب کنید.
             </p>
 
-            <p>
-                می‌خواهیم در انتخاب محصول مناسب،
-                تأمین تجهیزات و ارائه خدمات، در کنار مشتریان خود باشیم.
-            </p>
+            <div class="about-cta-actions">
 
-        </div>
+                <a asp-controller="Product"
+                   asp-action="ProductList"
+                   class="about-cta-btn">
 
-        <div class="about-mission-list">
+                    مشاهده محصولات
 
-            <div>
-                <i class="fa fa-star"></i>
-                <span>محصولات با کیفیت</span>
-            </div>
+                    <i class="fa fa-arrow-left"></i>
 
-            <div>
-                <i class="fa fa-cogs"></i>
-                <span>تجهیزات حرفه‌ای</span>
-            </div>
+                </a>
 
-            <div>
-                <i class="fa fa-headphones"></i>
-                <span>پشتیبانی مشتریان</span>
-            </div>
-
-            <div>
-                <i class="fa fa-thumbs-up"></i>
-                <span>رضایت مشتری</span>
             </div>
 
         </div>
 
-    </div>
+    </section>
 
-</section>
-
-<section class="about-cta">
-
-    <div>
-
-        <h2>
-            آماده همکاری با شما هستیم
-        </h2>
-
-        <p>
-            برای مشاهده محصولات و تجهیزات موجود،
-            از فروشگاه ما دیدن کنید.
-        </p>
-
-        <a asp-controller="Product"
-           asp-action="ProductList"
-           class="about-cta-btn">
-
-            مشاهده محصولات
-
-            <i class="fa fa-arrow-left"></i>
-
-        </a>
-
-    </div>
-
-</section>
+</main>

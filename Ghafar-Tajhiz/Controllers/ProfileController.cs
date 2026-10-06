@@ -2,6 +2,7 @@
 using BusinessLogic.ProfileServices.Models;
 using DataAccess.Enums;
 using DataAccess.Models;
+using Ghafar_Tajhiz.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -43,6 +44,44 @@ namespace Ghafar_Tajhiz.Controllers
                     sort);
 
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResubmitReceipt(ResubmitReceiptDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return Challenge();
+
+
+            var result = await _profileService.ResubmitReceipt(
+                user.Id,
+                model.BasketId,
+                model.Receipt!);
+
+
+            if (!result)
+            {
+                TempData["Error"] =
+                    "ارسال مجدد رسید انجام نشد. وضعیت سفارش را بررسی کنید.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+
+            TempData["Success"] =
+                "رسید جدید با موفقیت ارسال شد و در انتظار بررسی است.";
+
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

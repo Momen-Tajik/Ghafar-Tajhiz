@@ -5,33 +5,165 @@
     ViewData["Title"] = "صفحه اصلی";
 }
 
-<header class="myHeader">
+<main class="home-page">
 
-    <div class="headerItems">
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
 
-        <h1>
-            آشپزخانه صنعتی‌ات رو حرفه‌ای‌تر بساز
-        </h1>
+    <section class="home-hero">
 
-        <p>
-            ما اینجاییم تا با بهترین تجهیزات آشپزخانه صنعتی،
-            کارتو راحت‌تر و لذت‌بخش‌تر کنیم.
-            از جوجه‌گردان و فر گرفته تا انواع دستگاه‌های
-            پخت و پز، همه چیز آماده‌ست تا کسب‌وکارت
-            رو سریع‌تر، مطمئن‌تر و جذاب‌تر پیش ببری.
-        </p>
+        <div class="home-hero-container">
 
-    </div>
+            <!-- =================================================
+                 Hero Content
+                 ================================================= -->
 
-    <div class="headerItems">
+            <div class="home-hero-content">
 
-        <img class="headerImage"
-             src="~/asstes/img/ChatGPT Image Oct 12, 2025, 09_56_41 PM.png"
-             alt="آشپزخانه صنعتی"
-             loading="lazy" />
+                <span class="home-hero-badge">
+                    تجهیزات تاجیک
+                </span>
 
-    </div>
 
-</header>
+                <h1>
+                    آشپزخانه صنعتی‌ات را
+                    حرفه‌ای‌تر بساز
+                </h1>
 
-@await Component.InvokeAsync("HomeProducts")
+
+                <p>
+                    تجهیزات مناسب، یکی از مهم‌ترین بخش‌های
+                    یک کسب‌وکار حرفه‌ای است.
+                    ما مجموعه‌ای از تجهیزات آشپزخانه صنعتی،
+                    رستورانی، فست‌فود و هتلی را برای شما فراهم کرده‌ایم
+                    تا انتخاب و تأمین تجهیزات ساده‌تر و مطمئن‌تر باشد.
+                </p>
+
+
+                <div class="home-hero-actions">
+
+                    <a asp-controller="Product"
+                       asp-action="ProductList"
+                       class="home-primary-btn">
+
+                        مشاهده محصولات
+
+                        <i class="fa fa-arrow-left"></i>
+
+                    </a>
+
+                    <a asp-controller="Home"
+                       asp-action="AboutUs"
+                       class="home-secondary-btn">
+
+                        درباره ما
+
+                    </a>
+
+                </div>
+
+
+                <!-- =============================================
+                     Trust Features
+                     ============================================= -->
+
+                <div class="home-hero-features">
+
+                    <div class="home-feature">
+
+                        <div class="home-feature-icon">
+                            <i class="fa fa-check"></i>
+                        </div>
+
+                        <span>
+                            تجهیزات متنوع
+                        </span>
+
+                    </div>
+
+
+                    <div class="home-feature">
+
+                        <div class="home-feature-icon">
+                            <i class="fa fa-headphones"></i>
+                        </div>
+
+                        <span>
+                            پشتیبانی مشتری
+                        </span>
+
+                    </div>
+
+
+                    <div class="home-feature">
+
+                        <div class="home-feature-icon">
+                            <i class="fa fa-handshake-o"></i>
+                        </div>
+
+                        <span>
+                            خرید مطمئن
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 Hero Image
+                 ================================================= -->
+
+            <div class="home-hero-visual">
+
+                <div class="home-hero-image-wrapper">
+
+                    <img class="home-hero-image"
+                         src="~/asstes/img/ChatGPT Image Oct 12, 2025, 09_56_41 PM.png"
+                         alt="تجهیزات و آشپزخانه صنعتی"
+                         width="900"
+                         height="650"
+                         fetchpriority="high" />
+
+                </div>
+
+
+                <div class="home-image-badge">
+
+                    <i class="fa fa-star"></i>
+
+                    <div>
+
+                        <strong>
+                            تجهیزات حرفه‌ای
+                        </strong>
+
+                        <span>
+                            برای کسب‌وکار شما
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PRODUCTS
+         ===================================================== -->
+
+    <section class="home-products-section">
+
+        @await Component.InvokeAsync("HomeProducts")
+
+    </section>
+
+</main>

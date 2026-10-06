@@ -5,7 +5,8 @@
 @{
     ViewData["Title"] = "جزئیات سفارش";
 
-    var orderTotal = Model.Items?.Sum(x => x.Qty * x.UnitPrice) ?? 0;
+    var orderTotal =
+        Model.Items?.Sum(x => x.Qty * x.UnitPrice) ?? 0;
 
     string? receiptUrl = null;
 
@@ -321,7 +322,8 @@
 
                     <img src="@receiptUrl"
                          alt="رسید پرداخت"
-                         class="receipt-thumbnail" />
+                         class="receipt-thumbnail"
+                         loading="lazy" />
 
                     <div class="receipt-overlay">
 
@@ -447,7 +449,6 @@
                                              loading="lazy" />
                                     }
 
-
                                     <span>
                                         @item.ProductName
                                     </span>
@@ -540,16 +541,19 @@
     <div class="action-group">
 
 
-        <!-- Approve / Reject Payment -->
+        <!-- =====================================================
+             Approve / Reject Payment
+             ===================================================== -->
         @if (Model.Status ==
         BasketStatus.AwaitingPaymentVerification)
         {
             <div class="payment-actions">
 
-                <!-- Approve -->
+
+                <!-- Approve Payment -->
 
                 <button type="button"
-                        onclick="State(@Model.BasketId, true)"
+                        onclick="ApprovePayment(@Model.BasketId)"
                         class="payment-action-btn payment-approve">
 
                     <i class="fa fa-check"></i>
@@ -561,10 +565,10 @@
                 </button>
 
 
-                <!-- Reject -->
+                <!-- Reject Payment -->
 
                 <button type="button"
-                        onclick="State(@Model.BasketId, false)"
+                        onclick="RejectPayment(@Model.BasketId)"
                         class="payment-action-btn payment-reject">
 
                     <i class="fa fa-times"></i>
@@ -579,7 +583,9 @@
         }
 
 
-        <!-- Ship Order -->
+        <!-- =====================================================
+             Ship Order
+             ===================================================== -->
         @if (Model.Status ==
         BasketStatus.PaymentApproved)
         {
@@ -597,7 +603,9 @@
         }
 
 
-        <!-- Back -->
+        <!-- =====================================================
+             Back
+             ===================================================== -->
 
         <a asp-controller="Orders"
            asp-action="Index"
@@ -625,43 +633,3 @@
     @Html.AntiForgeryToken()
 
 </form>
-
-
-<!-- =========================================================
-     Receipt SweetAlert
-     ========================================================= -->
-
-<script>
-
-    function showReceipt(receiptUrl) {
-
-        Swal.fire({
-
-            title: "رسید پرداخت",
-
-            imageUrl: receiptUrl,
-
-            imageAlt: "رسید پرداخت",
-
-            width: "900px",
-
-            showCloseButton: true,
-
-            showConfirmButton: false,
-
-            allowOutsideClick: true,
-
-            allowEscapeKey: true,
-
-            background: "#ffffff",
-
-            customClass: {
-                popup: "receipt-swal-popup",
-                image: "receipt-swal-image"
-            }
-
-        });
-
-    }
-
-</script>

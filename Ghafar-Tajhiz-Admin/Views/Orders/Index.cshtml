@@ -36,34 +36,41 @@
         <select name="status"
                 class="form-select">
 
-            <option value="">
+            <option value=""
+                    selected="@(ViewBag.Status == null ? "selected" : null)">
                 همه وضعیت‌ها
             </option>
+
 
             <option value="PendingPayment"
                     selected="@(ViewBag.Status == BasketStatus.PendingPayment ? "selected" : null)">
                 در انتظار پرداخت
             </option>
 
+
             <option value="AwaitingPaymentVerification"
                     selected="@(ViewBag.Status == BasketStatus.AwaitingPaymentVerification ? "selected" : null)">
                 در انتظار بررسی پرداخت
             </option>
+
 
             <option value="PaymentApproved"
                     selected="@(ViewBag.Status == BasketStatus.PaymentApproved ? "selected" : null)">
                 پرداخت تأیید شد
             </option>
 
+
             <option value="PaymentRejected"
                     selected="@(ViewBag.Status == BasketStatus.PaymentRejected ? "selected" : null)">
                 پرداخت رد شد
             </option>
 
+
             <option value="Shipped"
                     selected="@(ViewBag.Status == BasketStatus.Shipped ? "selected" : null)">
                 ارسال شده
             </option>
+
 
             <option value="Cancelled"
                     selected="@(ViewBag.Status == BasketStatus.Cancelled ? "selected" : null)">
@@ -81,10 +88,12 @@
                 جدیدترین
             </option>
 
+
             <option value="oldest"
                     selected="@(ViewBag.Sort == "oldest" ? "selected" : null)">
                 قدیمی‌ترین
             </option>
+
 
             <option value="status"
                     selected="@(ViewBag.Sort == "status" ? "selected" : null)">
@@ -104,7 +113,9 @@
 </div>
 
 
-<!-- Anti Forgery -->
+<!-- =========================================================
+     Anti Forgery
+     ========================================================= -->
 
 <form id="stateForm">
 
@@ -119,284 +130,314 @@
 
 <div class="admin-card">
 
-    @if (!Model.Any())
+    @if (Model == null || !Model.Any())
     {
-        <div class="empty-state">
-            سفارشی پیدا نشد.
-        </div>
+            <div class="empty-state">
+                سفارشی پیدا نشد.
+            </div>
     }
     else
     {
-        <div class="table-scroll">
+            <div class="table-scroll">
 
-            <table class="admin-table">
+                <table class="admin-table">
 
-                <thead>
+                    <thead>
 
-                    <tr>
+                        <tr>
 
-                        <th>
-                            نام
-                        </th>
-
-                        <th>
-                            شماره تماس
-                        </th>
-
-                        <th>
-                            تاریخ پرداخت
-                        </th>
-
-                        <th>
-                            محصولات
-                        </th>
+                            <th>
+                                نام
+                            </th>
 
 
-                        <th>
-                            وضعیت
-                        </th>
-
-                        <th>
-                            عملیات
-                        </th>
-
-                    </tr>
-
-                </thead>
+                            <th>
+                                شماره تماس
+                            </th>
 
 
-                <tbody>
+                            <th>
+                                تاریخ پرداخت
+                            </th>
+
+
+                            <th>
+                                محصولات
+                            </th>
+
+
+                            <th>
+                                وضعیت
+                            </th>
+
+
+                            <th>
+                                عملیات
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
 
                     @foreach (var item in Model)
                     {
-                        <tr>
+                                <tr>
 
-                            <!-- User -->
+                                    <!-- =================================================
+                                         User
+                                         ================================================= -->
 
-                            <td>
+                                    <td>
                                 @item.UserName
-                            </td>
+                                    </td>
 
 
-                            <!-- Mobile -->
+                                    <!-- =================================================
+                                         Mobile
+                                         ================================================= -->
 
-                            <td>
+                                    <td>
                                 @item.MobileNumber
-                            </td>
+                                    </td>
 
 
-                            <!-- Paid Date -->
+                                    <!-- =================================================
+                                         Paid Date
+                                         ================================================= -->
 
-                            <td>
+                                    <td>
 
                                 @if (item.PaidDate.HasValue)
                                 {
                                     @item.PaidDate.Value.ToString(
-                                             "yyyy/MM/dd HH:mm")
+                                                 "yyyy/MM/dd HH:mm")
                                 }
                                 else
                                 {
-                                    <span>
-                                        -
-                                    </span>
+                                                <span>
+                                                    -
+                                                </span>
                                 }
 
-                            </td>
+                                    </td>
 
 
-                            <!-- Products -->
+                                    <!-- =================================================
+                                         Products
+                                         ================================================= -->
 
-                            <td>
+                                    <td>
 
                                 @if (item.Items != null &&
-                               item.Items.Any())
+                                   item.Items.Any())
                                 {
                                     @string.Join(" + ", item.Items)
                                 }
                                 else
                                 {
-                                    <span>
-                                        -
-                                    </span>
+                                                <span>
+                                                    -
+                                                </span>
                                 }
 
-                            </td>
+                                    </td>
 
 
-                          
+                                    <!-- =================================================
+                                         Status
+                                         ================================================= -->
 
-                            <!-- Status -->
-
-                            <td>
+                                    <td>
 
                                 @switch (item.Status)
                                 {
                                     case BasketStatus.PendingPayment:
 
-                                        <span class="badge badge-warning">
-                                            در انتظار پرداخت
-                                        </span>
+                                                        <span class="badge badge-warning">
+                                                            در انتظار پرداخت
+                                                        </span>
 
                                         break;
 
 
                                     case BasketStatus.AwaitingPaymentVerification:
 
-                                        <span class="badge badge-warning">
-                                            در انتظار بررسی پرداخت
-                                        </span>
+                                                        <span class="badge badge-warning">
+                                                            در انتظار بررسی پرداخت
+                                                        </span>
 
                                         break;
 
 
                                     case BasketStatus.PaymentApproved:
 
-                                        <span class="badge badge-success">
-                                            پرداخت تأیید شد
-                                        </span>
+                                                        <span class="badge badge-success">
+                                                            پرداخت تأیید شد
+                                                        </span>
 
                                         break;
 
 
                                     case BasketStatus.PaymentRejected:
 
-                                        <span class="badge badge-danger">
-                                            پرداخت رد شد
-                                        </span>
+                                                        <span class="badge badge-danger">
+                                                            پرداخت رد شد
+                                                        </span>
 
                                         break;
 
 
                                     case BasketStatus.Shipped:
 
-                                        <span class="badge badge-success">
-                                            ارسال شده
-                                        </span>
+                                                        <span class="badge badge-success">
+                                                            ارسال شده
+                                                        </span>
 
                                         break;
 
 
                                     case BasketStatus.Cancelled:
 
-                                        <span class="badge badge-danger">
-                                            لغو شده
-                                        </span>
+                                                        <span class="badge badge-danger">
+                                                            لغو شده
+                                                        </span>
 
                                         break;
 
 
                                     default:
 
-                                        <span class="badge">
-                                            نامشخص
-                                        </span>
+                                                        <span class="badge">
+                                                            نامشخص
+                                                        </span>
 
                                         break;
                                 }
 
-                            </td>
+                                    </td>
 
 
-                            <!-- Actions -->
+                                    <!-- =================================================
+                                         Actions
+                                         ================================================= -->
 
-                            <td>
+                                    <td>
 
-                                <div class="action-group">
+                                        <div class="action-group">
 
-                                    <!-- مشاهده جزئیات -->
+                                            <!-- مشاهده جزئیات -->
 
-                                    <a asp-controller="Orders"
-                                       asp-action="Details"
-                                       asp-route-id="@item.AdminOrderId"
-                                       class="action-btn action-view"
-                                       title="مشاهده جزئیات">
+                                            <a asp-controller="Orders"
+                                               asp-action="Details"
+                                               asp-route-id="@item.AdminOrderId"
+                                               class="action-btn action-view"
+                                               title="مشاهده جزئیات"
+                                               aria-label="مشاهده جزئیات">
 
-                                        <i class="fa fa-eye"></i>
+                                                <i class="fa fa-eye"></i>
 
-                                    </a>
+                                            </a>
 
 
-                                    <!-- تأیید / رد پرداخت -->
+                                            <!-- =========================================
+                                                 Approve / Reject Payment
+                                                 ========================================= -->
+
                                     @if (item.Status ==
-                                   BasketStatus.AwaitingPaymentVerification)
+                                  BasketStatus.AwaitingPaymentVerification)
                                     {
-                                        <button type="button"
-                                                onclick="State(@item.AdminOrderId, true)"
-                                                class="action-btn action-accept"
-                                                title="تأیید پرداخت">
+                                                    <!-- Approve -->
 
-                                            <i class="fa fa-check"></i>
+                                                    <button type="button"
+                                                            onclick="ApprovePayment(@item.AdminOrderId)"
+                                                            class="action-btn action-accept"
+                                                            title="تأیید پرداخت"
+                                                            aria-label="تأیید پرداخت">
 
-                                        </button>
+                                                        <i class="fa fa-check"></i>
+
+                                                    </button>
 
 
-                                        <button type="button"
-                                                onclick="State(@item.AdminOrderId, false)"
-                                                class="action-btn action-cancel"
-                                                title="رد پرداخت">
+                                                    <!-- Reject -->
 
-                                            <i class="fa fa-times"></i>
+                                                    <button type="button"
+                                                            onclick="RejectPayment(@item.AdminOrderId)"
+                                                            class="action-btn action-cancel"
+                                                            title="رد پرداخت"
+                                                            aria-label="رد پرداخت">
 
-                                        </button>
+                                                        <i class="fa fa-times"></i>
+
+                                                    </button>
                                     }
 
 
-                                    <!-- ارسال سفارش -->
+                                            <!-- =========================================
+                                                 Ship Order
+                                                 ========================================= -->
+
                                     @if (item.Status ==
-                                   BasketStatus.PaymentApproved)
+                                  BasketStatus.PaymentApproved)
                                     {
-                                        <button type="button"
-                                                onclick="ShipOrder(@item.AdminOrderId)"
-                                                class="action-btn action-accept"
-                                                title="ارسال سفارش">
+                                                    <button type="button"
+                                                            onclick="ShipOrder(@item.AdminOrderId)"
+                                                            class="action-btn action-accept"
+                                                            title="ارسال سفارش"
+                                                            aria-label="ارسال سفارش">
 
-                                            <i class="fa fa-truck"></i>
+                                                        <i class="fa fa-truck"></i>
 
-                                        </button>
+                                                    </button>
                                     }
 
-                                </div>
+                                        </div>
 
-                            </td>
+                                    </td>
 
-                        </tr>
+                                </tr>
 
 
-                        <!-- =================================================
-                             Rejection Reason
-                             ================================================= -->
+                                <!-- =================================================
+                                     Rejection Reason
+                                     ================================================= -->
+
                         @if (item.Status ==
-                       BasketStatus.PaymentRejected &&
-                       !string.IsNullOrWhiteSpace(
-                       item.PaymentRejectionReason))
+                           BasketStatus.PaymentRejected &&
+                           !string.IsNullOrWhiteSpace(
+                               item.PaymentRejectionReason))
                         {
-                            <tr>
+                                        <tr>
 
-                                <td colspan="7">
+                                            <!-- جدول ۶ ستون دارد -->
+                                            <td colspan="6">
 
-                                    <div class="alert alert-danger"
-                                         style="margin:0;">
+                                                <div class="alert alert-danger"
+                                                     style="margin:0;">
 
-                                        <strong>
-                                            دلیل رد پرداخت:
-                                        </strong>
+                                                    <strong>
+                                                        دلیل رد پرداخت:
+                                                    </strong>
 
                                         @item.PaymentRejectionReason
 
-                                    </div>
+                                                </div>
 
-                                </td>
+                                            </td>
 
-                            </tr>
+                                        </tr>
                         }
 
                     }
 
-                </tbody>
+                    </tbody>
 
-            </table>
+                </table>
 
-        </div>
+            </div>
     }
 
 </div>

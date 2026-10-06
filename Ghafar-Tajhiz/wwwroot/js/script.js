@@ -3,14 +3,90 @@
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", function () {
-    const navBtn = document.getElementById("mobileNavbarBtn");
-    const desktopNav = document.getElementById("desktopnavbar");
 
-    if (navBtn && desktopNav) {
-        navBtn.addEventListener("click", function () {
-            desktopNav.classList.toggle("active");
-        });
+    const navButton =
+        document.getElementById("mobileNavbarBtn");
+
+    const mobileNav =
+        document.getElementById("desktopnavbar");
+
+    if (!navButton || !mobileNav) {
+        return;
     }
+
+
+    navButton.addEventListener(
+        "click",
+        function () {
+
+            const isOpen =
+                mobileNav.classList.toggle("active");
+
+            navButton.setAttribute(
+                "aria-expanded",
+                isOpen.toString()
+            );
+
+
+            const icon =
+                navButton.querySelector("i");
+
+            if (icon) {
+
+                icon.classList.toggle(
+                    "fa-bars",
+                    !isOpen
+                );
+
+                icon.classList.toggle(
+                    "fa-times",
+                    isOpen
+                );
+            }
+        }
+    );
+
+
+    // بستن منوی موبایل هنگام کلیک روی لینک
+    mobileNav
+        .querySelectorAll("a")
+        .forEach(link => {
+
+            link.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        window.innerWidth <= 760 &&
+                        mobileNav.classList.contains("active")
+                    ) {
+
+                        mobileNav.classList.remove("active");
+
+                        navButton.setAttribute(
+                            "aria-expanded",
+                            "false"
+                        );
+
+
+                        const icon =
+                            navButton.querySelector("i");
+
+                        if (icon) {
+
+                            icon.classList.remove(
+                                "fa-times"
+                            );
+
+                            icon.classList.add(
+                                "fa-bars"
+                            );
+                        }
+                    }
+                }
+            );
+        });
+
 });
 
 
@@ -19,47 +95,117 @@ document.addEventListener("DOMContentLoaded", function () {
 ========================================================= */
 
 function formatPrice(price) {
-    const value = Number(price);
+
+    const value =
+        Number(price);
 
     if (Number.isNaN(value)) {
         return "۰";
     }
 
-    return new Intl.NumberFormat("fa-IR").format(value);
+    return new Intl.NumberFormat("fa-IR")
+        .format(value);
 }
 
 
 function getAntiForgeryToken() {
-    const token = document.querySelector(
-        'input[name="__RequestVerificationToken"]'
-    );
 
-    return token ? token.value : null;
+    const token =
+        document.querySelector(
+            '#antiForgeryForm input[name="__RequestVerificationToken"]'
+        );
+
+    return token
+        ? token.value
+        : null;
 }
 
 
 async function parseResponse(response) {
-    const contentType = response.headers.get("content-type") || "";
+
+    const contentType =
+        response.headers.get("content-type") || "";
+
 
     if (contentType.includes("application/json")) {
-        const data = await response.json();
+
+        const data =
+            await response.json();
+
 
         if (!response.ok) {
             throw data;
         }
 
+
         return data;
     }
 
-    const text = await response.text();
+
+    const text =
+        await response.text();
+
 
     if (!response.ok) {
+
         throw {
-            msg: text || "خطای غیرمنتظره"
+            msg:
+                text ||
+                "خطای غیرمنتظره‌ای رخ داد."
         };
     }
 
+
     return text;
+}
+
+
+function getFileValidationResult(file) {
+
+    if (!file) {
+
+        return {
+            valid: false,
+            message: "لطفاً یک فایل انتخاب کنید."
+        };
+    }
+
+
+    const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    ];
+
+
+    const maxFileSize =
+        5 * 1024 * 1024;
+
+
+    if (!allowedTypes.includes(file.type)) {
+
+        return {
+            valid: false,
+            message:
+                "فرمت فایل باید JPG، JPEG، PNG یا WEBP باشد."
+        };
+    }
+
+
+    if (file.size > maxFileSize) {
+
+        return {
+            valid: false,
+            message:
+                "حجم فایل نمی‌تواند بیشتر از ۵ مگابایت باشد."
+        };
+    }
+
+
+    return {
+        valid: true,
+        message: ""
+    };
 }
 
 
@@ -68,6 +214,7 @@ async function parseResponse(response) {
 ========================================================= */
 
 function updatePrice() {
+
     const basePriceElement =
         document.getElementById("basePrice");
 
@@ -83,6 +230,7 @@ function updatePrice() {
     const stockMessage =
         document.getElementById("stockMessage");
 
+
     if (
         !basePriceElement ||
         !countInput ||
@@ -92,60 +240,86 @@ function updatePrice() {
         return;
     }
 
+
     const basePrice =
         Number(basePriceElement.value);
 
     const stockQuantity =
         Number(stockQuantityElement.value);
 
+
     let count =
         Number(countInput.value);
 
-    if (Number.isNaN(basePrice) ||
-        Number.isNaN(stockQuantity)) {
+
+    if (
+        Number.isNaN(basePrice) ||
+        Number.isNaN(stockQuantity)
+    ) {
         return;
     }
 
+
     if (stockQuantity <= 0) {
+
         countInput.value = 0;
         countInput.disabled = true;
 
         basePriceShow.textContent =
             "قیمت نهایی: ۰ تومان";
 
+
         if (stockMessage) {
+
             stockMessage.textContent =
                 "موجودی: ۰";
 
-            stockMessage.style.color = "red";
+            stockMessage.style.color =
+                "#d32f2f";
         }
 
         return;
     }
 
-    if (Number.isNaN(count) || count < 1) {
+
+    if (
+        Number.isNaN(count) ||
+        count < 1
+    ) {
         count = 1;
     }
+
 
     if (count > stockQuantity) {
         count = stockQuantity;
     }
 
+
     countInput.value = count;
 
+
     if (stockMessage) {
+
         stockMessage.textContent =
             `موجودی انبار: ${formatPrice(stockQuantity)} عدد`;
 
+
         if (stockQuantity < 5) {
-            stockMessage.style.color = "orange";
+
+            stockMessage.style.color =
+                "#ef6c00";
+
         } else {
-            stockMessage.style.color = "#666";
+
+            stockMessage.style.color =
+                "#666";
         }
     }
 
+
     const totalPrice =
         basePrice * count;
+
 
     basePriceShow.textContent =
         `قیمت نهایی: ${formatPrice(totalPrice)} تومان`;
@@ -153,15 +327,30 @@ function updatePrice() {
 
 
 function initializeQuantityInput() {
+
     const countInput =
         document.getElementById("countInput");
 
-    if (!countInput || countInput.disabled) {
+
+    if (
+        !countInput ||
+        countInput.disabled
+    ) {
         return;
     }
 
-    countInput.addEventListener("input", updatePrice);
-    countInput.addEventListener("change", updatePrice);
+
+    countInput.addEventListener(
+        "input",
+        updatePrice
+    );
+
+
+    countInput.addEventListener(
+        "change",
+        updatePrice
+    );
+
 
     updatePrice();
 }
@@ -172,23 +361,44 @@ function initializeQuantityInput() {
 ========================================================= */
 
 function initializePasswordToggle() {
+
     const toggleButton =
         document.getElementById("togglePassword");
 
     const passwordInput =
         document.getElementById("passwordInput");
 
-    if (!toggleButton || !passwordInput) {
+
+    if (
+        !toggleButton ||
+        !passwordInput
+    ) {
         return;
     }
 
-    toggleButton.addEventListener("click", function () {
-        const isPassword =
-            passwordInput.type === "password";
 
-        passwordInput.type =
-            isPassword ? "text" : "password";
-    });
+    toggleButton.addEventListener(
+        "click",
+        function () {
+
+            const isPassword =
+                passwordInput.type === "password";
+
+
+            passwordInput.type =
+                isPassword
+                    ? "text"
+                    : "password";
+
+
+            toggleButton.setAttribute(
+                "aria-label",
+                isPassword
+                    ? "مخفی کردن رمز عبور"
+                    : "نمایش رمز عبور"
+            );
+        }
+    );
 }
 
 
@@ -196,7 +406,30 @@ function initializePasswordToggle() {
    PRODUCT MODAL
 ========================================================= */
 
+function closeProductModal() {
+
+    const modal =
+        document.getElementById("modal");
+
+
+    if (!modal) {
+        return;
+    }
+
+
+    modal.style.display =
+        "none";
+
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+}
+
+
 function initializeProductModal() {
+
     const modal =
         document.getElementById("modal");
 
@@ -206,75 +439,132 @@ function initializeProductModal() {
     const closeButton =
         document.getElementById("closeModal");
 
-    if (!modal || !modalBody) {
+
+    if (
+        !modal ||
+        !modalBody
+    ) {
         return;
     }
 
-    document.querySelectorAll(".openModal")
+
+    document
+        .querySelectorAll(".openModal")
         .forEach(button => {
 
-            button.addEventListener("click", async function () {
+            button.addEventListener(
+                "click",
+                async function () {
 
-                const productId =
-                    Number(this.dataset.productId);
-
-                if (!productId || productId <= 0) {
-                    return;
-                }
-
-                modal.style.display = "block";
-
-                modalBody.innerHTML =
-                    '<div class="text-center">در حال دریافت اطلاعات...</div>';
-
-                try {
-                    const response =
-                        await fetch(
-                            `/Product/GetProduct?id=${productId}`,
-                            {
-                                method: "GET",
-                                headers: {
-                                    "X-Requested-With":
-                                        "XMLHttpRequest"
-                                }
-                            }
+                    const productId =
+                        Number(
+                            this.dataset.productId
                         );
 
-                    if (!response.ok) {
-                        throw new Error(
-                            "دریافت اطلاعات محصول ناموفق بود."
-                        );
+
+                    if (
+                        !productId ||
+                        productId <= 0
+                    ) {
+                        return;
                     }
 
-                    const html =
-                        await response.text();
 
-                    modalBody.innerHTML = html;
+                    modal.style.display =
+                        "block";
 
-                } catch (error) {
 
-                    console.error(error);
+                    modal.setAttribute(
+                        "aria-hidden",
+                        "false"
+                    );
+
 
                     modalBody.innerHTML =
-                        "خطا در دریافت اطلاعات محصول";
+                        `
+                        <div class="text-center">
+                            در حال دریافت اطلاعات...
+                        </div>
+                        `;
+
+
+                    try {
+
+                        const response =
+                            await fetch(
+                                `/Product/GetProduct?id=${productId}`,
+                                {
+                                    method: "GET",
+                                    headers: {
+                                        "X-Requested-With":
+                                            "XMLHttpRequest"
+                                    }
+                                }
+                            );
+
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                "دریافت اطلاعات محصول ناموفق بود."
+                            );
+                        }
+
+
+                        const html =
+                            await response.text();
+
+
+                        modalBody.innerHTML =
+                            html;
+
+                    }
+                    catch (error) {
+
+                        console.error(
+                            "Product Modal Error:",
+                            error
+                        );
+
+
+                        modalBody.innerHTML =
+                            `
+                            <div class="text-danger text-center">
+                                خطا در دریافت اطلاعات محصول
+                            </div>
+                            `;
+                    }
                 }
-            });
+            );
         });
 
+
     if (closeButton) {
+
         closeButton.addEventListener(
             "click",
-            function () {
-                modal.style.display = "none";
-            }
+            closeProductModal
         );
     }
+
 
     window.addEventListener(
         "click",
         function (event) {
+
             if (event.target === modal) {
-                modal.style.display = "none";
+                closeProductModal();
+            }
+        }
+    );
+
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Escape") {
+                closeProductModal();
             }
         }
     );
@@ -293,42 +583,65 @@ async function AddToBasket() {
     const qtyElement =
         document.getElementById("countInput");
 
-    if (!productIdElement || !qtyElement) {
+
+    if (
+        !productIdElement ||
+        !qtyElement
+    ) {
         return;
     }
+
 
     const productId =
         Number(productIdElement.value);
 
+
     const qty =
         Number(qtyElement.value);
 
-    if (!productId || productId <= 0) {
+
+    if (
+        !productId ||
+        productId <= 0
+    ) {
+
         showFailAlert(
             "خطا",
             "محصول نامعتبر است."
         );
+
         return;
     }
 
-    if (!qty || qty <= 0) {
+
+    if (
+        !qty ||
+        qty <= 0
+    ) {
+
         showFailAlert(
             "خطا",
             "تعداد محصول نامعتبر است."
         );
+
         return;
     }
+
 
     const token =
         getAntiForgeryToken();
 
+
     if (!token) {
+
         showFailAlert(
             "خطا",
             "توکن امنیتی یافت نشد."
         );
+
         return;
     }
+
 
     try {
 
@@ -337,6 +650,7 @@ async function AddToBasket() {
                 "/Order/AddToBasket",
                 {
                     method: "POST",
+
                     headers: {
                         "Content-Type":
                             "application/json",
@@ -347,14 +661,18 @@ async function AddToBasket() {
                         "X-Requested-With":
                             "XMLHttpRequest"
                     },
+
                     body: JSON.stringify({
-                        productId: productId,
-                        qty: qty
+                        productId:
+                            productId,
+
+                        qty:
+                            qty
                     })
                 }
             );
 
-        // کاربر لاگین نیست
+
         if (response.status === 401) {
 
             showFailAlert(
@@ -365,8 +683,21 @@ async function AddToBasket() {
             return;
         }
 
+
+        if (response.status === 403) {
+
+            showFailAlert(
+                "دسترسی غیرمجاز",
+                "شما اجازه انجام این عملیات را ندارید."
+            );
+
+            return;
+        }
+
+
         const data =
             await parseResponse(response);
+
 
         if (!data.res) {
 
@@ -379,17 +710,24 @@ async function AddToBasket() {
             return;
         }
 
+
         showSuccessAlert(
             "",
             data.msg ||
             "محصول به سبد خرید اضافه شد."
         );
 
+
         await updateCartBadge();
 
-    } catch (error) {
+    }
+    catch (error) {
 
-        console.error(error);
+        console.error(
+            "AddToBasket Error:",
+            error
+        );
+
 
         showFailAlert(
             "خطا",
@@ -402,20 +740,28 @@ async function AddToBasket() {
 
 async function RemoveBasketItem(id) {
 
-    if (!id || id <= 0) {
+    if (
+        !id ||
+        id <= 0
+    ) {
         return;
     }
+
 
     const token =
         getAntiForgeryToken();
 
+
     if (!token) {
+
         showFailAlert(
             "خطا",
             "توکن امنیتی یافت نشد."
         );
+
         return;
     }
+
 
     try {
 
@@ -424,6 +770,7 @@ async function RemoveBasketItem(id) {
                 "/Order/RemoveBasketItem",
                 {
                     method: "POST",
+
                     headers: {
                         "Content-Type":
                             "application/json",
@@ -434,42 +781,81 @@ async function RemoveBasketItem(id) {
                         "X-Requested-With":
                             "XMLHttpRequest"
                     },
+
                     body: JSON.stringify({
-                        basketItemId: id
+                        basketItemId:
+                            id
                     })
                 }
             );
 
+
+        if (response.status === 401) {
+
+            showFailAlert(
+                "نیاز به ورود",
+                "ابتدا وارد حساب کاربری خود شوید."
+            );
+
+            return;
+        }
+
+
+        if (response.status === 403) {
+
+            showFailAlert(
+                "دسترسی غیرمجاز",
+                "شما اجازه انجام این عملیات را ندارید."
+            );
+
+            return;
+        }
+
+
         const data =
             await parseResponse(response);
 
+
         if (!data.res) {
+
             showFailAlert(
                 "خطا",
-                data.msg || "حذف محصول انجام نشد."
+                data.msg ||
+                "حذف محصول انجام نشد."
             );
+
             return;
         }
+
 
         const row =
             document.getElementById(
                 "Basket_" + id
             );
 
+
         if (row) {
             row.remove();
         }
 
+
         await updateCartBadge();
+
 
         showSuccessAlert(
             "",
-            data.msg || "محصول حذف شد."
+            data.msg ||
+            "محصول حذف شد."
         );
 
-    } catch (error) {
+    }
+    catch (error) {
 
-        console.error(error);
+        console.error(
+            "RemoveBasketItem Error:",
+            error
+        );
+
 
         showFailAlert(
             "خطا",
@@ -496,9 +882,11 @@ function validateCheckOutForm() {
         document.getElementById("receipt");
 
 
-    if (!addressElement ||
+    if (
+        !addressElement ||
         !mobileElement ||
-        !receiptElement) {
+        !receiptElement
+    ) {
         return false;
     }
 
@@ -506,8 +894,10 @@ function validateCheckOutForm() {
     const address =
         addressElement.value.trim();
 
+
     const mobile =
         mobileElement.value.trim();
+
 
     const receipt =
         receiptElement.files[0];
@@ -532,7 +922,9 @@ function validateCheckOutForm() {
     }
 
 
-    if (address.length < 10) {
+    if (
+        address.length < 10
+    ) {
 
         showFailAlert(
             "خطا",
@@ -543,11 +935,26 @@ function validateCheckOutForm() {
     }
 
 
+    if (
+        address.length > 500
+    ) {
+
+        showFailAlert(
+            "خطا",
+            "آدرس نمی‌تواند بیشتر از ۵۰۰ کاراکتر باشد."
+        );
+
+        return false;
+    }
+
+
     // ==============================
     // Mobile
     // ==============================
 
-    if (!mobileRegex.test(mobile)) {
+    if (
+        !mobileRegex.test(mobile)
+    ) {
 
         showFailAlert(
             "خطا",
@@ -562,64 +969,161 @@ function validateCheckOutForm() {
     // Receipt
     // ==============================
 
-    if (!receipt) {
+    const fileValidation =
+        getFileValidationResult(
+            receipt
+        );
+
+
+    if (!fileValidation.valid) {
 
         showFailAlert(
             "خطا",
-            "لطفاً رسید پرداخت را انتخاب کنید."
+            fileValidation.message
         );
 
-        return false;
-    }
 
+        if (receiptElement) {
+            receiptElement.value = "";
+        }
 
-    // ==============================
-    // File Type
-    // ==============================
-
-    const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/webp"
-    ];
-
-
-    if (!allowedTypes.includes(receipt.type)) {
-
-        showFailAlert(
-            "خطا",
-            "فرمت رسید باید JPG، PNG یا WEBP باشد."
-        );
-
-        receiptElement.value = "";
-
-        return false;
-    }
-
-
-    // ==============================
-    // File Size
-    // Maximum 5 MB
-    // ==============================
-
-    const maxFileSize =
-        5 * 1024 * 1024;
-
-
-    if (receipt.size > maxFileSize) {
-
-        showFailAlert(
-            "خطا",
-            "حجم رسید نمی‌تواند بیشتر از 5 مگابایت باشد."
-        );
-
-        receiptElement.value = "";
 
         return false;
     }
 
 
     return true;
+}
+
+
+/* =========================================================
+   RESUBMIT RECEIPT
+========================================================= */
+
+function initializeResubmitReceiptForms() {
+
+    const forms =
+        document.querySelectorAll(
+            ".resubmit-form"
+        );
+
+
+    if (!forms.length) {
+        return;
+    }
+
+
+    forms.forEach(form => {
+
+        const fileInput =
+            form.querySelector(
+                'input[type="file"][name="Receipt"]'
+            );
+
+
+        const fileLabel =
+            form.querySelector(
+                ".receipt-file-text strong"
+            );
+
+
+        const fileDescription =
+            form.querySelector(
+                ".receipt-file-text small"
+            );
+
+
+        if (!fileInput) {
+            return;
+        }
+
+
+        fileInput.addEventListener(
+            "change",
+            function () {
+
+                const file =
+                    this.files?.[0];
+
+
+                if (!file) {
+                    return;
+                }
+
+
+                const validation =
+                    getFileValidationResult(
+                        file
+                    );
+
+
+                if (!validation.valid) {
+
+                    showFailAlert(
+                        "فایل نامعتبر",
+                        validation.message
+                    );
+
+
+                    this.value =
+                        "";
+
+
+                    return;
+                }
+
+
+                if (fileLabel) {
+
+                    fileLabel.textContent =
+                        file.name;
+                }
+
+
+                if (fileDescription) {
+
+                    const sizeInMb =
+                        (
+                            file.size /
+                            (1024 * 1024)
+                        ).toFixed(2);
+
+
+                    fileDescription.textContent =
+                        `${sizeInMb} MB`;
+                }
+            }
+        );
+
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const file =
+                    fileInput.files?.[0];
+
+
+                const validation =
+                    getFileValidationResult(
+                        file
+                    );
+
+
+                if (!validation.valid) {
+
+                    event.preventDefault();
+
+
+                    showFailAlert(
+                        "خطا",
+                        validation.message
+                    );
+                }
+            }
+        );
+
+    });
 }
 
 
@@ -636,6 +1140,7 @@ async function updateCartBadge() {
                 "/Order/GetBasketCount",
                 {
                     method: "GET",
+
                     headers: {
                         "X-Requested-With":
                             "XMLHttpRequest"
@@ -643,47 +1148,66 @@ async function updateCartBadge() {
                 }
             );
 
+
+        if (
+            response.status === 401 ||
+            response.status === 403
+        ) {
+            return;
+        }
+
+
         if (!response.ok) {
             return;
         }
 
+
         const count =
             await response.json();
 
-        const badgeDesktop =
+
+        const desktopBadge =
             document.getElementById(
                 "cart-badge-desktop"
             );
 
-        const badgeMobile =
+
+        const mobileBadge =
             document.getElementById(
                 "cart-badge-mobile"
             );
 
-        if (badgeDesktop) {
-            badgeDesktop.textContent =
+
+        if (desktopBadge) {
+
+            desktopBadge.textContent =
                 count;
 
-            badgeDesktop.setAttribute(
+
+            desktopBadge.setAttribute(
                 "data-count",
                 count
             );
         }
 
-        if (badgeMobile) {
-            badgeMobile.textContent =
+
+        if (mobileBadge) {
+
+            mobileBadge.textContent =
                 count;
 
-            badgeMobile.setAttribute(
+
+            mobileBadge.setAttribute(
                 "data-count",
                 count
             );
         }
 
-    } catch (error) {
+    }
+    catch (error) {
 
         console.error(
-            "Failed to update basket badge:",
+            "Cart Badge Error:",
             error
         );
     }
@@ -702,50 +1226,75 @@ async function addComment() {
     const commentTextElement =
         document.getElementById("commentText");
 
-    if (!productIdElement || !commentTextElement) {
+
+    if (
+        !productIdElement ||
+        !commentTextElement
+    ) {
         return;
     }
+
 
     const productId =
         Number(productIdElement.value);
 
+
     const commentText =
         commentTextElement.value.trim();
+
 
     const token =
         getAntiForgeryToken();
 
-    if (!productId || productId <= 0) {
+
+    if (
+        !productId ||
+        productId <= 0
+    ) {
+
         showFailAlert(
             "خطا",
             "محصول نامعتبر است."
         );
+
         return;
     }
 
+
     if (!commentText) {
+
         showFailAlert(
             "خطا",
             "متن نظر نمی‌تواند خالی باشد."
         );
+
         return;
     }
 
-    if (commentText.length > 500) {
+
+    if (
+        commentText.length > 500
+    ) {
+
         showFailAlert(
             "خطا",
-            "متن نظر نمی‌تواند بیشتر از 500 کاراکتر باشد."
+            "متن نظر نمی‌تواند بیشتر از ۵۰۰ کاراکتر باشد."
         );
+
         return;
     }
 
+
     if (!token) {
+
         showFailAlert(
             "خطا",
             "توکن امنیتی یافت نشد."
         );
+
         return;
     }
+
 
     try {
 
@@ -756,51 +1305,79 @@ async function addComment() {
                     method: "POST",
 
                     headers: {
-                        "Content-Type": "application/json",
-                        "RequestVerificationToken": token,
-                        "X-Requested-With": "XMLHttpRequest"
+                        "Content-Type":
+                            "application/json",
+
+                        "RequestVerificationToken":
+                            token,
+
+                        "X-Requested-With":
+                            "XMLHttpRequest"
                     },
 
                     body: JSON.stringify({
-                        productId: productId,
-                        text: commentText
+                        productId:
+                            productId,
+
+                        text:
+                            commentText
                     })
                 }
             );
 
-        // =========================
-        // کاربر لاگین نیست
-        // =========================
-        if (response.status === 401) {
+
+        if (
+            response.status === 401
+        ) {
 
             let message =
                 "لطفاً ابتدا وارد حساب کاربری شوید.";
 
+
             try {
+
                 const errorData =
                     await response.json();
 
+
                 if (errorData.msg) {
-                    message = errorData.msg;
+                    message =
+                        errorData.msg;
                 }
+
             }
             catch {
-                // اگر JSON نبود، همان پیام پیش‌فرض استفاده می‌شود
+                // پیام پیش‌فرض باقی می‌ماند
             }
+
 
             showFailAlert(
                 "نیاز به ورود",
                 message
             );
 
+
             return;
         }
 
-        // =========================
-        // سایر پاسخ‌ها
-        // =========================
+
+        if (
+            response.status === 403
+        ) {
+
+            showFailAlert(
+                "دسترسی غیرمجاز",
+                "شما اجازه انجام این عملیات را ندارید."
+            );
+
+
+            return;
+        }
+
+
         const data =
             await parseResponse(response);
+
 
         if (!data.res) {
 
@@ -810,14 +1387,17 @@ async function addComment() {
                 "ثبت نظر انجام نشد."
             );
 
+
             return;
         }
+
 
         showSuccessAlert(
             "",
             data.msg ||
             "نظر شما با موفقیت ثبت شد."
         );
+
 
         setTimeout(
             () => location.reload(),
@@ -832,12 +1412,16 @@ async function addComment() {
             error
         );
 
+
         showFailAlert(
             "خطا",
+            error?.msg ||
             "خطای غیرمنتظره‌ای رخ داد."
         );
     }
 }
+
+
 /* =========================================================
    LOGIN ERROR
 ========================================================= */
@@ -847,23 +1431,34 @@ function showLoginError() {
     const loginErrorDiv =
         document.getElementById("loginError");
 
+
     if (!loginErrorDiv) {
         return;
     }
 
+
     const errorMessage =
         loginErrorDiv.dataset.error;
 
-    if (!errorMessage ||
-        !errorMessage.trim()) {
+
+    if (
+        !errorMessage ||
+        !errorMessage.trim()
+    ) {
         return;
     }
 
+
     Swal.fire({
+
         icon: "error",
+
         title: "خطا",
+
         text: errorMessage,
+
         confirmButtonText: "باشه"
+
     });
 }
 
@@ -876,12 +1471,23 @@ function showSuccessAlert(
     title = "",
     text = "عملیات با موفقیت انجام شد."
 ) {
+
     Swal.fire({
-        title: title,
-        text: text,
-        icon: "success",
-        showConfirmButton: false,
-        timer: 1200
+
+        title:
+            title,
+
+        text:
+            text,
+
+        icon:
+            "success",
+
+        showConfirmButton:
+            false,
+
+        timer:
+            1200
     });
 }
 
@@ -890,11 +1496,20 @@ function showFailAlert(
     title = "خطا",
     text = "عملیات ناموفق بود."
 ) {
+
     Swal.fire({
-        title: title,
-        text: text,
-        icon: "error",
-        confirmButtonText: "باشه"
+
+        title:
+            title,
+
+        text:
+            text,
+
+        icon:
+            "error",
+
+        confirmButtonText:
+            "باشه"
     });
 }
 
@@ -912,6 +1527,8 @@ document.addEventListener(
         initializePasswordToggle();
 
         initializeProductModal();
+
+        initializeResubmitReceiptForms();
 
         showLoginError();
 

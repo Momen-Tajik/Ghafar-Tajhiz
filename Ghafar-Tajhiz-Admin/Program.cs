@@ -7,76 +7,70 @@ using BusinessLogic.ProductServices;
 using BusinessLogic.ProfileServices;
 using DataAccess.Data;
 using DataAccess.Models;
-using DataAccess.Repositories.BasketItemRepo;
-using DataAccess.Repositories.BasketRepo;
-using DataAccess.Repositories.CategoryRepo;
-using DataAccess.Repositories.CommentRepo;
-using DataAccess.Repositories.ProductRepo;
 using Ghafar_Tajhiz_Admin.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// =====================================================
+// MVC
+// =====================================================
+
 builder.Services.AddControllersWithViews();
 
 
-// ===============================
+// =====================================================
 // Database
-// ===============================
+// =====================================================
+
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "DefaultConnection is not configured.");
+}
 
 builder.Services.AddDbContext<GhafarTajhizShopDbContext>(options =>
 {
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(connectionString);
 });
 
 
-// ===============================
-// Repositories & Services
-// ===============================
+// =====================================================
+// Application Services
+// =====================================================
 
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<CategoryService>();
-
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ProductService>();
-
-builder.Services.AddScoped<IFileUploadService, FileUploadService>();
-
-builder.Services.AddScoped<IBasketRepository, BasketRepository>();
 builder.Services.AddScoped<BasketService>();
-
-builder.Services.AddScoped<IBasketItemRepository, BasketItemRepository>();
 builder.Services.AddScoped<BasketItemService>();
-
-builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<CommentService>();
-
 builder.Services.AddScoped<ProfileService>();
+builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 
 builder.Services.AddScoped<UserService>();
 
 
-// ===============================
+// =====================================================
 // Identity
-// ===============================
+// =====================================================
 
 builder.Services.AddIdentity<User, Role>(options =>
 {
     // Password
+    options.Password.RequiredLength = 6;
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 4;
-    options.Password.RequiredUniqueChars = 0;
+    options.Password.RequiredUniqueChars = 1;
 
     // Lockout
     options.Lockout.DefaultLockoutTimeSpan =
-        TimeSpan.FromMinutes(3);
+        TimeSpan.FromMinutes(10);
 
     options.Lockout.MaxFailedAccessAttempts = 5;
 
@@ -86,40 +80,49 @@ builder.Services.AddIdentity<User, Role>(options =>
     options.User.RequireUniqueEmail = false;
 })
 .AddEntityFrameworkStores<GhafarTajhizShopDbContext>()
-.AddSignInManager<SignInManager<User>>()
 .AddDefaultTokenProviders();
 
 
-// ===============================
+// =====================================================
 // Admin Authentication Cookie
-// ===============================
+// =====================================================
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.Cookie.Name = "GhafarTajhizAdminCookie";
+    options.Cookie.Name =
+        "GhafarTajhizAdminCookie";
 
     options.Cookie.HttpOnly = true;
 
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    options.Cookie.SecurePolicy =
+        CookieSecurePolicy.Always;
 
-    options.LoginPath = "/AdminAccount/Login";
+    options.Cookie.SameSite =
+        SameSiteMode.Lax;
 
-    options.AccessDeniedPath = "/AdminAccount/AccessDenied";
+    options.ExpireTimeSpan =
+        TimeSpan.FromMinutes(60);
 
     options.SlidingExpiration = true;
+
+    options.LoginPath =
+        "/AdminAccount/Login";
+
+    options.AccessDeniedPath =
+        "/AdminAccount/AccessDenied";
 });
 
 
-// ===============================
-// Build Application
-// ===============================
+// =====================================================
+// Build
+// =====================================================
 
 var app = builder.Build();
 
 
-// ===============================
+// =====================================================
 // HTTP Pipeline
-// ===============================
+// =====================================================
 
 if (!app.Environment.IsDevelopment())
 {
@@ -139,40 +142,47 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-// ===============================
-// MVC Routing
-// ===============================
+// =====================================================
+// Routing
+// =====================================================
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 
-// ===============================
+// =====================================================
 // Seed Roles
-// ===============================
+// =====================================================
 
 using (var scope = app.Services.CreateScope())
 {
     var roleManager =
         scope.ServiceProvider
-        .GetRequiredService<RoleManager<Role>>();
+            .GetRequiredService<RoleManager<Role>>();
 
-    var roles = new[]
+    string[] roles =
     {
         "Admin",
         "User"
     };
 
-    foreach (var role in roles)
+    foreach (var roleName in roles)
     {
-        if (!await roleManager.RoleExistsAsync(role))
+        if (!await roleManager.RoleExistsAsync(roleName))
         {
-            await roleManager.CreateAsync(
-                new Role
-                {
-                    Name = role
-                });
+            var result =
+                await roleManager.CreateAsync(
+                    new Role
+                    {
+                        Name = roleName
+                    });
+
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    $"Could not create role '{roleName}'.");
+            }
         }
     }
 }

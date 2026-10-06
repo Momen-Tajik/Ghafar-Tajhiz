@@ -6,289 +6,757 @@
     ViewData["Title"] = "پروفایل";
 }
 
-<div class="user-dashboard">
+<div class="profile-page">
 
-    <aside class="user-info">
+    <!-- =====================================================
+         Page Header
+         ===================================================== -->
 
-        <div class="user-card">
+    <div class="profile-page-header">
 
-            <h3>اطلاعات کاربر</h3>
+        <div>
+            <span class="profile-page-eyebrow">
+                حساب کاربری
+            </span>
+
+            <h1>
+                پروفایل من
+            </h1>
 
             <p>
-                <strong>نام کاربری:</strong>
-                @Model.UserName
+                اطلاعات حساب و سفارش‌های خود را مدیریت کنید.
             </p>
-
-            <p>
-                <strong>شماره موبایل:</strong>
-                @(Model.MobileNumber ?? "ثبت نشده")
-            </p>
-
-            <p>
-                <strong>آدرس:</strong>
-                @(string.IsNullOrWhiteSpace(Model.Address)
-                    ? "ثبت نشده"
-                    : Model.Address)
-            </p>
-
         </div>
 
-    </aside>
+    </div>
 
 
-    <section class="user-orders">
+    <!-- =====================================================
+         Dashboard
+         ===================================================== -->
 
-        <!-- فیلتر -->
-        <form method="get">
+    <div class="user-dashboard">
 
-            <input type="text"
-                   name="search"
-                   value="@Model.Search"
-                   placeholder="جستجوی سفارش..." />
+        <!-- =================================================
+             User Information
+             ================================================= -->
 
-            <select name="status">
+        <aside class="user-info">
 
-                <option value="">
-                    همه
-                </option>
+            <div class="user-card">
 
-                <option value="PendingPayment"
-                        selected="@(Model.Status == BasketStatus.PendingPayment ? "selected" : null)">
-                    در انتظار پرداخت
-                </option>
+                <div class="user-card-header">
 
-                <option value="AwaitingPaymentVerification"
-                        selected="@(Model.Status == BasketStatus.AwaitingPaymentVerification ? "selected" : null)">
-                    در انتظار بررسی پرداخت
-                </option>
+                    <div class="user-avatar">
+                        <i class="fa fa-user"></i>
+                    </div>
 
-                <option value="PaymentApproved"
-                        selected="@(Model.Status == BasketStatus.PaymentApproved ? "selected" : null)">
-                    پرداخت تأیید شد
-                </option>
+                    <div>
 
-                <option value="PaymentRejected"
-                        selected="@(Model.Status == BasketStatus.PaymentRejected ? "selected" : null)">
-                    پرداخت رد شد
-                </option>
+                        <h3>
+                            @Model.UserName
+                        </h3>
 
-                <option value="Shipped"
-                        selected="@(Model.Status == BasketStatus.Shipped ? "selected" : null)">
-                    ارسال شده
-                </option>
+                        <span>
+                            اطلاعات حساب
+                        </span>
 
-                <option value="Cancelled"
-                        selected="@(Model.Status == BasketStatus.Cancelled ? "selected" : null)">
-                    لغو شده
-                </option>
+                    </div>
 
-            </select>
+                </div>
 
 
-            <!-- مرتب سازی -->
-
-            <select name="sort">
-
-                <option value="paiddate"
-                        selected="@(Model.Sort == "paiddate" ? "selected" : null)">
-                    جدیدترین
-                </option>
-
-                <option value="oldest"
-                        selected="@(Model.Sort == "oldest" ? "selected" : null)">
-                    قدیمی‌ترین
-                </option>
-
-                <option value="status"
-                        selected="@(Model.Sort == "status" ? "selected" : null)">
-                    وضعیت
-                </option>
-
-            </select>
+                <div class="user-card-divider"></div>
 
 
-            <button type="submit">
-                اعمال فیلتر
-            </button>
+                <div class="user-detail">
 
-        </form>
+                    <span class="user-detail-label">
+                        نام کاربری
+                    </span>
+
+                    <strong>
+                        @Model.UserName
+                    </strong>
+
+                </div>
 
 
-        @if (!Model.Orders.Any())
-        {
-            <div class="products-empty">
-                سفارشی وجود ندارد
+                <div class="user-detail">
+
+                    <span class="user-detail-label">
+                        شماره موبایل
+                    </span>
+
+                    <strong dir="ltr">
+                        @(string.IsNullOrWhiteSpace(Model.MobileNumber)
+                            ? "ثبت نشده"
+                            : Model.MobileNumber)
+                    </strong>
+
+                </div>
+
+
+                <div class="user-detail user-detail-address">
+
+                    <span class="user-detail-label">
+                        آدرس
+                    </span>
+
+                    <strong>
+                        @(string.IsNullOrWhiteSpace(Model.Address)
+                            ? "ثبت نشده"
+                            : Model.Address)
+                    </strong>
+
+                </div>
+
             </div>
-        }
-        else
-        {
-            foreach (var order in Model.Orders)
+
+        </aside>
+
+
+        <!-- =================================================
+             Orders
+             ================================================= -->
+
+        <section class="user-orders">
+
+            <!-- =============================================
+                 Section Header
+                 ============================================= -->
+
+            <div class="orders-section-header">
+
+                <div>
+
+                    <h2>
+                        سفارش‌های من
+                    </h2>
+
+                    <p>
+                        مشاهده وضعیت و جزئیات سفارش‌ها
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 Search / Filter
+                 ============================================= -->
+
+            <div class="orders-filter-card">
+
+                <div class="filter-header">
+
+                    <h3>
+                        جستجو و فیلتر سفارش‌ها
+                    </h3>
+
+                </div>
+
+
+                <form method="get"
+                      class="orders-filter-form">
+
+                    <div class="filter-field filter-search">
+
+                        <label for="orderSearch">
+                            جستجو
+                        </label>
+
+                        <input id="orderSearch"
+                               type="text"
+                               name="search"
+                               value="@Model.Search"
+                               placeholder="شماره سفارش، محصول، آدرس..." />
+
+                    </div>
+
+
+                    <div class="filter-field">
+
+                        <label for="orderStatus">
+                            وضعیت
+                        </label>
+
+                        <select id="orderStatus"
+                                name="status">
+
+                            <option value=""
+                                    selected="@(Model.Status == null
+                                        ? "selected"
+                                        : null)">
+                                همه سفارش‌ها
+                            </option>
+
+                            <option value="PendingPayment"
+                                    selected="@(Model.Status ==
+                                        BasketStatus.PendingPayment
+                                            ? "selected"
+                                            : null)">
+                                در انتظار پرداخت
+                            </option>
+
+                            <option value="AwaitingPaymentVerification"
+                                    selected="@(Model.Status ==
+                                        BasketStatus.AwaitingPaymentVerification
+                                            ? "selected"
+                                            : null)">
+                                در انتظار بررسی پرداخت
+                            </option>
+
+                            <option value="PaymentApproved"
+                                    selected="@(Model.Status ==
+                                        BasketStatus.PaymentApproved
+                                            ? "selected"
+                                            : null)">
+                                پرداخت تأیید شد
+                            </option>
+
+                            <option value="PaymentRejected"
+                                    selected="@(Model.Status ==
+                                        BasketStatus.PaymentRejected
+                                            ? "selected"
+                                            : null)">
+                                پرداخت رد شد
+                            </option>
+
+                            <option value="Shipped"
+                                    selected="@(Model.Status ==
+                                        BasketStatus.Shipped
+                                            ? "selected"
+                                            : null)">
+                                ارسال شده
+                            </option>
+
+                            <option value="Cancelled"
+                                    selected="@(Model.Status ==
+                                        BasketStatus.Cancelled
+                                            ? "selected"
+                                            : null)">
+                                لغو شده
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="filter-field">
+
+                        <label for="orderSort">
+                            مرتب‌سازی
+                        </label>
+
+                        <select id="orderSort"
+                                name="sort">
+
+                            <option value="paiddate"
+                                    selected="@(Model.Sort == "paiddate"
+                                        ? "selected"
+                                        : null)">
+                                جدیدترین
+                            </option>
+
+                            <option value="oldest"
+                                    selected="@(Model.Sort == "oldest"
+                                        ? "selected"
+                                        : null)">
+                                قدیمی‌ترین
+                            </option>
+
+                            <option value="status"
+                                    selected="@(Model.Sort == "status"
+                                        ? "selected"
+                                        : null)">
+                                بر اساس وضعیت
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="filter-action">
+
+                        <button type="submit">
+                            <i class="fa fa-search"></i>
+                            اعمال فیلتر
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- =============================================
+                 Empty State
+                 ============================================= -->
+            @if (Model.Orders == null ||
+            !Model.Orders.Any())
             {
-                <div class="order-card">
+                <div class="profile-empty-state">
 
-                    <div class="order-header">
-
-                        <span>
-                            شماره سفارش:
-                            @order.BasketId
-                        </span>
-
-
-                        @switch (order.Status)
-                        {
-                            case BasketStatus.PendingPayment:
-
-                                <span class="order-status pending">
-                                    در انتظار پرداخت
-                                </span>
-
-                                break;
-
-
-                            case BasketStatus.AwaitingPaymentVerification:
-
-                                <span class="order-status pending">
-                                    در انتظار بررسی پرداخت
-                                </span>
-
-                                break;
-
-
-                            case BasketStatus.PaymentApproved:
-
-                                <span class="order-status paid">
-                                    پرداخت تأیید شد
-                                </span>
-
-                                break;
-
-
-                            case BasketStatus.PaymentRejected:
-
-                                <span class="order-status cancelled">
-                                    پرداخت رد شد
-                                </span>
-
-                                break;
-
-
-                            case BasketStatus.Shipped:
-
-                                <span class="order-status shipped">
-                                    ارسال شده
-                                </span>
-
-                                break;
-
-
-                            case BasketStatus.Cancelled:
-
-                                <span class="order-status cancelled">
-                                    لغو شده
-                                </span>
-
-                                break;
-
-
-                            default:
-
-                                <span class="order-status">
-                                    نامشخص
-                                </span>
-
-                                break;
-                        }
-
+                    <div class="empty-icon">
+                        <i class="fa fa-shopping-bag"></i>
                     </div>
 
+                    <h3>
+                        سفارشی پیدا نشد
+                    </h3>
 
-                    <!-- اطلاعات سفارش -->
+                    <p>
+                        هنوز سفارشی با این مشخصات ثبت نشده است.
+                    </p>
 
-                    <div class="order-meta">
+                </div>
+            }
+            else
+            {
 
-                        <span>
-                            @(order.PaidDate.HasValue
-                                ? order.PaidDate.Value.ToString("HH:mm - yyyy/MM/dd")
-                                : "-")
-                        </span>
+                <!-- =========================================
+                     Orders
+                     ========================================= -->
 
-                        <br />
+                <div class="orders-list">
 
-                        <span>
-                            @order.MobileNumber
-                        </span>
+                    @foreach (var order in Model.Orders)
+                    {
 
-                        <br />
+                        <article class="order-card">
 
-                        <span>
-                            @order.Address
-                        </span>
+                            <!-- =================================
+                                 Order Header
+                                 ================================= -->
 
-                    </div>
+                            <div class="order-header">
+
+                                <div class="order-number">
+
+                                    <span>
+                                        شماره سفارش
+                                    </span>
+
+                                    <strong>
+                                        #@order.BasketId
+                                    </strong>
+
+                                </div>
 
 
-                    <!-- محصولات -->
+                                @switch (order.Status)
+                                {
+                                    case BasketStatus.PendingPayment:
 
-                    <div class="order-items">
+                                        <span class="order-status pending">
+                                            <i class="fa fa-clock-o"></i>
+                                            در انتظار پرداخت
+                                        </span>
 
-                        @if (order.BasketItems.Any())
-                        {
-                            decimal orderTotal = 0;
+                                        break;
 
-                            foreach (var item in order.BasketItems)
+
+                                    case BasketStatus.AwaitingPaymentVerification:
+
+                                        <span class="order-status pending">
+                                            <i class="fa fa-hourglass-half"></i>
+                                            در انتظار بررسی پرداخت
+                                        </span>
+
+                                        break;
+
+
+                                    case BasketStatus.PaymentApproved:
+
+                                        <span class="order-status paid">
+                                            <i class="fa fa-check"></i>
+                                            پرداخت تأیید شد
+                                        </span>
+
+                                        break;
+
+
+                                    case BasketStatus.PaymentRejected:
+
+                                        <span class="order-status rejected">
+                                            <i class="fa fa-times"></i>
+                                            پرداخت رد شد
+                                        </span>
+
+                                        break;
+
+
+                                    case BasketStatus.Shipped:
+
+                                        <span class="order-status shipped">
+                                            <i class="fa fa-truck"></i>
+                                            ارسال شده
+                                        </span>
+
+                                        break;
+
+
+                                    case BasketStatus.Cancelled:
+
+                                        <span class="order-status cancelled">
+                                            <i class="fa fa-ban"></i>
+                                            لغو شده
+                                        </span>
+
+                                        break;
+
+
+                                    default:
+
+                                        <span class="order-status">
+                                            نامشخص
+                                        </span>
+
+                                        break;
+                                }
+
+                            </div>
+
+
+                            <!-- =================================
+                                 Order Meta
+                                 ================================= -->
+
+                            <div class="order-meta">
+
+                                <div class="order-meta-item">
+
+                                    <span>
+                                        <i class="fa fa-calendar"></i>
+                                        تاریخ ثبت سفارش
+                                    </span>
+
+                                    <strong>
+                                        @order.Created.ToString(
+                                                 "yyyy/MM/dd HH:mm")
+                                    </strong>
+
+                                </div>
+
+
+                                @if (order.PaidDate.HasValue)
+                                {
+                                    <div class="order-meta-item">
+
+                                        <span>
+                                            <i class="fa fa-check-circle"></i>
+                                            تاریخ تأیید پرداخت
+                                        </span>
+
+                                        <strong>
+                                            @order.PaidDate.Value.ToString(
+                                                     "yyyy/MM/dd HH:mm")
+                                        </strong>
+
+                                    </div>
+                                }
+
+
+                                @if (order.ReceiptUploadedAt.HasValue)
+                                {
+                                    <div class="order-meta-item">
+
+                                        <span>
+                                            <i class="fa fa-file-image-o"></i>
+                                            آخرین ارسال رسید
+                                        </span>
+
+                                        <strong>
+                                            @order.ReceiptUploadedAt.Value.ToString(
+                                                     "yyyy/MM/dd HH:mm")
+                                        </strong>
+
+                                    </div>
+                                }
+
+
+                                <div class="order-meta-item">
+
+                                    <span>
+                                        <i class="fa fa-mobile"></i>
+                                        شماره تماس
+                                    </span>
+
+                                    <strong dir="ltr">
+                                        @order.MobileNumber
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="order-meta-item order-address">
+
+                                    <span>
+                                        <i class="fa fa-map-marker"></i>
+                                        آدرس
+                                    </span>
+
+                                    <strong>
+                                        @order.Address
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 Rejected Payment
+                                 ================================= -->
+                            @if (order.Status ==
+                           BasketStatus.PaymentRejected)
                             {
-                                var itemTotal = item.Qty * item.UnitPrice;
+                                <div class="rejected-payment-box">
 
-                                orderTotal += itemTotal;
+                                    <div class="rejection-header">
 
-                                <div class="order-item">
+                                        <div class="rejection-icon">
+                                            <i class="fa fa-exclamation"></i>
+                                        </div>
 
-                                    <span class="product-name">
-                                        @item.Product?.ProductName
-                                    </span>
+                                        <div>
 
-                                    <span class="price">
-                                        قیمت واحد:
-                                        @item.UnitPrice.ToString("N0")
-                                        تومان
-                                    </span>
+                                            <h3>
+                                                پرداخت این سفارش رد شده است
+                                            </h3>
 
-                                    <span class="qty">
-                                        @item.Qty عدد
-                                    </span>
+                                            <p>
+                                                لطفاً دلیل رد را بررسی کرده و
+                                                رسید صحیح را دوباره ارسال کنید.
+                                            </p>
 
-                                    <span class="price">
-                                        جمع:
-                                        @itemTotal.ToString("N0")
-                                        تومان
-                                    </span>
+                                        </div>
+
+                                    </div>
+
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                   order.PaymentRejectionReason))
+                                    {
+                                        <div class="rejection-reason">
+
+                                            <span>
+                                                دلیل رد پرداخت
+                                            </span>
+
+                                            <p>
+                                                @order.PaymentRejectionReason
+                                            </p>
+
+                                        </div>
+                                    }
+
+
+                                    <div class="resubmit-receipt">
+
+                                        <div class="resubmit-header">
+
+                                            <h4>
+                                                ارسال مجدد رسید
+                                            </h4>
+
+                                            <p>
+                                                تصویر جدید رسید پرداخت را انتخاب کنید.
+                                            </p>
+
+                                        </div>
+
+
+                                        <form asp-controller="Profile"
+                                              asp-action="ResubmitReceipt"
+                                              method="post"
+                                              enctype="multipart/form-data"
+                                              class="resubmit-form">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="BasketId"
+                                                   value="@order.BasketId" />
+
+
+                                            <div class="receipt-upload-group">
+
+                                                <label class="receipt-file-label"
+                                                       for="receipt-@order.BasketId">
+
+                                                    <span class="receipt-file-icon">
+                                                        <i class="fa fa-upload"></i>
+                                                    </span>
+
+                                                    <span class="receipt-file-text">
+
+                                                        <strong>
+                                                            انتخاب رسید جدید
+                                                        </strong>
+
+                                                        <small>
+                                                            JPG، JPEG، PNG یا WEBP
+                                                            — حداکثر ۵ مگابایت
+                                                        </small>
+
+                                                    </span>
+
+                                                </label>
+
+
+                                                <input id="receipt-@order.BasketId"
+                                                       type="file"
+                                                       name="Receipt"
+                                                       accept=".jpg,.jpeg,.png,.webp"
+                                                       required />
+
+                                            </div>
+
+
+                                            <button type="submit"
+                                                    class="resubmit-btn">
+
+                                                <i class="fa fa-refresh"></i>
+
+                                                ارسال مجدد رسید
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
 
                                 </div>
                             }
 
 
-                            <!-- جمع کل -->
+                            <!-- =================================
+                                 Order Items
+                                 ================================= -->
 
                             <div class="order-items">
 
-                                <span class="total-price">
-                                    جمع کل
-                                </span>
+                                <div class="order-items-header">
 
-                                <span class="total-price">
-                                    @orderTotal.ToString("N0")
-                                    تومان
-                                </span>
+                                    <h3>
+                                        محصولات سفارش
+                                    </h3>
+
+                                </div>
+
+
+                                @if (order.BasketItems != null &&
+                               order.BasketItems.Any())
+                                {
+                                    decimal orderTotal = 0;
+
+
+                                    foreach (var item in order.BasketItems)
+                                    {
+                                        var itemTotal =
+                                        item.Qty * item.UnitPrice;
+
+                                        orderTotal += itemTotal;
+
+
+                                        <div class="order-item">
+
+                                            <div class="order-product-name">
+
+                                                <span class="item-label">
+                                                    محصول
+                                                </span>
+
+                                                <strong>
+                                                    @(item.Product?.ProductName
+                                                        ?? "محصول حذف شده")
+                                                </strong>
+
+                                            </div>
+
+
+                                            <div class="order-item-detail">
+
+                                                <span>
+                                                    قیمت واحد
+                                                </span>
+
+                                                <strong>
+                                                    @item.UnitPrice.ToString("N0")
+                                                    تومان
+                                                </strong>
+
+                                            </div>
+
+
+                                            <div class="order-item-detail">
+
+                                                <span>
+                                                    تعداد
+                                                </span>
+
+                                                <strong>
+                                                    @item.Qty
+                                                    عدد
+                                                </strong>
+
+                                            </div>
+
+
+                                            <div class="order-item-detail item-total">
+
+                                                <span>
+                                                    جمع
+                                                </span>
+
+                                                <strong>
+                                                    @itemTotal.ToString("N0")
+                                                    تومان
+                                                </strong>
+
+                                            </div>
+
+                                        </div>
+                                    }
+
+
+                                    <div class="order-total">
+
+                                        <span>
+                                            جمع کل سفارش
+                                        </span>
+
+                                        <strong>
+                                            @orderTotal.ToString("N0")
+                                            تومان
+                                        </strong>
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="order-no-items">
+                                        محصولی برای این سفارش ثبت نشده است.
+                                    </div>
+                                }
 
                             </div>
-                        }
 
-                    </div>
+                        </article>
+
+                    }
 
                 </div>
             }
-        }
 
-    </section>
+        </section>
+
+    </div>
 
 </div>

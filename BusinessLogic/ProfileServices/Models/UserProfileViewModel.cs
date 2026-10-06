@@ -7,16 +7,31 @@ namespace BusinessLogic.ProfileServices.Models
     {
         public int UserId { get; set; }
 
-        public string UserName { get; set; } ="کاربر";
+        public string UserName { get; set; }
+            = "کاربر";
 
         public string? MobileNumber { get; set; }
+
         public string? Address { get; set; }
 
-        public List<Basket> Orders { get; set; } = new();
 
-        // Filtering & Searching
+        // =========================================================
+        // Orders
+        // =========================================================
+
+        public List<Basket> Orders { get; set; }
+            = new();
+
+
+        // =========================================================
+        // Filtering / Searching
+        // =========================================================
+
         public string? Search { get; set; }
+
         public BasketStatus? Status { get; set; }
-        public string Sort { get; set; } = "paiddate";
+
+        public string Sort { get; set; }
+            = "paiddate";
     }
 }

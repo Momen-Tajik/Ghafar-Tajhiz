@@ -31,8 +31,12 @@ namespace BusinessLogic.BasketServices
             int qty,
             int userId)
         {
-            if (qty <= 0)
+            if (productId <= 0 ||
+                qty <= 0 ||
+                userId <= 0)
+            {
                 return false;
+            }
 
             var product = await _context.Products
                 .FirstOrDefaultAsync(p =>
@@ -41,7 +45,6 @@ namespace BusinessLogic.BasketServices
 
             if (product == null)
                 return false;
-
 
             var basket = await _context.Baskets
                 .Include(b => b.BasketItems)
@@ -61,18 +64,18 @@ namespace BusinessLogic.BasketServices
                 _context.Baskets.Add(basket);
             }
 
-
             var basketItem = basket.BasketItems
                 .FirstOrDefault(i =>
                     i.ProductId == productId);
 
-            var newQuantity =
-                (basketItem?.Qty ?? 0) + qty;
+            var currentQuantity =
+                basketItem?.Qty ?? 0;
 
+            var newQuantity =
+                currentQuantity + qty;
 
             if (newQuantity > product.StockQuantity)
                 return false;
-
 
             if (basketItem == null)
             {
@@ -90,10 +93,9 @@ namespace BusinessLogic.BasketServices
             {
                 basketItem.Qty = newQuantity;
 
-                // قیمت واحد
+                // UnitPrice باید قیمت هر واحد باشد.
                 basketItem.UnitPrice = product.Price;
             }
-
 
             await _context.SaveChangesAsync();
 
@@ -105,43 +107,66 @@ namespace BusinessLogic.BasketServices
         // Get Current Basket
         // =========================================================
 
-        public async Task<List<BasketItem>> GetUserBasket(int userId)
+        public async Task<List<BasketItem>> GetUserBasket(
+            int userId)
         {
             return await _context.BasketItems
                 .AsNoTracking()
                 .Where(i =>
                     i.Basket.UserId == userId &&
-                    i.Basket.Status == BasketStatus.PendingPayment)
+                    i.Basket.Status ==
+                        BasketStatus.PendingPayment)
                 .Include(i => i.Product)
                 .ToListAsync();
         }
 
 
         // =========================================================
-        // Submit Payment / Upload Receipt
+        // Submit Payment + Receipt
         // =========================================================
-        // فعلاً این متد اطلاعات سفارش را ذخیره می‌کند
-        // و وضعیت را به AwaitingPaymentVerification می‌برد.
         //
-        // ذخیره فایل رسید باید در بخش Upload Receipt انجام شود.
+        // PendingPayment
+        //        +
+        // address/mobile/receipt
+        //        ↓
+        // AwaitingPaymentVerification
+        //
+        // همچنین PaymentRejected اجازه ارسال مجدد رسید دارد.
         // =========================================================
+
         public async Task<bool> Pay(
             string mobile,
             string address,
             IFormFile receipt,
             int userId)
         {
-            if (receipt == null || receipt.Length == 0)
+            if (userId <= 0)
                 return false;
 
+            if (string.IsNullOrWhiteSpace(mobile) ||
+                string.IsNullOrWhiteSpace(address))
+            {
+                return false;
+            }
+
+            if (receipt == null ||
+                receipt.Length == 0)
+            {
+                return false;
+            }
 
             var basket = await _context.Baskets
                 .Include(b => b.BasketItems)
                 .ThenInclude(i => i.Product)
                 .FirstOrDefaultAsync(b =>
                     b.UserId == userId &&
-                    b.Status == BasketStatus.PendingPayment);
+                    (
+                        b.Status ==
+                            BasketStatus.PendingPayment ||
 
+                        b.Status ==
+                            BasketStatus.PaymentRejected
+                    ));
 
             if (basket == null ||
                 basket.BasketItems.Count == 0)
@@ -150,11 +175,15 @@ namespace BusinessLogic.BasketServices
             }
 
 
-            // بررسی موجودی
+            // =====================================================
+            // Check Stock
+            // =====================================================
+
             foreach (var item in basket.BasketItems)
             {
                 if (item.Product == null ||
                     !item.Product.IsAvailable ||
+                    item.Qty <= 0 ||
                     item.Qty > item.Product.StockQuantity)
                 {
                     return false;
@@ -162,14 +191,27 @@ namespace BusinessLogic.BasketServices
             }
 
 
-            // آپلود رسید
+            // =====================================================
+            // Upload Receipt
+            // =====================================================
+
             var receiptFileName =
-                await _fileUploadService.UploadReceiptAsync(receipt);
+                await _fileUploadService
+                    .UploadReceiptAsync(receipt);
+
+            if (string.IsNullOrWhiteSpace(receiptFileName))
+                return false;
 
 
-            basket.Address = address;
+            // =====================================================
+            // Update Order
+            // =====================================================
 
-            basket.MobileNumber = mobile;
+            basket.Address =
+                address.Trim();
+
+            basket.MobileNumber =
+                mobile.Trim();
 
             basket.ReceiptImage =
                 receiptFileName;
@@ -177,10 +219,13 @@ namespace BusinessLogic.BasketServices
             basket.ReceiptUploadedAt =
                 DateTime.Now;
 
+            // هنوز پرداخت توسط Admin تأیید نشده.
             basket.PaymentVerifiedAt = null;
 
+            // اگر قبلاً رد شده بود، دلیل رد قبلی پاک می‌شود.
             basket.PaymentRejectionReason = null;
 
+            // PaidDate فقط بعد از تأیید پرداخت تنظیم می‌شود.
             basket.PaidDate = null;
 
             basket.Status =
@@ -188,7 +233,6 @@ namespace BusinessLogic.BasketServices
 
 
             await _context.SaveChangesAsync();
-
 
             return true;
         }
@@ -206,14 +250,17 @@ namespace BusinessLogic.BasketServices
         {
             var query = _context.Baskets
                 .AsNoTracking()
-                .Where(b => b.UserId == userId)
+                .Where(b =>
+                    b.UserId == userId)
                 .Include(b => b.BasketItems)
                 .ThenInclude(i => i.Product)
                 .AsQueryable();
 
 
-            // وقتی فیلتر وضعیت انتخاب نشده
-            // سبد موقت را نمایش نده
+            // =====================================================
+            // Status Filter
+            // =====================================================
+
             if (status.HasValue)
             {
                 query = query.Where(b =>
@@ -221,16 +268,21 @@ namespace BusinessLogic.BasketServices
             }
             else
             {
+                // سبد موقت کاربر در لیست سفارش‌ها نمایش داده نشود.
                 query = query.Where(b =>
-                    b.Status != BasketStatus.PendingPayment);
+                    b.Status !=
+                        BasketStatus.PendingPayment);
             }
 
 
+            // =====================================================
             // Search
+            // =====================================================
+
             if (!string.IsNullOrWhiteSpace(search))
             {
-                var trimmedSearch = search.Trim();
-
+                var trimmedSearch =
+                    search.Trim();
 
                 if (int.TryParse(
                     trimmedSearch,
@@ -239,32 +291,49 @@ namespace BusinessLogic.BasketServices
                     query = query.Where(b =>
                         b.BasketId == basketId ||
 
-                        (b.MobileNumber != null &&
-                         b.MobileNumber.Contains(trimmedSearch)) ||
+                        (
+                            b.MobileNumber != null &&
+                            b.MobileNumber.Contains(
+                                trimmedSearch)
+                        ) ||
 
-                        (b.Address != null &&
-                         b.Address.Contains(trimmedSearch)) ||
+                        (
+                            b.Address != null &&
+                            b.Address.Contains(
+                                trimmedSearch)
+                        ) ||
 
                         b.BasketItems.Any(i =>
                             i.Product.ProductName
-                                .Contains(trimmedSearch)));
+                                .Contains(trimmedSearch))
+                    );
                 }
                 else
                 {
                     query = query.Where(b =>
+                        (
+                            b.MobileNumber != null &&
+                            b.MobileNumber.Contains(
+                                trimmedSearch)
+                        ) ||
 
-                        (b.MobileNumber != null &&
-                         b.MobileNumber.Contains(trimmedSearch)) ||
-
-                        (b.Address != null &&
-                         b.Address.Contains(trimmedSearch)) ||
+                        (
+                            b.Address != null &&
+                            b.Address.Contains(
+                                trimmedSearch)
+                        ) ||
 
                         b.BasketItems.Any(i =>
                             i.Product.ProductName
-                                .Contains(trimmedSearch)));
+                                .Contains(trimmedSearch))
+                    );
                 }
             }
 
+
+            // =====================================================
+            // Sort
+            // =====================================================
 
             query = sort.Trim()
                 .ToLowerInvariant() switch
@@ -293,75 +362,176 @@ namespace BusinessLogic.BasketServices
 
         public async Task<List<AdminOrderDto>> GetAdminBskets(
             string? search,
+            BasketStatus? status,
             string sort = "paiddate")
         {
             var query = _context.Baskets
                 .AsNoTracking()
-                .Where(b =>
-                    b.Status != BasketStatus.PendingPayment)
-                .Select(b => new AdminOrderDto
-                {
-                    AdminOrderId = b.BasketId,
-
-                    PaidDate = b.PaidDate,
-
-                    UserId = b.UserId,
-
-                    Address = b.Address ?? string.Empty,
-
-                    MobileNumber = b.MobileNumber ?? string.Empty,
-
-                    Status = b.Status,
-
-                    UserName = b.User!.FullName ?? string.Empty,
-
-                    Items = b.BasketItems
-                .Select(i => i.Product.ProductName)
-                .ToList(),
-
-                    ReceiptImage = b.ReceiptImage,
-
-                    ReceiptUploadedAt = b.ReceiptUploadedAt,
-
-                    PaymentVerifiedAt = b.PaymentVerifiedAt,
-
-                    PaymentRejectionReason = b.PaymentRejectionReason
-                });
+                .AsQueryable();
 
 
+            // =====================================================
+            // Status Filter
+            // =====================================================
+
+            if (status.HasValue)
+            {
+                query = query.Where(b =>
+                    b.Status == status.Value);
+            }
+            else
+            {
+                // سبدهای موقت در لیست Admin نمایش داده نشوند.
+                query = query.Where(b =>
+                    b.Status !=
+                        BasketStatus.PendingPayment);
+            }
+
+
+            // =====================================================
             // Search
+            // =====================================================
+
             if (!string.IsNullOrWhiteSpace(search))
             {
                 var trimmedSearch =
                     search.Trim();
 
-                query = query.Where(o =>
-                    o.UserName.Contains(trimmedSearch) ||
-                    o.MobileNumber.Contains(trimmedSearch) ||
-                    o.Address.Contains(trimmedSearch) ||
-                    o.Items.Any(p =>
-                        p.Contains(trimmedSearch)));
+                if (int.TryParse(
+                    trimmedSearch,
+                    out var basketId))
+                {
+                    query = query.Where(b =>
+                        b.BasketId == basketId ||
+
+                        (
+                            b.MobileNumber != null &&
+                            b.MobileNumber.Contains(
+                                trimmedSearch)
+                        ) ||
+
+                        (
+                            b.Address != null &&
+                            b.Address.Contains(
+                                trimmedSearch)
+                        ) ||
+
+                        (
+                            b.User != null &&
+                            b.User.FullName.Contains(
+                                trimmedSearch)
+                        ) ||
+
+                        b.BasketItems.Any(i =>
+                            i.Product.ProductName
+                                .Contains(trimmedSearch))
+                    );
+                }
+                else
+                {
+                    query = query.Where(b =>
+                        (
+                            b.MobileNumber != null &&
+                            b.MobileNumber.Contains(
+                                trimmedSearch)
+                        ) ||
+
+                        (
+                            b.Address != null &&
+                            b.Address.Contains(
+                                trimmedSearch)
+                        ) ||
+
+                        (
+                            b.User != null &&
+                            b.User.FullName.Contains(
+                                trimmedSearch)
+                        ) ||
+
+                        b.BasketItems.Any(i =>
+                            i.Product.ProductName
+                                .Contains(trimmedSearch))
+                    );
+                }
             }
 
 
-            query = sort.Trim()
-                .ToLowerInvariant() switch
-            {
-                "status" =>
-                    query.OrderByDescending(
-                        o => o.Status),
+            // =====================================================
+            // Projection
+            // =====================================================
 
-                "oldest" =>
-                    query.OrderBy(
-                        o => o.PaidDate),
+            var resultQuery =
+                query.Select(b => new AdminOrderDto
+                {
+                    AdminOrderId =
+                        b.BasketId,
 
-                _ =>
-                    query.OrderByDescending(
-                        o => o.PaidDate)
-            };
+                    PaidDate =
+                        b.PaidDate,
+
+                    UserId =
+                        b.UserId,
+
+                    Address =
+                        b.Address ?? string.Empty,
+
+                    MobileNumber =
+                        b.MobileNumber ?? string.Empty,
+
+                    Status =
+                        b.Status,
+
+                    UserName =
+                        b.User != null
+                            ? b.User.FullName
+                            : string.Empty,
+
+                    Items =
+                        b.BasketItems
+                            .Select(i =>
+                                i.Product.ProductName)
+                            .ToList(),
+
+                    ReceiptImage =
+                        b.ReceiptImage,
+
+                    ReceiptUploadedAt =
+                        b.ReceiptUploadedAt,
+
+                    PaymentVerifiedAt =
+                        b.PaymentVerifiedAt,
+
+                    PaymentRejectionReason =
+                        b.PaymentRejectionReason
+                });
 
 
-            return await query.ToListAsync();
+            // =====================================================
+            // Sort
+            // =====================================================
+
+            resultQuery =
+                sort.Trim()
+                    .ToLowerInvariant() switch
+                {
+                    "status" =>
+                        resultQuery
+                            .OrderByDescending(
+                                x => x.Status),
+
+                    "oldest" =>
+                        resultQuery
+                            .OrderBy(
+                                x => x.PaidDate),
+
+                    _ =>
+                        resultQuery
+                            .OrderByDescending(
+                                x => x.PaidDate)
+                };
+
+
+            return await resultQuery.ToListAsync();
         }
 
 
@@ -376,7 +546,8 @@ namespace BusinessLogic.BasketServices
                 .AsNoTracking()
                 .Where(b =>
                     b.UserId == userId &&
-                    b.Status != BasketStatus.PendingPayment)
+                    b.Status !=
+                        BasketStatus.PendingPayment)
                 .OrderByDescending(
                     b => b.Created)
                 .FirstOrDefaultAsync();
@@ -400,12 +571,18 @@ namespace BusinessLogic.BasketServices
 
 
         // =========================================================
-        // Approve / Reject Payment
+        // Approve Payment
+        // =========================================================
+        //
+        // AwaitingPaymentVerification
+        //              ↓
+        //       PaymentApproved
+        //
+        // موجودی فقط اینجا کم می‌شود.
         // =========================================================
 
-        public async Task<bool> SetState(
-            int basketId,
-            bool approved)
+        public async Task<bool> ApprovePayment(
+            int basketId)
         {
             var basket = await _context.Baskets
                 .Include(b => b.BasketItems)
@@ -413,13 +590,10 @@ namespace BusinessLogic.BasketServices
                 .FirstOrDefaultAsync(b =>
                     b.BasketId == basketId);
 
-
             if (basket == null)
                 return false;
 
 
-            // فقط سفارش‌هایی که منتظر بررسی هستند
-            // قابل تأیید یا رد هستند.
             if (basket.Status !=
                 BasketStatus.AwaitingPaymentVerification)
             {
@@ -427,29 +601,27 @@ namespace BusinessLogic.BasketServices
             }
 
 
-            // =====================================================
-            // Reject Payment
-            // =====================================================
-
-            if (!approved)
+            // سفارش منتظر بررسی باید رسید داشته باشد.
+            if (string.IsNullOrWhiteSpace(
+                basket.ReceiptImage))
             {
-                basket.Status =
-                    BasketStatus.PaymentRejected;
-
-                await _context.SaveChangesAsync();
-
-                return true;
+                return false;
             }
 
 
+            if (basket.BasketItems.Count == 0)
+                return false;
+
+
             // =====================================================
-            // Approve Payment
+            // Check Stock
             // =====================================================
 
             foreach (var item in basket.BasketItems)
             {
                 if (item.Product == null ||
                     !item.Product.IsAvailable ||
+                    item.Qty <= 0 ||
                     item.Qty > item.Product.StockQuantity)
                 {
                     return false;
@@ -457,10 +629,14 @@ namespace BusinessLogic.BasketServices
             }
 
 
-            // کم کردن موجودی فقط بعد از تأیید پرداخت
+            // =====================================================
+            // Decrease Stock
+            // =====================================================
+
             foreach (var item in basket.BasketItems)
             {
-                item.Product.StockQuantity -= item.Qty;
+                item.Product.StockQuantity -=
+                    item.Qty;
 
                 if (item.Product.StockQuantity == 0)
                 {
@@ -469,11 +645,72 @@ namespace BusinessLogic.BasketServices
             }
 
 
+            // =====================================================
+            // Update Payment Status
+            // =====================================================
+
             basket.Status =
                 BasketStatus.PaymentApproved;
 
             basket.PaidDate =
                 DateTime.Now;
+
+            basket.PaymentVerifiedAt =
+                DateTime.Now;
+
+            basket.PaymentRejectionReason =
+                null;
+
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+
+        // =========================================================
+        // Reject Payment
+        // =========================================================
+        //
+        // AwaitingPaymentVerification
+        //              ↓
+        //       PaymentRejected
+        // =========================================================
+
+        public async Task<bool> RejectPayment(
+            int basketId,
+            string reason)
+        {
+            if (string.IsNullOrWhiteSpace(reason))
+                return false;
+
+            var basket =
+                await _context.Baskets
+                    .FirstOrDefaultAsync(b =>
+                        b.BasketId == basketId);
+
+            if (basket == null)
+                return false;
+
+
+            if (basket.Status !=
+                BasketStatus.AwaitingPaymentVerification)
+            {
+                return false;
+            }
+
+
+            basket.Status =
+                BasketStatus.PaymentRejected;
+
+            basket.PaymentRejectionReason =
+                reason.Trim();
+
+            basket.PaymentVerifiedAt =
+                DateTime.Now;
+
+            // پرداخت تأیید نشده است.
+            basket.PaidDate = null;
 
 
             await _context.SaveChangesAsync();
@@ -485,20 +722,24 @@ namespace BusinessLogic.BasketServices
         // =========================================================
         // Ship Order
         // =========================================================
+        //
+        // PaymentApproved
+        //       ↓
+        //    Shipped
+        // =========================================================
 
         public async Task<bool> ShipOrder(
             int basketId)
         {
-            var basket = await _context.Baskets
-                .FirstOrDefaultAsync(b =>
-                    b.BasketId == basketId);
-
+            var basket =
+                await _context.Baskets
+                    .FirstOrDefaultAsync(b =>
+                        b.BasketId == basketId);
 
             if (basket == null)
                 return false;
 
 
-            // فقط سفارش تأیید شده قابل ارسال است
             if (basket.Status !=
                 BasketStatus.PaymentApproved)
             {
@@ -519,21 +760,30 @@ namespace BusinessLogic.BasketServices
         // =========================================================
         // Cancel Order
         // =========================================================
+        //
+        // سفارشی که پرداخت آن تأیید شده یا ارسال شده،
+        // از این مسیر قابل لغو نیست؛ چون موجودی در Approval
+        // مصرف شده و Refund هم در سیستم فعلی وجود ندارد.
+        // =========================================================
 
         public async Task<bool> CancelOrder(
             int basketId)
         {
-            var basket = await _context.Baskets
-                .FirstOrDefaultAsync(b =>
-                    b.BasketId == basketId);
-
+            var basket =
+                await _context.Baskets
+                    .FirstOrDefaultAsync(b =>
+                        b.BasketId == basketId);
 
             if (basket == null)
                 return false;
 
 
-            if (basket.Status == BasketStatus.Shipped ||
-                basket.Status == BasketStatus.Cancelled)
+            if (basket.Status !=
+                    BasketStatus.PendingPayment &&
+                basket.Status !=
+                    BasketStatus.AwaitingPaymentVerification &&
+                basket.Status !=
+                    BasketStatus.PaymentRejected)
             {
                 return false;
             }
@@ -547,57 +797,132 @@ namespace BusinessLogic.BasketServices
 
             return true;
         }
-        
-        public async Task<AdminOrderDetailDto?> GetAdminOrderDetail(int basketId)
+
+
+        // =========================================================
+        // Get Admin Order Details
+        // =========================================================
+
+        public async Task<AdminOrderDetailDto?>
+            GetAdminOrderDetail(
+                int basketId)
         {
             return await _context.Baskets
                 .AsNoTracking()
-                .Where(b => b.BasketId == basketId)
-                .Select(b => new AdminOrderDetailDto
-                {
-                    BasketId = b.BasketId,
+                .Where(b =>
+                    b.BasketId == basketId)
+                .Select(b =>
+                    new AdminOrderDetailDto
+                    {
+                        BasketId =
+                            b.BasketId,
 
-                    UserId = b.UserId,
+                        UserId =
+                            b.UserId,
 
-                    UserName = b.User!.FullName ?? string.Empty,
+                        UserName =
+                            b.User != null
+                                ? b.User.FullName
+                                : string.Empty,
 
-                    MobileNumber = b.MobileNumber ?? string.Empty,
+                        MobileNumber =
+                            b.MobileNumber ??
+                            string.Empty,
 
-                    Address = b.Address ?? string.Empty,
+                        Address =
+                            b.Address ??
+                            string.Empty,
 
-                    Status = b.Status,
+                        Status =
+                            b.Status,
 
-                    Created = b.Created,
+                        Created =
+                            b.Created,
 
-                    PaidDate = b.PaidDate,
+                        PaidDate =
+                            b.PaidDate,
 
-                    ReceiptUploadedAt = b.ReceiptUploadedAt,
+                        ReceiptUploadedAt =
+                            b.ReceiptUploadedAt,
 
-                    PaymentVerifiedAt = b.PaymentVerifiedAt,
+                        PaymentVerifiedAt =
+                            b.PaymentVerifiedAt,
 
-                    ReceiptImage = b.ReceiptImage,
+                        ReceiptImage =
+                            b.ReceiptImage,
 
-                    PaymentRejectionReason =
-                        b.PaymentRejectionReason,
+                        PaymentRejectionReason =
+                            b.PaymentRejectionReason,
 
-                    Items = b.BasketItems
-                        .Select(i => new AdminOrderDetailItemDto
-                        {
-                            ProductId = i.ProductId,
+                        Items =
+                            b.BasketItems
+                                .Select(i =>
+                                    new AdminOrderDetailItemDto
+                                    {
+                                        ProductId =
+                                            i.ProductId,
 
-                            ProductName =
-                                i.Product.ProductName,
+                                        ProductName =
+                                            i.Product.ProductName,
 
-                            ImageUrl =
-                                i.Product.ImageUrl,
+                                        ImageUrl =
+                                            i.Product.ImageUrl,
 
-                            Qty = i.Qty,
+                                        Qty =
+                                            i.Qty,
 
-                            UnitPrice = i.UnitPrice
-                        })
-                        .ToList()
-                })
+                                        UnitPrice =
+                                            i.UnitPrice
+                                    })
+                                .ToList()
+                    })
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> ResubmitReceipt(
+    int basketId,
+    int userId,
+    IFormFile receipt)
+        {
+            if (basketId <= 0)
+                return false;
+
+            if (receipt == null || receipt.Length == 0)
+                return false;
+
+
+            var basket = await _context.Baskets
+                .FirstOrDefaultAsync(b =>
+                    b.BasketId == basketId &&
+                    b.UserId == userId &&
+                    b.Status == BasketStatus.PaymentRejected);
+
+
+            if (basket == null)
+                return false;
+
+
+            var receiptFileName =
+                await _fileUploadService.UploadReceiptAsync(receipt);
+
+
+            basket.ReceiptImage = receiptFileName;
+
+            basket.ReceiptUploadedAt = DateTime.Now;
+
+            basket.PaymentVerifiedAt = null;
+
+            basket.PaymentRejectionReason = null;
+
+            basket.PaidDate = null;
+
+            basket.Status =
+                BasketStatus.AwaitingPaymentVerification;
+
+
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }

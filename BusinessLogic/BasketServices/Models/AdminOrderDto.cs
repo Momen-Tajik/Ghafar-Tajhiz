@@ -10,16 +10,21 @@ namespace BusinessLogic.BasketServices.Models
 
         public int UserId { get; set; }
 
-        public string Address { get; set; } = string.Empty;
+        public string Address { get; set; }
+            = string.Empty;
 
-        public string MobileNumber { get; set; } = string.Empty;
+        public string MobileNumber { get; set; }
+            = string.Empty;
 
         public BasketStatus Status { get; set; }
 
-        public string UserName { get; set; } = string.Empty;
+        public string UserName { get; set; }
+            = string.Empty;
 
-        public List<string> Items { get; set; } = new();
+        public List<string> Items { get; set; }
+            = new();
 
+        // Payment
         public string? ReceiptImage { get; set; }
 
         public DateTime? ReceiptUploadedAt { get; set; }
