@@ -1,28 +1,154 @@
 ﻿@using DataAccess.Models
 @model Product
 
+<div class="modal-product">
 
+    <!-- =====================================================
+         Header
+         ===================================================== -->
 
+    <div class="modal-product-header">
 
+        <div class="modal-product-image-wrapper">
 
-        <!-- Header: تصویر کوچک + نام محصول -->
-        <div class="modal-header">
-            <img src="/api/FileUpload/GetFile?filename=@Model.ImageUrl"
-                 alt="@Model.ProductName"
-                 class="modal-product-img">
-            <h2 class="modal-product-title">@Model.ProductName</h2>
+            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+            {
+                <img src="/api/FileUpload/GetFile?filename=@Uri.EscapeDataString(Model.ImageUrl)"
+                     alt="@Model.ProductName"
+                     class="modal-product-img"
+                     loading="eager" />
+            }
+            else
+            {
+                <div class="modal-product-image-empty">
+                    <i class="fa fa-image"></i>
+                </div>
+            }
+
         </div>
 
-        <!-- توضیحات محصول -->
-        <div class="modal-body" id="modalBody">
-            <p>@Model.ProductDescription</p>
 
-            <div class="modal-meta">
-                <span class="price">قیمت: <strong>@Model.Price.ToString("N0") تومان</strong></span>
-                <span class="stock @(Model.StockQuantity > 0 ? "in-stock" : "out-stock")">
-                    @(Model.StockQuantity > 0 ? $"موجودی: {Model.StockQuantity}" : "ناموجود")
-                </span>
-            </div>
+        <div class="modal-product-heading">
+
+            <span>
+                محصول
+            </span>
+
+            <h2>
+                @Model.ProductName
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         Description
+         ===================================================== -->
+    @if (!string.IsNullOrWhiteSpace(Model.ProductDescription))
+    {
+        <div class="modal-product-description">
+
+            <h3>
+                توضیحات
+            </h3>
+
+            <p>
+                @Model.ProductDescription
+            </p>
+
+        </div>
+    }
+
+
+    <!-- =====================================================
+         Meta
+         ===================================================== -->
+
+    <div class="modal-product-meta">
+
+        <div class="modal-meta-item">
+
+            <span>
+                قیمت
+            </span>
+
+            <strong>
+                @Model.Price.ToString("N0")
+                تومان
+            </strong>
+
         </div>
 
 
+        <div class="modal-meta-item">
+
+            <span>
+                موجودی
+            </span>
+
+            @if (Model.StockQuantity > 0)
+            {
+                <strong class="modal-stock available">
+
+                    <i class="fa fa-check-circle"></i>
+
+                    موجودی:
+                    @Model.StockQuantity.ToString("N0")
+                    عدد
+
+                </strong>
+            }
+            else
+            {
+                <strong class="modal-stock unavailable">
+
+                    <i class="fa fa-times-circle"></i>
+
+                    ناموجود
+
+                </strong>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         Action
+         ===================================================== -->
+
+    <div class="modal-product-action">
+
+        @if (Model.StockQuantity > 0)
+        {
+            <a asp-controller="Product"
+               asp-action="Index"
+               asp-route-id="@Model.ProductId"
+               class="modal-view-product-btn">
+
+                مشاهده صفحه محصول
+
+                <i class="fa fa-arrow-left"></i>
+
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Product"
+               asp-action="Index"
+               asp-route-id="@Model.ProductId"
+               class="modal-view-product-btn">
+
+                مشاهده جزئیات محصول
+
+                <i class="fa fa-arrow-left"></i>
+
+            </a>
+        }
+
+    </div>
+
+</div>

@@ -2,175 +2,407 @@
 @model IEnumerable<ProductDto>
 
 @{
-    ViewData["Title"] = "لیست محصولات";
+    ViewData["Title"] = "محصولات";
 
-    int currentPage = ViewBag.CurrentPage ?? 1;
-    int totalPages = ViewBag.TotalPages ?? 1;
+    int currentPage =
+        ViewBag.CurrentPage ?? 1;
+
+    int totalPages =
+        ViewBag.TotalPages ?? 1;
 
     string search =
         ViewBag.Search ?? string.Empty;
 
     string currentSort =
         ViewBag.Sort ?? "newest";
+
+    int startPage =
+        Math.Max(1, currentPage - 2);
+
+    int endPage =
+        Math.Min(totalPages, currentPage + 2);
 }
 
-<div class="products-search">
+<main class="product-list-page">
 
-    <form asp-action="ProductList"
-          method="get">
+    <!-- =====================================================
+         Header
+         ===================================================== -->
 
-        <input style="width:70%;"
-               type="text"
-               name="search"
-               value="@search"
-               placeholder="جستجوی محصول..." />
+    <section class="product-list-header">
 
-        <button type="submit"
-                class="btnProduct">
-            جستجو
-        </button>
+        <div>
 
-    </form>
+            <span class="product-list-eyebrow">
+                فروشگاه تجهیزات تاجیک
+            </span>
 
-</div>
+            <h1>
+                محصولات
+            </h1>
 
-<div class="filtering-section">
+            <p>
+                تجهیزات مورد نیاز کسب‌وکار خود را
+                پیدا و بررسی کنید.
+            </p>
 
-    <div class="filter-title">
-        مرتب‌سازی بر اساس:
-    </div>
-
-    <div class="filter-buttons">
-
-        <a asp-action="ProductList"
-           asp-route-page="1"
-           asp-route-search="@search"
-           asp-route-sort="bestselling"
-           class="filter-btn @(currentSort == "bestselling" ? "active" : "")">
-            پرفروش‌ترین
-        </a>
-
-        <a asp-action="ProductList"
-           asp-route-page="1"
-           asp-route-search="@search"
-           asp-route-sort="newest"
-           class="filter-btn @(currentSort == "newest" ? "active" : "")">
-            جدیدترین
-        </a>
-
-        <a asp-action="ProductList"
-           asp-route-page="1"
-           asp-route-search="@search"
-           asp-route-sort="highestprice"
-           class="filter-btn @(currentSort == "highestprice" ? "active" : "")">
-            گران‌ترین
-        </a>
-
-        <a asp-action="ProductList"
-           asp-route-page="1"
-           asp-route-search="@search"
-           asp-route-sort="lowestprice"
-           class="filter-btn @(currentSort == "lowestprice" ? "active" : "")">
-            ارزان‌ترین
-        </a>
-
-    </div>
-
-</div>
-
-<div class="productsContainer">
-
-    @if (!Model.Any())
-    {
-        <div class="products-empty">
-            محصولی یافت نشد
         </div>
-    }
-    else
-    {
-        foreach (var item in Model)
+
+    </section>
+
+
+    <!-- =====================================================
+         Search
+         ===================================================== -->
+
+    <section class="products-search-card">
+
+        <form asp-action="ProductList"
+              method="get"
+              class="products-search-form">
+
+            <div class="products-search-input">
+
+                <i class="fa fa-search"></i>
+
+                <input type="text"
+                       name="search"
+                       value="@search"
+                       placeholder="نام محصول را جستجو کنید..."
+                       autocomplete="off" />
+
+            </div>
+
+
+            <input type="hidden"
+                   name="sort"
+                   value="@currentSort" />
+
+
+            <button type="submit"
+                    class="products-search-btn">
+
+                جستجو
+
+            </button>
+
+
+            @if (!string.IsNullOrWhiteSpace(search))
+            {
+                <a asp-action="ProductList"
+                   asp-route-page="1"
+                   asp-route-sort="@currentSort"
+                   class="products-clear-search">
+
+                    <i class="fa fa-times"></i>
+
+                    پاک کردن
+
+                </a>
+            }
+
+        </form>
+
+    </section>
+
+
+    <!-- =====================================================
+         Sorting
+         ===================================================== -->
+
+    <section class="products-toolbar">
+
+        <div class="products-toolbar-title">
+
+            <span>
+                مرتب‌سازی
+            </span>
+
+        </div>
+
+
+        <div class="filter-buttons">
+
+            <a asp-action="ProductList"
+               asp-route-page="1"
+               asp-route-search="@search"
+               asp-route-sort="bestselling"
+               class="filter-btn @(currentSort == "bestselling" ? "active" : "")">
+
+                پرفروش‌ترین
+
+            </a>
+
+
+            <a asp-action="ProductList"
+               asp-route-page="1"
+               asp-route-search="@search"
+               asp-route-sort="newest"
+               class="filter-btn @(currentSort == "newest" ? "active" : "")">
+
+                جدیدترین
+
+            </a>
+
+
+            <a asp-action="ProductList"
+               asp-route-page="1"
+               asp-route-search="@search"
+               asp-route-sort="highestprice"
+               class="filter-btn @(currentSort == "highestprice" ? "active" : "")">
+
+                گران‌ترین
+
+            </a>
+
+
+            <a asp-action="ProductList"
+               asp-route-page="1"
+               asp-route-search="@search"
+               asp-route-sort="lowestprice"
+               class="filter-btn @(currentSort == "lowestprice" ? "active" : "")">
+
+                ارزان‌ترین
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         Products
+         ===================================================== -->
+
+    <section class="products-container">
+
+        @if (Model == null ||
+        !Model.Any())
         {
-            <div class="productsItems">
+            <div class="products-empty">
 
-                @if (!string.IsNullOrWhiteSpace(item.ImageName))
-                {
-                    <img class="productsImage"
-                         src="/api/FileUpload/GetFile?filename=@Uri.EscapeDataString(item.ImageName)"
-                         alt="@item.ProductName"
-                         loading="lazy" />
-                }
-
-                <div class="productsInfo">
-
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-
-                        <h5>
-                            @item.ProductName
-                        </h5>
-
-                        <button type="button"
-                                class="openModal"
-                                data-product-id="@item.ProductId"
-                                aria-label="اطلاعات محصول">
-                            <i class="infoBtn fa fa-info-circle"></i>
-                        </button>
-
-                    </div>
-
-                    <p>
-                        @item.Price.ToString("N0")
-                        تومان
-                    </p>
-
-                    <a asp-controller="Product"
-                       asp-action="Index"
-                       asp-route-id="@item.ProductId"
-                       class="btnProduct">
-                        مشاهده محصول
-                    </a>
-
+                <div class="products-empty-icon">
+                    <i class="fa fa-search"></i>
                 </div>
+
+                <h2>
+                    محصولی پیدا نشد
+                </h2>
+
+                <p>
+                    عبارت جستجو یا فیلترهای خود را تغییر دهید.
+                </p>
+
+                @if (!string.IsNullOrWhiteSpace(search))
+                {
+                    <a asp-action="ProductList"
+                       class="products-empty-btn">
+
+                        مشاهده همه محصولات
+
+                    </a>
+                }
 
             </div>
         }
+        else
+        {
+            <div class="products-grid">
+
+                @foreach (var item in Model)
+                {
+                    <article class="product-card">
+
+                        <!-- Image -->
+
+                        <a asp-controller="Product"
+                           asp-action="Index"
+                           asp-route-id="@item.ProductId"
+                           class="product-card-image-link">
+
+                            @if (!string.IsNullOrWhiteSpace(item.ImageName))
+                            {
+                                <img class="product-card-image"
+                                     src="/api/FileUpload/GetFile?filename=@Uri.EscapeDataString(item.ImageName)"
+                                     alt="@item.ProductName"
+                                     loading="lazy" />
+                            }
+                            else
+                            {
+                                <div class="product-card-image-empty">
+
+                                    <i class="fa fa-image"></i>
+
+                                    <span>
+                                        بدون تصویر
+                                    </span>
+
+                                </div>
+                            }
+
+                        </a>
+
+
+                        <!-- Information -->
+
+                        <div class="product-card-body">
+
+                            <div class="product-card-title-row">
+
+                                <h2>
+                                    @item.ProductName
+                                </h2>
+
+
+                                <button type="button"
+                                        class="openModal product-info-btn"
+                                        data-product-id="@item.ProductId"
+                                        aria-label="اطلاعات بیشتر درباره @item.ProductName">
+
+                                    <i class="fa fa-info-circle"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <div class="product-card-price">
+
+                                <span>
+                                    قیمت
+                                </span>
+
+                                <strong>
+                                    @item.Price.ToString("N0")
+                                    تومان
+                                </strong>
+
+                            </div>
+
+
+                            <a asp-controller="Product"
+                               asp-action="Index"
+                               asp-route-id="@item.ProductId"
+                               class="product-card-btn">
+
+                                مشاهده محصول
+
+                                <i class="fa fa-arrow-left"></i>
+
+                            </a>
+
+                        </div>
+
+                    </article>
+                }
+
+            </div>
+        }
+
+    </section>
+
+
+    <!-- =====================================================
+         Pagination
+         ===================================================== -->
+    @if (totalPages > 1)
+    {
+        <nav class="products-pagination"
+             aria-label="صفحه‌بندی محصولات">
+
+            @if (currentPage > 1)
+            {
+                <a asp-action="ProductList"
+                   asp-route-page="@(currentPage - 1)"
+                   asp-route-search="@search"
+                   asp-route-sort="@currentSort"
+                   class="pagination-btn">
+
+                    <i class="fa fa-angle-right"></i>
+
+                    قبلی
+
+                </a>
+            }
+
+
+            @if (startPage > 1)
+            {
+                <a asp-action="ProductList"
+                   asp-route-page="1"
+                   asp-route-search="@search"
+                   asp-route-sort="@currentSort"
+                   class="pagination-number">
+
+                    1
+
+                </a>
+
+
+                @if (startPage > 2)
+                {
+                    <span class="pagination-dots">
+                        ...
+                    </span>
+                }
+            }
+
+
+            @for (int i = startPage;
+           i <= endPage;
+           i++)
+            {
+                <a asp-action="ProductList"
+                   asp-route-page="@i"
+                   asp-route-search="@search"
+                   asp-route-sort="@currentSort"
+                   class="pagination-number @(i == currentPage ? "active" : "")">
+
+                    @i
+
+                </a>
+            }
+
+
+            @if (endPage < totalPages)
+            {
+                @if (endPage < totalPages - 1)
+                {
+                    <span class="pagination-dots">
+                        ...
+                    </span>
+                }
+
+
+                <a asp-action="ProductList"
+                   asp-route-page="@totalPages"
+                   asp-route-search="@search"
+                   asp-route-sort="@currentSort"
+                   class="pagination-number">
+
+                    @totalPages
+
+                </a>
+            }
+
+
+            @if (currentPage < totalPages)
+            {
+                <a asp-action="ProductList"
+                   asp-route-page="@(currentPage + 1)"
+                   asp-route-search="@search"
+                   asp-route-sort="@currentSort"
+                   class="pagination-btn">
+
+                    بعدی
+
+                    <i class="fa fa-angle-left"></i>
+
+                </a>
+            }
+
+        </nav>
     }
 
-</div>
-
-@if (totalPages > 1)
-{
-    <div class="pagination">
-
-        @if (currentPage > 1)
-        {
-            <a asp-action="ProductList"
-               asp-route-page="@(currentPage - 1)"
-               asp-route-search="@search"
-               asp-route-sort="@currentSort">
-                قبلی
-            </a>
-        }
-
-        @for (int i = 1; i <= totalPages; i++)
-        {
-            <a asp-action="ProductList"
-               asp-route-page="@i"
-               asp-route-search="@search"
-               asp-route-sort="@currentSort"
-               class="@(i == currentPage ? "active" : "")">
-                @i
-            </a>
-        }
-
-        @if (currentPage < totalPages)
-        {
-            <a asp-action="ProductList"
-               asp-route-page="@(currentPage + 1)"
-               asp-route-search="@search"
-               asp-route-sort="@currentSort">
-                بعدی
-            </a>
-        }
-
-    </div>
-}
+</main>

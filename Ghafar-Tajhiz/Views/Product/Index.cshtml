@@ -3,144 +3,256 @@
 
 @{
     ViewData["Title"] = Model.ProductName;
+
+    var hasStock = Model.StockQuantity > 0;
 }
 
 <input id="productId"
        type="hidden"
        value="@Model.ProductId" />
 
-<header class="productHeader">
+<main class="product-page">
 
-    <div class="product">
+    <!-- =====================================================
+         Breadcrumb
+         ===================================================== -->
 
-        <div class="product-image">
+    <nav class="product-breadcrumb"
+         aria-label="مسیر صفحه">
 
-            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
-            {
-                <img src="/api/FileUpload/GetFile?filename=@Uri.EscapeDataString(Model.ImageUrl)"
-                     alt="@Model.ProductName"
-                     class="product-img"
-                     loading="lazy" />
-            }
+        <a asp-controller="Home"
+           asp-action="Index">
+            صفحه اصلی
+        </a>
+
+        <i class="fa fa-angle-left"></i>
+
+        <a asp-controller="Product"
+           asp-action="ProductList">
+            محصولات
+        </a>
+
+        <i class="fa fa-angle-left"></i>
+
+        <span>
+            @Model.ProductName
+        </span>
+
+    </nav>
+
+
+    <!-- =====================================================
+         Product Details
+         ===================================================== -->
+
+    <section class="product-main">
+
+        <!-- =================================================
+             Product Image
+             ================================================= -->
+
+        <div class="product-gallery">
+
+            <div class="product-image-card">
+
+                @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                {
+                    <img src="/api/FileUpload/GetFile?filename=@Uri.EscapeDataString(Model.ImageUrl)"
+                         alt="@Model.ProductName"
+                         class="product-main-image"
+                         width="800"
+                         height="800"
+                         fetchpriority="high" />
+                }
+                else
+                {
+                    <div class="product-image-empty">
+
+                        <i class="fa fa-image"></i>
+
+                        <span>
+                            تصویری برای این محصول ثبت نشده است.
+                        </span>
+
+                    </div>
+                }
+
+            </div>
 
         </div>
 
-        <div class="product-content">
 
-            <div class="product-details">
+        <!-- =================================================
+             Product Information
+             ================================================= -->
+
+        <div class="product-information">
+
+            <div class="product-heading">
+
+                <span class="product-label">
+                    محصول
+                </span>
 
                 <h1>
                     @Model.ProductName
                 </h1>
 
-                <div class="features">
+            </div>
 
-                    <ul>
-                        <li>
-                            ظرفیت استثنایی پخت ۱۸ تکه جوجه در هر بار،
-                            راندمان تولید شما را افزایش می‌دهد.
-                        </li>
 
-                        <li>
-                            سیستم پخت ۳۶۰ درجه و کنترل دمای دیجیتال،
-                            کیفیت یکسان هر بار پخت را تضمین می‌کند.
-                        </li>
+            <!-- Description -->
+            @if (!string.IsNullOrWhiteSpace(Model.ProductDescription))
+            {
+                <div class="product-description">
 
-                        <li>
-                            طراحی استیل ضدزنگ با سینی جداشونده،
-                            نظافت را ساده‌تر می‌کند.
-                        </li>
+                    <h2>
+                        توضیحات محصول
+                    </h2>
 
-                        @if (!string.IsNullOrWhiteSpace(
-                        Model.ProductDescription))
-                        {
-                            <li>
-                                @Model.ProductDescription
-                            </li>
-                        }
-                    </ul>
+                    <p>
+                        @Model.ProductDescription
+                    </p>
+
+                </div>
+            }
+
+
+            <!-- Product Summary -->
+
+            <div class="product-summary">
+
+                <div class="product-summary-item">
+
+                    <span>
+                        وضعیت
+                    </span>
+
+                    @if (hasStock)
+                    {
+                        <strong class="product-stock available">
+                            <i class="fa fa-check-circle"></i>
+                            موجود
+                        </strong>
+                    }
+                    else
+                    {
+                        <strong class="product-stock unavailable">
+                            <i class="fa fa-times-circle"></i>
+                            ناموجود
+                        </strong>
+                    }
 
                 </div>
 
-                <div class="purchase-section">
 
-                    <div class="price">
+                <div class="product-summary-item">
 
-                        <input id="stockQuantity"
-                               type="hidden"
-                               value="@Model.StockQuantity" />
+                    <span>
+                        موجودی
+                    </span>
 
-                        <input id="basePrice"
-                               type="hidden"
-                               value="@Model.Price" />
+                    <strong>
+                        @Model.StockQuantity.ToString("N0")
+                        عدد
+                    </strong>
 
-                        <strong id="basePriceShow">
-                            قیمت:
-                            @Model.Price.ToString("N0")
-                            تومان
-                        </strong>
+                </div>
 
-                    </div>
+            </div>
 
-                    <div class="quantity">
 
-                        <label>
-                            تعداد:
-                        </label>
+            <!-- Purchase Box -->
 
-                        @if (Model.StockQuantity > 0)
-                        {
+            <div class="purchase-box">
+
+                <div class="purchase-price">
+
+                    <span>
+                        قیمت
+                    </span>
+
+                    <strong id="basePriceShow">
+                        @Model.Price.ToString("N0")
+                        تومان
+                    </strong>
+
+                </div>
+
+
+                <input id="stockQuantity"
+                       type="hidden"
+                       value="@Model.StockQuantity" />
+
+                <input id="basePrice"
+                       type="hidden"
+                       value="@Model.Price" />
+
+
+                @if (hasStock)
+                {
+                    <div class="purchase-controls">
+
+                        <div class="quantity-control">
+
+                            <label for="countInput">
+                                تعداد
+                            </label>
+
                             <input id="countInput"
                                    type="number"
                                    min="1"
                                    max="@Model.StockQuantity"
                                    value="1"
-                                   class="quantity-input" />
+                                   class="product-quantity-input"
+                                   inputmode="numeric" />
 
-                            <span id="stockMessage"
-                                  class="stock-message"
-                                  style="font-size:12px;color:#666;">
-                                موجودی انبار:
-                                @Model.StockQuantity
-                                عدد
-                            </span>
-                        }
-                        else
-                        {
-                            <input id="countInput"
-                                   type="number"
-                                   min="0"
-                                   max="0"
-                                   value="0"
-                                   class="quantity-input"
-                                   disabled />
+                        </div>
 
-                            <span id="stockMessage"
-                                  class="stock-message"
-                                  style="font-size:12px;color:red;">
-                                موجودی: ۰
-                            </span>
-                        }
+
+                        <span id="stockMessage"
+                              class="product-stock-message">
+
+                            موجودی انبار:
+                            @Model.StockQuantity.ToString("N0")
+                            عدد
+
+                        </span>
 
                     </div>
 
-                </div>
 
-                @if (Model.StockQuantity > 0)
-                {
                     <button type="button"
                             onclick="AddToBasket()"
-                            class="btnProduct">
+                            class="product-add-btn">
+
+                        <i class="fa fa-shopping-cart"></i>
+
                         افزودن به سبد خرید
+
                     </button>
                 }
                 else
                 {
+                    <div class="out-of-stock-message">
+
+                        <i class="fa fa-exclamation-circle"></i>
+
+                        <span>
+                            این محصول در حال حاضر موجود نیست.
+                        </span>
+
+                    </div>
+
+
                     <button type="button"
-                            class="btnProduct"
-                            disabled
-                            style="opacity:0.5;cursor:not-allowed;">
-                        این محصول موجود نمی‌باشد
+                            class="product-add-btn disabled"
+                            disabled>
+
+                        <i class="fa fa-shopping-cart"></i>
+
+                        محصول ناموجود است
+
                     </button>
                 }
 
@@ -148,78 +260,173 @@
 
         </div>
 
-    </div>
+    </section>
 
-</header>
 
-<section class="comments-section">
+    <!-- =====================================================
+         Comments
+         ===================================================== -->
 
-    <h3 class="comments-title">
-        نظرات کاربران
-    </h3>
+    <section class="comments-section">
 
-    <form asp-action="AddProductComment"
-          asp-controller="Product"
-          method="post"
-          class="comment-form">
+        <div class="comments-header">
 
-        @Html.AntiForgeryToken()
+            <div>
 
-        <textarea id="commentText"
-                  name="Text"
-                  rows="4"
-                  maxlength="500"
-                  placeholder="نظر خود را بنویسید..."
-                  required></textarea>
+                <span class="comments-eyebrow">
+                    تجربه کاربران
+                </span>
 
-        <button type="button"
-                onclick="addComment()"
-                class="btn-submit">
-            ثبت نظر
-        </button>
+                <h2 class="comments-title">
+                    نظرات کاربران
+                </h2>
 
-    </form>
+            </div>
 
-    <div class="comments-count">
 
-        <span>
-            @Model.Comments.Count
-        </span>
+            <span class="comments-count-badge">
 
-        نظر
+                <i class="fa fa-comments"></i>
 
-    </div>
+                @Model.Comments.Count
+                نظر
 
-    <div class="comments-list">
+            </span>
 
-        @foreach (var item in Model.Comments)
-        {
-            <div class="comment-item">
+        </div>
 
-                <div class="comment-header mb-4">
 
-                    <h6>
-                        @(item.User?.FullName ?? "کاربر")
-                    </h6>
+        <!-- Comment Form -->
 
-                    <span class="comment-date">
-                        @item.Created.ToString(
-                                 "yyyy/MM/dd - HH:mm")
+        <div class="comment-form-card">
+
+            <div class="comment-form-header">
+
+                <h3>
+                    نظر خود را با ما به اشتراک بگذارید
+                </h3>
+
+                <p>
+                    نظر شما می‌تواند به دیگر کاربران در انتخاب محصول کمک کند.
+                </p>
+
+            </div>
+
+
+            <form asp-action="AddProductComment"
+                  asp-controller="Product"
+                  method="post"
+                  class="comment-form">
+
+                @Html.AntiForgeryToken()
+
+
+                <label for="commentText">
+                    متن نظر
+                </label>
+
+
+                <textarea id="commentText"
+                          name="Text"
+                          rows="4"
+                          maxlength="500"
+                          placeholder="نظر خود را درباره این محصول بنویسید..."
+                          required></textarea>
+
+
+                <div class="comment-form-footer">
+
+                    <span>
+                        حداکثر ۵۰۰ کاراکتر
                     </span>
 
+
+                    <button type="button"
+                            onclick="addComment()"
+                            class="btn-submit">
+
+                        <i class="fa fa-paper-plane"></i>
+
+                        ثبت نظر
+
+                    </button>
+
                 </div>
 
-                <div class="comment-body">
+            </form>
 
-                    <p>
-                        @item.Text
-                    </p>
+        </div>
 
+
+        <!-- Comments List -->
+        @if (Model.Comments != null &&
+        Model.Comments.Any())
+        {
+            <div class="comments-list">
+
+                @foreach (var item in Model.Comments)
+                {
+                    <article class="comment-item">
+
+                        <div class="comment-header">
+
+                            <div class="comment-user">
+
+                                <div class="comment-avatar">
+                                    <i class="fa fa-user"></i>
+                                </div>
+
+                                <strong>
+                                    @(item.User?.FullName ?? "کاربر")
+                                </strong>
+
+                            </div>
+
+
+                            <time class="comment-date">
+
+                                <i class="fa fa-clock-o"></i>
+
+                                @item.Created.ToString(
+                                         "yyyy/MM/dd - HH:mm")
+
+                            </time>
+
+                        </div>
+
+
+                        <div class="comment-body">
+
+                            <p>
+                                @item.Text
+                            </p>
+
+                        </div>
+
+                    </article>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="comments-empty">
+
+                <div class="comments-empty-icon">
+                    <i class="fa fa-comments-o"></i>
                 </div>
+
+                <h3>
+                    هنوز نظری ثبت نشده است
+                </h3>
+
+                <p>
+                    اولین نفری باشید که درباره این محصول نظر می‌دهد.
+                </p>
 
             </div>
         }
 
-    </div>
+    </section>
 
-</section>
+</main>
