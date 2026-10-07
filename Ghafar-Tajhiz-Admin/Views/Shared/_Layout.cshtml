@@ -1,232 +1,152 @@
 ﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl">
-
 <head>
-
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] | پنل مدیریت</title>
 
-    <title>
-        @ViewData["Title"] | پنل مدیریت
-    </title>
-
-
-    <link rel="stylesheet"
-          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-
-
-    <link rel="stylesheet"
-          href="~/css/admin.css"
-          asp-append-version="true" />
-
-
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
-
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 
     @await RenderSectionAsync("Styles", required: false)
-
 </head>
 
-
 <body class="admin-body">
+    @{
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
 
+        bool IsActive(string controller) =>
+        string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase);
+
+        var successMessage = TempData["Success"] as string;
+        var errorMessage = TempData["Error"] as string;
+    }
 
     <header class="admin-navbar">
-
-        <div class="title">
-            پنل مدیریت Ghafar Tajhiz
+        <div class="admin-brand">
+            <div class="admin-brand-icon">
+                <i class="fa fa-cogs"></i>
+            </div>
+            <div>
+                <div class="admin-brand-title">Ghafar Tajhiz</div>
+                <div class="admin-brand-subtitle">پنل مدیریت</div>
+            </div>
         </div>
-
 
         <form asp-controller="AdminAccount"
               asp-action="Logout"
               method="post"
-              style="display:inline;">
-
+              class="logout-form">
             @Html.AntiForgeryToken()
 
-            <button type="submit"
-                    class="logout">
-
-                خروج
-
+            <button type="submit" class="logout">
+                <i class="fa fa-sign-out"></i>
+                <span>خروج</span>
             </button>
-
         </form>
-
     </header>
 
-
     <div class="admin-container">
+        <aside class="admin-sidebar" aria-label="منوی مدیریت">
+            <div class="sidebar-heading">
+                <span>منوی اصلی</span>
+            </div>
 
+            <nav>
+                <ul>
+                    <li>
+                        <a asp-controller="Home"
+                           asp-action="Index"
+                           class="@(IsActive("Home") ? "active" : null)"
+                           aria-current="@(IsActive("Home") ? "page" : null)">
+                            <span class="sidebar-icon"><i class="fa fa-dashboard"></i></span>
+                            <span>داشبورد</span>
+                        </a>
+                    </li>
 
-        <aside class="admin-sidebar">
+                    <li>
+                        <a asp-controller="Categories"
+                           asp-action="Index"
+                           class="@(IsActive("Categories") ? "active" : null)"
+                           aria-current="@(IsActive("Categories") ? "page" : null)">
+                            <span class="sidebar-icon"><i class="fa fa-list"></i></span>
+                            <span>دسته‌بندی‌ها</span>
+                        </a>
+                    </li>
 
-            <ul>
+                    <li>
+                        <a asp-controller="Products"
+                           asp-action="Index"
+                           class="@(IsActive("Products") ? "active" : null)"
+                           aria-current="@(IsActive("Products") ? "page" : null)">
+                            <span class="sidebar-icon"><i class="fa fa-cube"></i></span>
+                            <span>محصولات</span>
+                        </a>
+                    </li>
 
-                <li>
+                    <li>
+                        <a asp-controller="Orders"
+                           asp-action="Index"
+                           class="@(IsActive("Orders") ? "active" : null)"
+                           aria-current="@(IsActive("Orders") ? "page" : null)">
+                            <span class="sidebar-icon"><i class="fa fa-shopping-cart"></i></span>
+                            <span>سفارش‌ها</span>
+                        </a>
+                    </li>
 
-                    <a asp-controller="Home"
-                       asp-action="Index">
-
-                        <i class="fa fa-dashboard"></i>
-
-                        داشبورد
-
-                    </a>
-
-                </li>
-
-
-                <li>
-
-                    <a asp-controller="Categories"
-                       asp-action="Index">
-
-                        <i class="fa fa-list"></i>
-
-                        دسته‌بندی‌ها
-
-                    </a>
-
-                </li>
-
-
-                <li>
-
-                    <a asp-controller="Products"
-                       asp-action="Index">
-
-                        <i class="fa fa-cube"></i>
-
-                        محصولات
-
-                    </a>
-
-                </li>
-
-
-                <li>
-
-                    <a asp-controller="Orders"
-                       asp-action="Index">
-
-                        <i class="fa fa-shopping-cart"></i>
-
-                        سفارش‌ها
-
-                    </a>
-
-                </li>
-
-
-                <li>
-
-                    <a asp-controller="AdminUser"
-                       asp-action="Index">
-
-                        <i class="fa fa-users"></i>
-
-                        کاربران
-
-                    </a>
-
-                </li>
-
-            </ul>
-
+                    <li>
+                        <a asp-controller="AdminUser"
+                           asp-action="Index"
+                           class="@(IsActive("AdminUser") ? "active" : null)"
+                           aria-current="@(IsActive("AdminUser") ? "page" : null)">
+                            <span class="sidebar-icon"><i class="fa fa-users"></i></span>
+                            <span>کاربران</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </aside>
 
-
         <main class="admin-content">
-
             @RenderBody()
-
         </main>
-
     </div>
 
-
     <footer class="admin-footer">
-
-        © ۱۴۰۴ - Ghafar Tajhiz
-
+        <span>Ghafar Tajhiz</span>
+        <span class="footer-separator">•</span>
+        <span>پنل مدیریت</span>
     </footer>
 
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
-
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-
-
-    <script src="~/js/admin.js"
-            asp-append-version="true"></script>
-
-
-    <script src="~/js/site.js"
-            asp-append-version="true"></script>
-
-
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-
-
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-
-
-    @{
-        var successMessage =
-        TempData["Success"] as string;
-
-        var errorMessage =
-        TempData["Error"] as string;
-    }
-
 
     @if (!string.IsNullOrWhiteSpace(successMessage))
     {
         <script>
-
-            showSuccessToast(
-            @Html.Raw(
-                     System.Text.Json.JsonSerializer.Serialize(
-                     successMessage
-                     )
-                     )
-                        );
-
+            document.addEventListener('DOMContentLoaded', function () {
+                showSuccessToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(successMessage)));
+            });
         </script>
     }
-
 
     @if (!string.IsNullOrWhiteSpace(errorMessage))
     {
         <script>
-
-            showErrorToast(
-            @Html.Raw(
-                     System.Text.Json.JsonSerializer.Serialize(
-                     errorMessage
-                     )
-                     )
-                        );
-
+            document.addEventListener('DOMContentLoaded', function () {
+                showErrorToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(errorMessage)));
+            });
         </script>
     }
 
-
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
-
 </html>

@@ -5,57 +5,36 @@
 }
 
 <div class="page-header">
-
-    <h1>
-        خطایی رخ داد
-    </h1>
-
-    <p>
-        متأسفانه در پردازش درخواست شما مشکلی پیش آمد.
-    </p>
-
+    <span class="page-eyebrow">خطای سیستم</span>
+    <h1>خطایی رخ داد</h1>
+    <p>متأسفانه در پردازش درخواست شما مشکلی پیش آمد.</p>
 </div>
 
-
-<div class="admin-card">
-
-    <div class="empty-state">
-
-        <div style="font-size:48px; margin-bottom:15px;">
-            ⚠️
-        </div>
-
-        <h3 style="margin-bottom:10px;">
-            انجام عملیات امکان‌پذیر نیست
-        </h3>
-
-        <p>
-            لطفاً دوباره تلاش کنید.
-            اگر مشکل ادامه داشت، با مدیر سیستم تماس بگیرید.
-        </p>
-
-        @if (!string.IsNullOrWhiteSpace(Model.TraceId))
-        {
-            <p style="margin-top:20px; font-size:12px; color:#777;">
-                کد پیگیری:
-                <strong>
-                    @Model.TraceId
-                </strong>
-            </p>
-        }
-
-        <div style="margin-top:20px;">
-
-            <a asp-controller="Home"
-               asp-action="Index"
-               class="form-button">
-
-                بازگشت به داشبورد
-
-            </a>
-
-        </div>
-
+<section class="admin-card error-state-card">
+    <div class="state-icon state-icon-danger">
+        <i class="fa fa-exclamation-triangle"></i>
     </div>
 
-</div>
+    <h2>انجام عملیات امکان‌پذیر نیست</h2>
+
+    <p>
+        لطفاً دوباره تلاش کنید. اگر مشکل ادامه داشت، با مدیر سیستم تماس بگیرید.
+    </p>
+
+    @if (!string.IsNullOrWhiteSpace(Model.TraceId))
+    {
+        <div class="trace-id">
+            <span>کد پیگیری</span>
+            <strong dir="ltr">@Model.TraceId</strong>
+        </div>
+    }
+
+    <div class="state-actions">
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="admin-btn admin-btn-primary">
+            <i class="fa fa-home"></i>
+            بازگشت به داشبورد
+        </a>
+    </div>
+</section>

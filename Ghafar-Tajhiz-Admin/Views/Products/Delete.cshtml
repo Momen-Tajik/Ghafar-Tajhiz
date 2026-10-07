@@ -6,23 +6,96 @@
 
 <div class="page-header">
 
-    <h1>
-        حذف محصول
-    </h1>
+    <div class="page-title-row">
 
-    <p>
-        این عملیات غیرقابل بازگشت است
-    </p>
+        <div class="page-icon danger">
+            <i class="fa fa-trash"></i>
+        </div>
+
+        <div>
+
+            <h1>
+                حذف محصول
+            </h1>
+
+            <p>
+                قبل از حذف، اطلاعات محصول را بررسی کنید.
+            </p>
+
+        </div>
+
+    </div>
 
 </div>
 
-<div class="admin-card">
 
-    <div class="delete-warning">
-        آیا از حذف این محصول مطمئن هستید؟
+<div class="admin-card delete-product-card">
+
+
+    <div class="delete-warning-box">
+
+        <div class="delete-warning-icon">
+            <i class="fa fa-exclamation-triangle"></i>
+        </div>
+
+
+        <div>
+
+            <h3>
+                آیا از حذف این محصول مطمئن هستید؟
+            </h3>
+
+            <p>
+                این عملیات قابل بازگشت نیست و اطلاعات محصول حذف خواهد شد.
+            </p>
+
+        </div>
+
     </div>
 
-    <div class="details-grid">
+
+    <div class="delete-product-preview">
+
+
+        <div class="delete-product-image">
+
+            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+            {
+                <img src="/api/FileUpload/GetFile?fileName=@Uri.EscapeDataString(Model.ImageUrl)"
+                     alt="@Model.ProductName"
+                     loading="lazy" />
+            }
+            else
+            {
+                <div>
+                    <i class="fa fa-picture-o"></i>
+                </div>
+            }
+
+        </div>
+
+
+        <div class="delete-product-info">
+
+            <span class="product-details-label">
+                محصول
+            </span>
+
+            <h2>
+                @Model.ProductName
+            </h2>
+
+            <span>
+                @Model.Price.ToString("N0") تومان
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="details-grid delete-details-grid">
+
 
         <div class="detail-item">
 
@@ -40,13 +113,11 @@
         <div class="detail-item">
 
             <span class="label">
-                توضیحات
+                دسته‌بندی
             </span>
 
             <span class="value">
-                @(string.IsNullOrWhiteSpace(Model.ProductDescription)
-                    ? "—"
-                    : Model.ProductDescription)
+                @(Model.Category?.CategoryName ?? "بدون دسته‌بندی")
             </span>
 
         </div>
@@ -81,27 +152,23 @@
         <div class="detail-item">
 
             <span class="label">
-                دسته‌بندی
-            </span>
-
-            <span class="value">
-                @Model.Category?.CategoryName
-            </span>
-
-        </div>
-
-
-        <div class="detail-item">
-
-            <span class="label">
                 وضعیت
             </span>
 
             <span class="value">
 
-                @(Model.IsAvailable
-                    ? "فعال"
-                    : "غیرفعال")
+                @if (Model.IsAvailable)
+                {
+                    <span class="status-badge status-active">
+                        فعال
+                    </span>
+                }
+                else
+                {
+                    <span class="status-badge status-inactive">
+                        غیرفعال
+                    </span>
+                }
 
             </span>
 
@@ -121,51 +188,28 @@
         </div>
 
 
-        <div class="detail-item image-item">
-
-            <span class="label">
-                تصویر
-            </span>
-
-            <span class="value">
-
-                @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
-                {
-                    <img src="/api/FileUpload/GetFile?fileName=@Uri.EscapeDataString(Model.ImageUrl)"
-                         alt="@Model.ProductName"
-                         class="details-image"
-                         loading="lazy" />
-                }
-                else
-                {
-                    <span>
-                        بدون تصویر
-                    </span>
-                }
-
-            </span>
-
-        </div>
-
     </div>
 
 
     <form asp-controller="Products"
           asp-action="DeleteConfirmed"
           method="post"
-          class="form-actions danger-actions delete-product-form"
-          data-product-name="@Model.ProductName">
+          class="form-actions danger-actions delete-confirm-form"
+          data-item-name="@Model.ProductName">
 
         @Html.AntiForgeryToken()
+
 
         <input type="hidden"
                name="productId"
                value="@Model.ProductId" />
 
+
         <button type="submit"
                 class="form-button danger">
 
             <i class="fa fa-trash"></i>
+
             حذف محصول
 
         </button>

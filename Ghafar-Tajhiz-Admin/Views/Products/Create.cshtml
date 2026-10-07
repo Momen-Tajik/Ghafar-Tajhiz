@@ -5,100 +5,163 @@
 }
 
 <div class="page-header">
-    <h1>ایجاد محصول جدید</h1>
-    <p>ثبت محصول جدید در فروشگاه</p>
+
+    <div class="page-title-row">
+
+        <div class="page-icon">
+            <i class="fa fa-plus"></i>
+        </div>
+
+        <div>
+
+            <h1>
+                ایجاد محصول جدید
+            </h1>
+
+            <p>
+                محصول جدید را با اطلاعات کامل در فروشگاه ثبت کنید.
+            </p>
+
+        </div>
+
+    </div>
+
 </div>
 
-<div class="admin-card">
+
+<div class="admin-card product-form-card">
+
+    <div class="form-section-header">
+
+        <div>
+
+            <h3>
+                اطلاعات محصول
+            </h3>
+
+            <p>
+                اطلاعات اصلی محصول را وارد کنید.
+            </p>
+
+        </div>
+
+    </div>
+
 
     <form asp-action="Create"
           method="post"
           enctype="multipart/form-data"
-          class="admin-form">
+          class="admin-form product-form">
 
         @Html.AntiForgeryToken()
 
+
         <div asp-validation-summary="ModelOnly"
-             class="text-danger">
+             class="validation-summary">
         </div>
+
 
         <div class="form-group">
 
             <label asp-for="ProductName">
                 نام محصول
+                <span class="required-star">*</span>
             </label>
 
             <input asp-for="ProductName"
-                   class="form-input" />
+                   class="form-input"
+                   placeholder="مثلاً لپ‌تاپ Lenovo IdeaPad"
+                   autocomplete="off" />
 
             <span asp-validation-for="ProductName"
-                  class="text-danger">
+                  class="validation-error">
             </span>
 
         </div>
+
 
         <div class="form-group">
 
             <label asp-for="ProductDescription">
-                توضیحات
+                توضیحات محصول
             </label>
 
             <textarea asp-for="ProductDescription"
-                      class="form-input"></textarea>
+                      class="form-textarea"
+                      rows="5"
+                      placeholder="توضیح کوتاهی درباره محصول وارد کنید..."></textarea>
 
             <span asp-validation-for="ProductDescription"
-                  class="text-danger">
+                  class="validation-error">
             </span>
 
         </div>
 
+
         <div class="two-columns">
+
 
             <div class="form-group">
 
                 <label asp-for="Price">
                     قیمت
+                    <span class="required-star">*</span>
                 </label>
 
-                <input asp-for="Price"
-                       type="number"
-                       min="0"
-                       step="0.01"
-                       class="form-input" />
+                <div class="input-with-suffix">
+
+                    <input asp-for="Price"
+                           type="number"
+                           min="0"
+                           step="0.01"
+                           class="form-input"
+                           placeholder="0" />
+
+                    <span>
+                        تومان
+                    </span>
+
+                </div>
 
                 <span asp-validation-for="Price"
-                      class="text-danger">
+                      class="validation-error">
                 </span>
 
             </div>
+
 
             <div class="form-group">
 
                 <label asp-for="StockQuantity">
                     موجودی
+                    <span class="required-star">*</span>
                 </label>
 
                 <input asp-for="StockQuantity"
                        type="number"
                        min="0"
-                       class="form-input" />
+                       class="form-input"
+                       placeholder="0" />
 
                 <span asp-validation-for="StockQuantity"
-                      class="text-danger">
+                      class="validation-error">
                 </span>
 
             </div>
 
+
         </div>
+
 
         <div class="form-group">
 
             <label asp-for="CategoryId">
                 دسته‌بندی
+                <span class="required-star">*</span>
             </label>
 
             <select asp-for="CategoryId"
-                    class="form-input"
+                    class="form-select"
                     asp-items="ViewBag.CategoryId">
 
                 <option value="">
@@ -108,10 +171,11 @@
             </select>
 
             <span asp-validation-for="CategoryId"
-                  class="text-danger">
+                  class="validation-error">
             </span>
 
         </div>
+
 
         <div class="form-group">
 
@@ -119,36 +183,82 @@
                 تصویر محصول
             </label>
 
-            <input asp-for="ImageUrl"
-                   type="file"
-                   accept=".jpg,.jpeg,.png,.webp"
-                   class="form-input" />
+            <div class="file-upload-box">
+
+                <div class="file-upload-icon">
+                    <i class="fa fa-cloud-upload"></i>
+                </div>
+
+                <div class="file-upload-content">
+
+                    <strong>
+                        تصویر محصول را انتخاب کنید
+                    </strong>
+
+                    <span>
+                        JPG، JPEG، PNG یا WEBP
+                    </span>
+
+                </div>
+
+                <input asp-for="ImageUrl"
+                       type="file"
+                       accept=".jpg,.jpeg,.png,.webp"
+                       class="file-upload-input" />
+
+            </div>
 
             <span asp-validation-for="ImageUrl"
-                  class="text-danger">
+                  class="validation-error">
             </span>
 
         </div>
 
-        <div class="form-group checkbox-group">
 
-            <label>
+        <div class="availability-box">
+
+            <label class="switch-row">
+
                 <input asp-for="IsAvailable" />
-                فعال باشد
+
+                <span class="switch-ui"></span>
+
+                <span>
+
+                    <strong>
+                        محصول فعال باشد
+                    </strong>
+
+                    <small>
+                        محصول برای فروش در سایت در دسترس باشد.
+                    </small>
+
+                </span>
+
             </label>
 
         </div>
+
 
         <div class="form-actions">
 
             <button type="submit"
                     class="form-button primary">
+
+                <i class="fa fa-check"></i>
+
                 ذخیره محصول
+
             </button>
+
 
             <a asp-action="Index"
                class="form-button secondary">
+
+                <i class="fa fa-arrow-right"></i>
+
                 بازگشت
+
             </a>
 
         </div>
@@ -157,6 +267,9 @@
 
 </div>
 
+
 @section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
+
 }

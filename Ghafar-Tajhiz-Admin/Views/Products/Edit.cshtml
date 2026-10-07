@@ -5,79 +5,138 @@
 }
 
 <div class="page-header">
-    <h1>ویرایش محصول</h1>
+
+    <div class="page-title-row">
+
+        <div class="page-icon edit">
+            <i class="fa fa-edit"></i>
+        </div>
+
+        <div>
+
+            <h1>
+                ویرایش محصول
+            </h1>
+
+            <p>
+                اطلاعات محصول را بررسی و تغییر دهید.
+            </p>
+
+        </div>
+
+    </div>
+
 </div>
 
-<div class="admin-card">
+
+<div class="admin-card product-form-card">
+
+
+    <div class="form-section-header">
+
+        <div>
+
+            <h3>
+                اطلاعات محصول
+            </h3>
+
+            <p>
+                تغییرات شما پس از ذخیره اعمال خواهد شد.
+            </p>
+
+        </div>
+
+    </div>
+
 
     <form asp-action="Edit"
           method="post"
           enctype="multipart/form-data"
-          class="admin-form">
+          class="admin-form product-form">
 
         @Html.AntiForgeryToken()
+
 
         <input type="hidden"
                asp-for="ProductId" />
 
+
         <div asp-validation-summary="ModelOnly"
-             class="text-danger">
+             class="validation-summary">
         </div>
+
 
         <div class="form-group">
 
             <label asp-for="ProductName">
                 نام محصول
+                <span class="required-star">*</span>
             </label>
 
             <input asp-for="ProductName"
-                   class="form-input" />
+                   class="form-input"
+                   autocomplete="off" />
 
             <span asp-validation-for="ProductName"
-                  class="text-danger">
+                  class="validation-error">
             </span>
 
         </div>
+
 
         <div class="form-group">
 
             <label asp-for="ProductDescription">
-                توضیحات
+                توضیحات محصول
             </label>
 
             <textarea asp-for="ProductDescription"
-                      class="form-input"></textarea>
+                      class="form-textarea"
+                      rows="5"></textarea>
 
             <span asp-validation-for="ProductDescription"
-                  class="text-danger">
+                  class="validation-error">
             </span>
 
         </div>
 
+
         <div class="two-columns">
+
 
             <div class="form-group">
 
                 <label asp-for="Price">
                     قیمت
+                    <span class="required-star">*</span>
                 </label>
 
-                <input asp-for="Price"
-                       type="number"
-                       min="0"
-                       step="0.01"
-                       class="form-input" />
+                <div class="input-with-suffix">
+
+                    <input asp-for="Price"
+                           type="number"
+                           min="0"
+                           step="0.01"
+                           class="form-input" />
+
+                    <span>
+                        تومان
+                    </span>
+
+                </div>
 
                 <span asp-validation-for="Price"
-                      class="text-danger">
+                      class="validation-error">
                 </span>
 
             </div>
+
 
             <div class="form-group">
 
                 <label asp-for="StockQuantity">
                     موجودی
+                    <span class="required-star">*</span>
                 </label>
 
                 <input asp-for="StockQuantity"
@@ -86,21 +145,24 @@
                        class="form-input" />
 
                 <span asp-validation-for="StockQuantity"
-                      class="text-danger">
+                      class="validation-error">
                 </span>
 
             </div>
 
+
         </div>
+
 
         <div class="form-group">
 
             <label asp-for="CategoryId">
                 دسته‌بندی
+                <span class="required-star">*</span>
             </label>
 
             <select asp-for="CategoryId"
-                    class="form-input"
+                    class="form-select"
                     asp-items="ViewBag.CategoryId">
 
                 <option value="">
@@ -110,10 +172,11 @@
             </select>
 
             <span asp-validation-for="CategoryId"
-                  class="text-danger">
+                  class="validation-error">
             </span>
 
         </div>
+
 
         <div class="form-group">
 
@@ -121,23 +184,52 @@
                 تصویر فعلی
             </label>
 
+
             @if (!string.IsNullOrWhiteSpace(Model.ImageName))
             {
-                <div>
+                <div class="current-product-image">
+
                     <img src="/api/FileUpload/GetFile?fileName=@Uri.EscapeDataString(Model.ImageName)"
-                         class="details-image"
                          alt="@Model.ProductName"
                          loading="lazy" />
+
+                    <div>
+
+                        <strong>
+                            تصویر فعلی محصول
+                        </strong>
+
+                        <span>
+                            برای تغییر تصویر، فایل جدید انتخاب کنید.
+                        </span>
+
+                    </div>
+
                 </div>
             }
             else
             {
-                <p class="text-muted">
-                    تصویر فعلی ندارد.
-                </p>
+                <div class="current-product-image empty">
+
+                    <div class="current-image-icon">
+                        <i class="fa fa-picture-o"></i>
+                    </div>
+
+                    <div>
+                        <strong>
+                            تصویری ثبت نشده است
+                        </strong>
+
+                        <span>
+                            می‌توانید یک تصویر جدید انتخاب کنید.
+                        </span>
+                    </div>
+
+                </div>
             }
 
         </div>
+
 
         <div class="form-group">
 
@@ -145,36 +237,84 @@
                 تصویر جدید
             </label>
 
-            <input asp-for="ImageUrl"
-                   type="file"
-                   accept=".jpg,.jpeg,.png,.webp"
-                   class="form-input" />
+
+            <div class="file-upload-box">
+
+                <div class="file-upload-icon">
+                    <i class="fa fa-cloud-upload"></i>
+                </div>
+
+                <div class="file-upload-content">
+
+                    <strong>
+                        انتخاب تصویر جدید
+                    </strong>
+
+                    <span>
+                        JPG، JPEG، PNG یا WEBP
+                    </span>
+
+                </div>
+
+                <input asp-for="ImageUrl"
+                       type="file"
+                       accept=".jpg,.jpeg,.png,.webp"
+                       class="file-upload-input" />
+
+            </div>
+
 
             <span asp-validation-for="ImageUrl"
-                  class="text-danger">
+                  class="validation-error">
             </span>
 
         </div>
 
-        <div class="form-group checkbox-group">
 
-            <label>
+        <div class="availability-box">
+
+            <label class="switch-row">
+
                 <input asp-for="IsAvailable" />
-                فعال
+
+                <span class="switch-ui"></span>
+
+                <span>
+
+                    <strong>
+                        محصول فعال باشد
+                    </strong>
+
+                    <small>
+                        وضعیت نمایش و فروش محصول در سایت.
+                    </small>
+
+                </span>
+
             </label>
 
         </div>
+
 
         <div class="form-actions">
 
             <button type="submit"
                     class="form-button primary">
+
+                <i class="fa fa-save"></i>
+
                 ذخیره تغییرات
+
             </button>
+
 
             <a asp-action="Index"
                class="form-button secondary">
+
+                <i class="fa fa-arrow-right"></i>
+
                 بازگشت
+
             </a>
 
         </div>
@@ -183,6 +323,9 @@
 
 </div>
 
+
 @section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
+
 }

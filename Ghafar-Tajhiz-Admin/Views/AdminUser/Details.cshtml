@@ -2,213 +2,179 @@
 
 @{
     ViewData["Title"] = "جزئیات کاربر";
-
     var roles = ViewBag.Roles as IList<string> ?? new List<string>();
 }
 
-<div class="container mt-4">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-            <h2>جزئیات کاربر</h2>
-
-            <p class="text-muted mb-0">
-                اطلاعات حساب کاربری
-            </p>
-        </div>
-
+<div class="page-header details-page-header">
+    <div>
+        <span class="page-eyebrow">کاربران</span>
+        <h1>جزئیات کاربر</h1>
+        <p>اطلاعات حساب کاربری و وضعیت دسترسی این کاربر.</p>
     </div>
 
+    <a asp-action="Edit"
+       asp-route-id="@Model.Id"
+       class="admin-btn admin-btn-primary">
+        <i class="fa fa-edit"></i>
+        ویرایش کاربر
+    </a>
+</div>
 
-    <div class="card">
+<div class="details-layout">
+    <section class="admin-card">
+        <div class="card-header">
+            <div>
+                <h2>اطلاعات اصلی</h2>
+                <p>مشخصات ثبت‌شده حساب</p>
+            </div>
+        </div>
 
-        <div class="card-body">
+        <div class="details-grid">
+            <div class="detail-item">
+                <span class="label">شناسه</span>
+                <span class="value" dir="ltr">@Model.Id</span>
+            </div>
 
-            <!-- شناسه -->
-            <p>
-                <strong>شناسه:</strong>
-                @Model.Id
-            </p>
+            <div class="detail-item">
+                <span class="label">نام و نام خانوادگی</span>
+                <span class="value">
+                    @(string.IsNullOrWhiteSpace(Model.FullName) ? "-" : Model.FullName)
+                </span>
+            </div>
 
+            <div class="detail-item">
+                <span class="label">شماره تلفن</span>
+                <span class="value" dir="ltr">
+                    @(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "-" : Model.PhoneNumber)
+                </span>
+            </div>
 
-            <!-- نام -->
-            <p>
-                <strong>نام و نام خانوادگی:</strong>
+            <div class="detail-item">
+                <span class="label">ایمیل</span>
+                <span class="value" dir="ltr">
+                    @(string.IsNullOrWhiteSpace(Model.Email) ? "-" : Model.Email)
+                </span>
+            </div>
 
-                @(string.IsNullOrWhiteSpace(Model.FullName)
-                    ? "-"
-                    : Model.FullName)
-            </p>
+            <div class="detail-item">
+                <span class="label">نام کاربری</span>
+                <span class="value" dir="ltr">
+                    @(string.IsNullOrWhiteSpace(Model.UserName) ? "-" : Model.UserName)
+                </span>
+            </div>
 
-
-            <!-- شماره تلفن -->
-            <p>
-                <strong>شماره تلفن:</strong>
-
-                @(string.IsNullOrWhiteSpace(Model.PhoneNumber)
-                    ? "-"
-                    : Model.PhoneNumber)
-            </p>
-
-
-            <!-- Email -->
-            <p>
-                <strong>Email:</strong>
-
-                @(string.IsNullOrWhiteSpace(Model.Email)
-                    ? "-"
-                    : Model.Email)
-            </p>
-
-
-            <!-- Username -->
-            <p>
-                <strong>نام کاربری:</strong>
-
-                @(string.IsNullOrWhiteSpace(Model.UserName)
-                    ? "-"
-                    : Model.UserName)
-            </p>
-
-
-            <!-- Role -->
-            <p>
-
-                <strong>Role:</strong>
-
-                @if (roles.Any())
-                {
-                    foreach (var role in roles)
+            <div class="detail-item">
+                <span class="label">نقش</span>
+                <span class="value">
+                    @if (roles.Any())
                     {
-                        <span class="badge bg-primary me-1">
-                            @role
+                        <span class="badge-list">
+                            @foreach (var role in roles)
+                            {
+                                <span class="status-badge status-badge-primary">@role</span>
+                            }
                         </span>
                     }
-                }
-                else
-                {
-                    <span class="badge bg-secondary">
-                        بدون نقش
-                    </span>
-                }
+                    else
+                    {
+                        <span class="status-badge status-badge-muted">بدون نقش</span>
+                    }
+                </span>
+            </div>
+        </div>
+    </section>
 
-            </p>
+    <section class="admin-card">
+        <div class="card-header">
+            <div>
+                <h2>وضعیت امنیتی</h2>
+                <p>وضعیت اعتبارسنجی و دسترسی حساب</p>
+            </div>
+        </div>
 
-
-            <!-- وضعیت رمز عبور -->
-            <p>
-
-                <strong>رمز عبور:</strong>
+        <div class="security-list">
+            <div class="security-item">
+                <div class="security-item-info">
+                    <span class="security-icon"><i class="fa fa-key"></i></span>
+                    <div>
+                        <strong>رمز عبور</strong>
+                        <small>وضعیت تنظیم رمز عبور</small>
+                    </div>
+                </div>
 
                 @if (!string.IsNullOrEmpty(Model.PasswordHash))
                 {
-                    <span class="badge bg-success">
-                        تنظیم شده
-                    </span>
+                    <span class="status-badge status-badge-success">تنظیم شده</span>
                 }
                 else
                 {
-                    <span class="badge bg-danger">
-                        تنظیم نشده
-                    </span>
+                    <span class="status-badge status-badge-danger">تنظیم نشده</span>
                 }
+            </div>
 
-            </p>
-
-
-            <!-- وضعیت شماره تلفن -->
-            <p>
-
-                <strong>تأیید شماره تلفن:</strong>
+            <div class="security-item">
+                <div class="security-item-info">
+                    <span class="security-icon"><i class="fa fa-mobile"></i></span>
+                    <div>
+                        <strong>شماره تلفن</strong>
+                        <small>وضعیت تأیید شماره موبایل</small>
+                    </div>
+                </div>
 
                 @if (Model.PhoneNumberConfirmed)
                 {
-                    <span class="badge bg-success">
-                        تأیید شده
-                    </span>
+                    <span class="status-badge status-badge-success">تأیید شده</span>
                 }
                 else
                 {
-                    <span class="badge bg-secondary">
-                        تأیید نشده
-                    </span>
+                    <span class="status-badge status-badge-muted">تأیید نشده</span>
                 }
+            </div>
 
-            </p>
-
-
-            <!-- وضعیت ایمیل -->
-            <p>
-
-                <strong>تأیید ایمیل:</strong>
+            <div class="security-item">
+                <div class="security-item-info">
+                    <span class="security-icon"><i class="fa fa-envelope"></i></span>
+                    <div>
+                        <strong>ایمیل</strong>
+                        <small>وضعیت تأیید ایمیل</small>
+                    </div>
+                </div>
 
                 @if (Model.EmailConfirmed)
                 {
-                    <span class="badge bg-success">
-                        تأیید شده
-                    </span>
+                    <span class="status-badge status-badge-success">تأیید شده</span>
                 }
                 else
                 {
-                    <span class="badge bg-secondary">
-                        تأیید نشده
-                    </span>
+                    <span class="status-badge status-badge-muted">تأیید نشده</span>
                 }
-
-            </p>
-
-
-            <!-- وضعیت قفل -->
-            <p>
-
-                <strong>وضعیت حساب:</strong>
-
-                @if (Model.LockoutEnd.HasValue &&
-                Model.LockoutEnd.Value > DateTimeOffset.UtcNow)
-                {
-                    <span class="badge bg-danger">
-                        قفل شده
-                    </span>
-                }
-                else
-                {
-                    <span class="badge bg-success">
-                        فعال
-                    </span>
-                }
-
-            </p>
-
-
-            <hr />
-
-
-            <!-- دکمه‌ها -->
-            <div class="mt-3">
-
-                <a asp-action="Edit"
-                   asp-route-id="@Model.Id"
-                   class="btn btn-warning">
-
-                    <i class="fa fa-edit"></i>
-                    ویرایش کاربر
-
-                </a>
-
-
-                <a asp-action="Index"
-                   class="btn btn-secondary">
-
-                    <i class="fa fa-arrow-right"></i>
-                    بازگشت
-
-                </a>
-
             </div>
 
+            <div class="security-item">
+                <div class="security-item-info">
+                    <span class="security-icon"><i class="fa fa-shield"></i></span>
+                    <div>
+                        <strong>وضعیت حساب</strong>
+                        <small>بررسی قفل بودن حساب</small>
+                    </div>
+                </div>
+
+                @if (Model.LockoutEnd.HasValue && Model.LockoutEnd.Value > DateTimeOffset.UtcNow)
+                {
+                    <span class="status-badge status-badge-danger">قفل شده</span>
+                }
+                else
+                {
+                    <span class="status-badge status-badge-success">فعال</span>
+                }
+            </div>
         </div>
 
-    </div>
-
+        <div class="form-actions details-actions">
+            <a asp-action="Index" class="admin-btn admin-btn-secondary">
+                <i class="fa fa-arrow-right"></i>
+                بازگشت به کاربران
+            </a>
+        </div>
+    </section>
 </div>

@@ -2,170 +2,144 @@
 
 @{
     ViewData["Title"] = "مدیریت کاربران";
+    var users = Model?.ToList() ?? new List<DataAccess.Models.User>();
 }
 
-<div class="admin-dashboard">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-            <h2 class="fw-bold">
-                مدیریت کاربران
-            </h2>
-
-            <p class="text-muted mb-0">
-                لیست کاربران ثبت‌نام شده در سیستم
-            </p>
-        </div>
-
+<div class="page-header users-page-header">
+    <div>
+        <span class="page-eyebrow">مدیریت حساب‌ها</span>
+        <h1>مدیریت کاربران</h1>
+        <p>کاربران ثبت‌نام‌شده در سیستم را مشاهده و مدیریت کنید.</p>
     </div>
 
+    <div class="page-header-meta">
+        <span class="count-badge">
+            <i class="fa fa-users"></i>
+            <strong id="usersCount">@users.Count</strong>
+            کاربر
+        </span>
+    </div>
+</div>
 
-    <div class="admin-card">
+<section class="admin-card">
+    <div class="table-toolbar">
+        <div>
+            <h2 class="section-title">فهرست کاربران</h2>
+            <p class="section-subtitle">برای جست‌وجوی سریع، نام، شماره موبایل یا ایمیل را وارد کنید.</p>
+        </div>
 
-        <div class="table-responsive">
+        <div class="table-search">
+            <i class="fa fa-search"></i>
+            <input type="search"
+                   placeholder="جست‌وجوی کاربر..."
+                   aria-label="جست‌وجوی کاربر"
+                   data-user-search />
+            <button type="button"
+                    class="search-clear"
+                    data-search-clear
+                    aria-label="پاک کردن جست‌وجو"
+                    title="پاک کردن جست‌وجو">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+    </div>
 
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success">
-                    @TempData["Success"]
-                </div>
-            }
+    <div class="table-scroll">
+        <table class="admin-table users-table">
+            <thead>
+                <tr>
+                    <th class="col-index">#</th>
+                    <th>نام و نام خانوادگی</th>
+                    <th>شماره موبایل</th>
+                    <th>ایمیل</th>
+                    <th class="col-actions">عملیات</th>
+                </tr>
+            </thead>
 
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger">
-                    @TempData["Error"]
-                </div>
-            }
+            <tbody data-users-body>
+                @if (users.Any())
+                {
+                    var counter = 1;
 
-            <table class="table table-hover align-middle">
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            #
-                        </th>
-
-                        <th>
-                            نام و نام خانوادگی
-                        </th>
-
-                        <th>
-                            شماره موبایل
-                        </th>
-
-                        <th>
-                            ایمیل
-                        </th>
-
-                        <th>
-                            عملیات
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    @if (Model != null && Model.Any())
+                    foreach (var user in users)
                     {
-                        int counter = 1;
+                        var fullName = string.IsNullOrWhiteSpace(user.FullName) ? "-" : user.FullName;
+                        var phone = string.IsNullOrWhiteSpace(user.PhoneNumber) ? "-" : user.PhoneNumber;
+                        var email = string.IsNullOrWhiteSpace(user.Email) ? "-" : user.Email;
 
-                        foreach (var user in Model)
-                        {
-                            <tr>
+                        <tr data-user-row
+                            data-search="@($"{fullName} {phone} {email}")">
+                            <td class="muted-number">@counter</td>
 
-                                <td>
-                                    @counter
-                                </td>
+                            <td>
+                                <div class="user-table-name">
+                                    <span class="user-avatar">
+                                        @(string.IsNullOrWhiteSpace(user.FullName) ? "؟" : user.FullName.Trim().Substring(0, 1))
+                                    </span>
+                                    <div>
+                                        <strong>@fullName</strong>
+                                        <small>شناسه: @user.Id</small>
+                                    </div>
+                                </div>
+                            </td>
 
-                                <td>
-                                    @(user.FullName ?? "-")
-                                </td>
+                            <td dir="ltr" class="ltr-cell">@phone</td>
+                            <td dir="ltr" class="ltr-cell">@email</td>
 
-                                <td>
-                                    @(user.PhoneNumber ?? "-")
-                                </td>
-
-                                <td>
-                                    @(user.Email ?? "-")
-                                </td>
-
-                                <td>
-
+                            <td>
+                                <div class="action-group">
                                     <a asp-controller="AdminUser"
                                        asp-action="Details"
                                        asp-route-id="@user.Id"
-                                       class="btn btn-sm btn-info">
-
+                                       class="action-btn action-view"
+                                       title="مشاهده جزئیات"
+                                       aria-label="مشاهده جزئیات">
                                         <i class="fa fa-eye"></i>
-                                        جزئیات
-
                                     </a>
-
 
                                     <a asp-controller="AdminUser"
                                        asp-action="Edit"
                                        asp-route-id="@user.Id"
-                                       class="btn btn-sm btn-warning">
-
+                                       class="action-btn action-edit"
+                                       title="ویرایش کاربر"
+                                       aria-label="ویرایش کاربر">
                                         <i class="fa fa-edit"></i>
-                                        ویرایش
-
                                     </a>
-
 
                                     <form asp-controller="AdminUser"
                                           asp-action="Delete"
                                           asp-route-id="@user.Id"
                                           method="post"
-                                          style="display:inline;">
-
+                                          class="delete-confirm-form"
+                                          data-item-name="@(string.IsNullOrWhiteSpace(user.FullName) ? "این کاربر" : user.FullName)">
                                         @Html.AntiForgeryToken()
-
                                         <button type="submit"
-                                                class="btn btn-sm btn-danger"
-                                                onclick="return confirm('آیا از حذف این کاربر مطمئن هستید؟');">
-
+                                                class="action-btn action-delete"
+                                                title="حذف کاربر"
+                                                aria-label="حذف کاربر">
                                             <i class="fa fa-trash"></i>
-                                            حذف
-
                                         </button>
-
                                     </form>
-
-                                </td>
-
-                            </tr>
-
-                            counter++;
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-
-                            <td colspan="5"
-                                class="text-center text-muted">
-
-                                هیچ کاربری پیدا نشد.
-
+                                </div>
                             </td>
-
                         </tr>
+
+                        counter++;
                     }
+                }
 
-                </tbody>
-
-            </table>
-
-        </div>
-
+                <tr data-user-empty class="@(users.Any() ? "d-none" : null)">
+                    <td colspan="5">
+                        <div class="empty-state compact-empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <strong>کاربری پیدا نشد</strong>
+                            <span>هنوز کاربری برای نمایش وجود ندارد یا عبارت جست‌وجو نتیجه‌ای نداشت.</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-
-</div>
+</section>

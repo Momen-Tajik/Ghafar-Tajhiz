@@ -2,106 +2,228 @@
 
 @{
     ViewData["Title"] = "جزئیات محصول";
+
+    var categoryName =
+        Model.Category?.CategoryName ?? "بدون دسته‌بندی";
 }
 
 <div class="page-header">
-    <h1>جزئیات محصول</h1>
-</div>
 
-<div class="admin-card details-card">
+    <div class="page-title-row">
 
-    <div class="details-grid">
-
-        <div class="detail-item">
-            <span class="label">نام محصول</span>
-            <span class="value">
-                @Model.ProductName
-            </span>
+        <div class="page-icon">
+            <i class="fa fa-cube"></i>
         </div>
 
-        <div class="detail-item">
-            <span class="label">توضیحات</span>
-            <span class="value">
-                @(string.IsNullOrWhiteSpace(Model.ProductDescription)
-                    ? "—"
-                    : Model.ProductDescription)
-            </span>
-        </div>
+        <div>
 
-        <div class="detail-item">
-            <span class="label">قیمت</span>
-            <span class="value">
-                @Model.Price.ToString("N0") تومان
-            </span>
-        </div>
+            <h1>
+                جزئیات محصول
+            </h1>
 
-        <div class="detail-item">
-            <span class="label">موجودی</span>
-            <span class="value">
-                @Model.StockQuantity
-            </span>
-        </div>
-
-        <div class="detail-item">
-            <span class="label">دسته‌بندی</span>
-            <span class="value">
-                @Model.Category?.CategoryName
-            </span>
-        </div>
-
-        <div class="detail-item">
-            <span class="label">وضعیت</span>
-            <span class="value">
-                @(Model.IsAvailable ? "فعال" : "غیرفعال")
-            </span>
-        </div>
-
-        <div class="detail-item">
-            <span class="label">تاریخ ایجاد</span>
-            <span class="value">
-                @Model.CreateDate.ToString("yyyy/MM/dd")
-            </span>
-        </div>
-
-        <div class="detail-item image-item">
-
-            <span class="label">
-                تصویر
-            </span>
-
-            <span class="value">
-
-                @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
-                {
-                    <img src="/api/FileUpload/GetFile?fileName=@Uri.EscapeDataString(Model.ImageUrl)"
-                         alt="@Model.ProductName"
-                         class="details-image"
-                         loading="lazy" />
-                }
-                else
-                {
-                    <span>
-                        بدون تصویر
-                    </span>
-                }
-
-            </span>
+            <p>
+                مشاهده اطلاعات کامل محصول
+            </p>
 
         </div>
 
     </div>
+
+</div>
+
+
+<div class="admin-card product-details-card">
+
+
+    <div class="product-details-main">
+
+
+        <div class="product-details-image-area">
+
+            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+            {
+                <div class="product-main-image-wrapper">
+
+                    <img src="/api/FileUpload/GetFile?fileName=@Uri.EscapeDataString(Model.ImageUrl)"
+                         alt="@Model.ProductName"
+                         class="product-main-image"
+                         loading="lazy" />
+
+                </div>
+            }
+            else
+            {
+                <div class="product-main-image-wrapper empty">
+
+                    <i class="fa fa-picture-o"></i>
+
+                    <span>
+                        بدون تصویر
+                    </span>
+
+                </div>
+            }
+
+        </div>
+
+
+        <div class="product-details-summary">
+
+            <div class="product-details-top">
+
+                <div>
+
+                    <span class="product-details-label">
+                        محصول
+                    </span>
+
+                    <h2>
+                        @Model.ProductName
+                    </h2>
+
+                </div>
+
+
+                @if (Model.IsAvailable)
+                {
+                    <span class="status-badge status-active large">
+                        <i class="fa fa-check"></i>
+                        فعال
+                    </span>
+                }
+                else
+                {
+                    <span class="status-badge status-inactive large">
+                        <i class="fa fa-ban"></i>
+                        غیرفعال
+                    </span>
+                }
+
+            </div>
+
+
+            <div class="product-details-price">
+
+                <strong>
+                    @Model.Price.ToString("N0")
+                </strong>
+
+                <span>
+                    تومان
+                </span>
+
+            </div>
+
+
+            <div class="product-details-meta">
+
+                <div>
+
+                    <span class="label">
+                        دسته‌بندی
+                    </span>
+
+                    <strong>
+                        @categoryName
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span class="label">
+                        موجودی
+                    </span>
+
+                    <strong>
+                        @Model.StockQuantity عدد
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span class="label">
+                        تاریخ ایجاد
+                    </span>
+
+                    <strong>
+                        @Model.CreateDate.ToString("yyyy/MM/dd")
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="product-description-section">
+
+        <div class="details-section-title">
+
+            <i class="fa fa-file-text-o"></i>
+
+            <h3>
+                توضیحات محصول
+            </h3>
+
+        </div>
+
+
+        <div class="product-description-box">
+
+            @if (string.IsNullOrWhiteSpace(Model.ProductDescription))
+            {
+                <span class="muted">
+                    توضیحی برای این محصول ثبت نشده است.
+                </span>
+            }
+            else
+            {
+                @Model.ProductDescription
+            }
+
+        </div>
+
+    </div>
+
 
     <div class="form-actions">
 
         <a asp-action="Edit"
            asp-route-id="@Model.ProductId"
            class="form-button primary">
-            ویرایش
+
+            <i class="fa fa-edit"></i>
+
+            ویرایش محصول
+
         </a>
+
+
+        <a asp-action="Delete"
+           asp-route-id="@Model.ProductId"
+           class="form-button danger-outline">
+
+            <i class="fa fa-trash"></i>
+
+            حذف
+
+        </a>
+
 
         <a asp-action="Index"
            class="form-button secondary">
-            بازگشت
+
+            <i class="fa fa-arrow-right"></i>
+
+            بازگشت به محصولات
+
         </a>
 
     </div>

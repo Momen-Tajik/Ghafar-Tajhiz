@@ -2,161 +2,355 @@
 
 @{
     ViewData["Title"] = "مدیریت محصولات";
+    var products = Model?.ToList() ?? new List<DataAccess.Models.Product>();
 }
 
-<div class="page-header">
+<div class="page-header product-page-header">
 
-    <h1>
-        مدیریت محصولات
-    </h1>
+    <div>
+        <div class="page-title-row">
 
-    <p>
-        لیست محصولات ثبت‌شده در فروشگاه
-    </p>
+            <div class="page-icon">
+                <i class="fa fa-cubes"></i>
+            </div>
+
+            <div>
+                <h1>مدیریت محصولات</h1>
+
+                <p>
+                    مدیریت، ویرایش و مشاهده محصولات فروشگاه
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <a asp-action="Create"
+       class="form-button primary product-add-button">
+
+        <i class="fa fa-plus"></i>
+
+        افزودن محصول
+
+    </a>
 
 </div>
 
-<div class="admin-card">
 
-    <div style="margin-bottom:16px;">
+<div class="admin-card product-list-card">
 
-        <a asp-action="Create"
-           class="form-button">
+    <div class="product-toolbar">
 
-            <i class="fa fa-plus"></i>
-            افزودن محصول جدید
+        <div class="product-toolbar-info">
 
-        </a>
+            <span class="product-count">
+                <strong>@products.Count</strong>
+                محصول
+            </span>
+
+            @if (products.Any())
+            {
+                <span class="product-toolbar-separator"></span>
+
+                <span class="product-toolbar-hint">
+                    برای پیدا کردن سریع محصول جستجو کنید
+                </span>
+            }
+
+        </div>
+
+
+        @if (products.Any())
+        {
+            <div class="product-search">
+
+                <i class="fa fa-search"></i>
+
+                <input type="search"
+                       id="productSearch"
+                       class="product-search-input"
+                       placeholder="جستجوی محصول..."
+                       autocomplete="off" />
+
+                <button type="button"
+                        id="clearProductSearch"
+                        class="product-search-clear"
+                        title="پاک کردن جستجو"
+                        aria-label="پاک کردن جستجو">
+
+                    <i class="fa fa-times"></i>
+
+                </button>
+
+            </div>
+        }
 
     </div>
 
-    @if (!Model.Any())
+
+    @if (!products.Any())
     {
-        <div class="empty-state">
-            هنوز محصولی ثبت نشده است.
+        <div class="product-empty-state">
+
+            <div class="product-empty-icon">
+                <i class="fa fa-cubes"></i>
+            </div>
+
+            <h3>
+                هنوز محصولی ثبت نشده است
+            </h3>
+
+            <p>
+                برای شروع، اولین محصول فروشگاه را اضافه کنید.
+            </p>
+
+            <a asp-action="Create"
+               class="form-button primary">
+
+                <i class="fa fa-plus"></i>
+                افزودن اولین محصول
+
+            </a>
+
         </div>
     }
     else
     {
         <div class="table-scroll">
 
-            <table class="admin-table">
+            <table class="admin-table products-table">
 
                 <thead>
+
                     <tr>
-                        <th>نام محصول</th>
-                        <th>توضیحات</th>
-                        <th>قیمت</th>
-                        <th>موجودی</th>
-                        <th>تصویر</th>
-                        <th>وضعیت</th>
-                        <th>تاریخ ایجاد</th>
-                        <th>دسته‌بندی</th>
-                        <th>عملیات</th>
+
+                        <th class="product-col-main">
+                            محصول
+                        </th>
+
+                        <th>
+                            قیمت
+                        </th>
+
+                        <th>
+                            موجودی
+                        </th>
+
+                        <th>
+                            وضعیت
+                        </th>
+
+                        <th>
+                            دسته‌بندی
+                        </th>
+
+                        <th>
+                            تاریخ ایجاد
+                        </th>
+
+                        <th class="product-actions-column">
+                            عملیات
+                        </th>
+
                     </tr>
+
                 </thead>
 
-                <tbody>
 
-                    @foreach (var item in Model)
+                <tbody id="productsTableBody">
+
+                    @foreach (var item in products)
                     {
-                        <tr>
+                        var description =
+                            item.ProductDescription?.Trim() ?? "";
+
+                        var shortDescription =
+                            description.Length > 65
+                                ? description[..65] + "..."
+                                : description;
+
+                        var categoryName =
+                            item.Category?.CategoryName ?? "بدون دسته‌بندی";
+
+                        var stockClass =
+                            item.StockQuantity <= 0
+                                ? "stock-danger"
+                                : item.StockQuantity <= 5
+                                    ? "stock-warning"
+                                    : "stock-good";
+
+                        <tr class="product-row"
+                            data-search="@($"{item.ProductName} {categoryName} {item.ProductDescription}")">
 
                             <td>
-                                @item.ProductName
+
+                                <div class="product-table-info">
+
+                                    @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                                    {
+                                        <img class="product-list-image"
+                                             src="/api/FileUpload/GetFile?fileName=@Uri.EscapeDataString(item.ImageUrl)"
+                                             alt="@item.ProductName"
+                                             loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <div class="product-list-image product-list-image-empty">
+
+                                            <i class="fa fa-picture-o"></i>
+
+                                        </div>
+                                    }
+
+
+                                    <div class="product-table-content">
+
+                                        <strong class="product-name">
+                                            @item.ProductName
+                                        </strong>
+
+                                        @if (!string.IsNullOrWhiteSpace(shortDescription))
+                                        {
+                                            <span class="product-description">
+                                                @shortDescription
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="product-description muted">
+                                                بدون توضیحات
+                                            </span>
+                                        }
+
+                                    </div>
+
+                                </div>
+
                             </td>
 
-                            <td>
-                                @{
-                                    var description =
-                                    item.ProductDescription ?? "";
-
-                                    var shortDescription =
-                                    description.Length > 50
-                                    ? description[..50] + "..."
-                                    : description;
-                                }
-
-                                @(string.IsNullOrWhiteSpace(shortDescription)
-                                    ? "—"
-                                    : shortDescription)
-                            </td>
-
-                            <td>
-                                @item.Price.ToString("N0") تومان
-                            </td>
-
-                            <td>
-                                @item.StockQuantity
-                            </td>
 
                             <td>
 
-                                @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
-                                {
-                                    <img class="product-image"
-                                         src="/api/FileUpload/GetFile?fileName=@Uri.EscapeDataString(item.ImageUrl)"
-                                         alt="@item.ProductName"
-                                         loading="lazy" />
-                                }
-                                else
-                                {
+                                <div class="product-price">
+
+                                    <strong>
+                                        @item.Price.ToString("N0")
+                                    </strong>
+
                                     <span>
-                                        —
+                                        تومان
                                     </span>
-                                }
+
+                                </div>
 
                             </td>
+
+
+                            <td>
+
+                                <span class="stock-badge @stockClass">
+
+                                    @if (item.StockQuantity <= 0)
+                                    {
+                                        <i class="fa fa-times-circle"></i>
+                                        <span>ناموجود</span>
+                                    }
+                                    else if (item.StockQuantity <= 5)
+                                    {
+                                        <i class="fa fa-exclamation-circle"></i>
+                                        <span>@item.StockQuantity</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa fa-check-circle"></i>
+                                        <span>@item.StockQuantity</span>
+                                    }
+
+                                </span>
+
+                            </td>
+
 
                             <td>
 
                                 @if (item.IsAvailable)
                                 {
-                                    <span class="boolean-true">
+                                    <span class="status-badge status-active">
+                                        <i class="fa fa-check"></i>
                                         فعال
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="boolean-false">
+                                    <span class="status-badge status-inactive">
+                                        <i class="fa fa-ban"></i>
                                         غیرفعال
                                     </span>
                                 }
 
                             </td>
 
+
                             <td>
-                                @item.CreateDate.ToString("yyyy/MM/dd")
+
+                                <span class="category-badge">
+                                    <i class="fa fa-tag"></i>
+                                    @categoryName
+                                </span>
+
                             </td>
 
+
                             <td>
-                                @item.Category?.CategoryName
+
+                                <span class="date-value">
+                                    @item.CreateDate.ToString("yyyy/MM/dd")
+                                </span>
+
                             </td>
 
+
                             <td>
 
-                                <div class="action-group">
-
-                                    <a asp-action="Edit"
-                                       asp-route-id="@item.ProductId"
-                                       class="action-btn action-edit"
-                                       title="ویرایش">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
+                                <div class="action-group product-action-group">
 
                                     <a asp-action="Details"
                                        asp-route-id="@item.ProductId"
                                        class="action-btn action-view"
-                                       title="جزئیات">
+                                       title="مشاهده جزئیات"
+                                       aria-label="مشاهده جزئیات">
+
                                         <i class="fa fa-eye"></i>
+
                                     </a>
 
-                                    <a asp-action="Delete"
+
+                                    <a asp-action="Edit"
                                        asp-route-id="@item.ProductId"
-                                       class="action-btn action-delete"
-                                       title="حذف">
-                                        <i class="fa fa-trash"></i>
+                                       class="action-btn action-edit"
+                                       title="ویرایش محصول"
+                                       aria-label="ویرایش محصول">
+
+                                        <i class="fa fa-edit"></i>
+
                                     </a>
+
+
+                                    <form asp-action="Delete"
+                                          asp-route-id="@item.ProductId"
+                                          method="get"
+                                          class="product-delete-link">
+
+                                        <button type="submit"
+                                                class="action-btn action-delete"
+                                                title="حذف محصول"
+                                                aria-label="حذف محصول">
+
+                                            <i class="fa fa-trash"></i>
+
+                                        </button>
+
+                                    </form>
 
                                 </div>
 
@@ -170,6 +364,135 @@
             </table>
 
         </div>
+
+
+        <div id="productSearchEmpty"
+             class="product-search-empty"
+             style="display:none;">
+
+            <div class="product-empty-icon small">
+                <i class="fa fa-search"></i>
+            </div>
+
+            <h4>
+                محصولی پیدا نشد
+            </h4>
+
+            <p>
+                عبارت جستجو را تغییر دهید.
+            </p>
+
+        </div>
     }
 
 </div>
+
+
+@section Scripts {
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const searchInput =
+                document.getElementById("productSearch");
+
+            const clearButton =
+                document.getElementById("clearProductSearch");
+
+            const rows =
+                document.querySelectorAll(".product-row");
+
+            const emptyState =
+                document.getElementById("productSearchEmpty");
+
+
+            if (!searchInput) {
+                return;
+            }
+
+
+            function filterProducts() {
+
+                const query =
+                    searchInput.value
+                        .trim()
+                        .toLowerCase();
+
+
+                let visibleCount = 0;
+
+
+                rows.forEach(function (row) {
+
+                    const text =
+                        (row.dataset.search || "")
+                            .toLowerCase();
+
+
+                    const visible =
+                        !query ||
+                        text.includes(query);
+
+
+                    row.style.display =
+                        visible ? "" : "none";
+
+
+                    if (visible) {
+                        visibleCount++;
+                    }
+
+                });
+
+
+                if (emptyState) {
+
+                    emptyState.style.display =
+                        visibleCount === 0
+                            ? "block"
+                            : "none";
+
+                }
+
+
+                if (clearButton) {
+
+                    clearButton.classList.toggle(
+                        "visible",
+                        searchInput.value.length > 0
+                    );
+
+                }
+
+            }
+
+
+            searchInput.addEventListener(
+                "input",
+                filterProducts
+            );
+
+
+            if (clearButton) {
+
+                clearButton.addEventListener(
+                    "click",
+                    function () {
+
+                        searchInput.value = "";
+
+                        filterProducts();
+
+                        searchInput.focus();
+
+                    }
+                );
+
+            }
+
+        });
+
+    </script>
+
+}

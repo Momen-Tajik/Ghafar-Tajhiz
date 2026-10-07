@@ -1,21 +1,40 @@
-﻿@model ErrorViewModel
+﻿@model Ghafar_Tajhiz_Admin.Models.ErrorViewModel
 
 @{
     ViewData["Title"] = "خطا";
 }
 
-<div class="text-center">
-    <h1 class="text-danger">خطایی رخ داد</h1>
-
-    <h2 class="text-danger">
-        در پردازش درخواست شما مشکلی پیش آمد.
-    </h2>
-
-    @if (!string.IsNullOrEmpty(Model.TraceId))
-    {
-        <p>
-            <strong>Trace ID:</strong>
-            <code>@Model.TraceId</code>
-        </p>
-    }
+<div class="page-header">
+    <span class="page-eyebrow">خطای سیستم</span>
+    <h1>خطایی رخ داد</h1>
+    <p>متأسفانه در پردازش درخواست شما مشکلی پیش آمد.</p>
 </div>
+
+<section class="admin-card error-state-card">
+    <div class="state-icon state-icon-danger">
+        <i class="fa fa-exclamation-triangle"></i>
+    </div>
+
+    <h2>انجام عملیات امکان‌پذیر نیست</h2>
+
+    <p>
+        لطفاً دوباره تلاش کنید. اگر مشکل ادامه داشت، با مدیر سیستم تماس بگیرید.
+    </p>
+
+    @if (!string.IsNullOrWhiteSpace(Model.TraceId))
+    {
+        <div class="trace-id">
+            <span>کد پیگیری</span>
+            <strong dir="ltr">@Model.TraceId</strong>
+        </div>
+    }
+
+    <div class="state-actions">
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="admin-btn admin-btn-primary">
+            <i class="fa fa-home"></i>
+            بازگشت به داشبورد
+        </a>
+    </div>
+</section>

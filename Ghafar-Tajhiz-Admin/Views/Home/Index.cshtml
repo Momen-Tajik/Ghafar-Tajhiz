@@ -2,66 +2,75 @@
     ViewData["Title"] = "داشبورد";
 }
 
-<div class="admin-dashboard">
-
-    <div class="mb-4">
-
-        <h2 class="fw-bold">
-            داشبورد
-        </h2>
-
-        <p class="text-muted mb-0">
-            خوش آمدید. از این بخش می‌توانید مدیریت فروشگاه را انجام دهید.
-        </p>
-
+<div class="page-header dashboard-header">
+    <div>
+        <span class="page-eyebrow">مدیریت فروشگاه</span>
+        <h1>داشبورد</h1>
+        <p>خوش آمدید. از این بخش می‌توانید بخش‌های اصلی فروشگاه را مدیریت کنید.</p>
     </div>
-
-    <div class="admin-card">
-
-        <h5 class="mb-3">
-            دسترسی سریع
-        </h5>
-
-        <div class="d-flex flex-wrap gap-3">
-
-            <a asp-controller="Products"
-               asp-action="Create"
-               class="btn btn-primary">
-
-                <i class="fa fa-plus"></i>
-                افزودن محصول
-
-            </a>
-
-            <a asp-controller="Categories"
-               asp-action="Create"
-               class="btn btn-outline-primary">
-
-                <i class="fa fa-list"></i>
-                افزودن دسته‌بندی
-
-            </a>
-
-            <a asp-controller="Orders"
-               asp-action="Index"
-               class="btn btn-outline-secondary">
-
-                <i class="fa fa-shopping-cart"></i>
-                مشاهده سفارش‌ها
-
-            </a>
-
-            <a asp-controller="AdminUser"
-               asp-action="Index"
-               class="btn btn-outline-secondary">
-
-                <i class="fa fa-users"></i>
-                مدیریت کاربران
-
-            </a>
-
-        </div>
-
-    </div>
-
 </div>
+
+<section class="admin-card quick-actions-card">
+    <div class="card-header">
+        <div>
+            <h2>دسترسی سریع</h2>
+            <p>کارهای پرتکرار را سریع‌تر انجام دهید.</p>
+        </div>
+    </div>
+
+    <div class="quick-actions-grid">
+        <a asp-controller="Products"
+           asp-action="Create"
+           class="quick-action quick-action-primary">
+            <span class="quick-action-icon"><i class="fa fa-cube"></i></span>
+            <span>
+                <strong>افزودن محصول</strong>
+                <small>ایجاد یک محصول جدید</small>
+            </span>
+            <i class="fa fa-angle-left quick-action-arrow"></i>
+        </a>
+
+        <a asp-controller="Categories"
+           asp-action="Create"
+           class="quick-action">
+            <span class="quick-action-icon"><i class="fa fa-list"></i></span>
+            <span>
+                <strong>افزودن دسته‌بندی</strong>
+                <small>ایجاد دسته‌بندی جدید</small>
+            </span>
+            <i class="fa fa-angle-left quick-action-arrow"></i>
+        </a>
+
+        <a asp-controller="Orders"
+           asp-action="Index"
+           class="quick-action">
+            <span class="quick-action-icon"><i class="fa fa-shopping-cart"></i></span>
+            <span>
+                <strong>مشاهده سفارش‌ها</strong>
+                <small>بررسی سفارش‌های ثبت‌شده</small>
+            </span>
+            <i class="fa fa-angle-left quick-action-arrow"></i>
+        </a>
+
+        <a asp-controller="AdminUser"
+           asp-action="Index"
+           class="quick-action">
+            <span class="quick-action-icon"><i class="fa fa-users"></i></span>
+            <span>
+                <strong>مدیریت کاربران</strong>
+                <small>مشاهده و ویرایش کاربران</small>
+            </span>
+            <i class="fa fa-angle-left quick-action-arrow"></i>
+        </a>
+    </div>
+</section>
+
+<section class="admin-card dashboard-note-card">
+    <div class="dashboard-note-icon">
+        <i class="fa fa-info"></i>
+    </div>
+    <div>
+        <h3>نکته</h3>
+        <p>برای انجام عملیات حساس مانند حذف کاربر یا تأیید پرداخت، پیام تأیید نمایش داده می‌شود.</p>
+    </div>
+</section>

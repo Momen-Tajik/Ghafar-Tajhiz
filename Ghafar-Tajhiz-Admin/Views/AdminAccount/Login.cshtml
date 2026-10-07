@@ -1,96 +1,86 @@
 ﻿@{
     ViewData["Title"] = "ورود مدیر";
+    Layout = "_AdminAuthLayout";
 }
 
-<div class="container mt-5">
-
-    <div class="row justify-content-center">
-
-        <div class="col-md-5">
-
-            <div class="card shadow">
-
-                <div class="card-body">
-
-                    <h3 class="text-center mb-4">
-                        ورود به پنل مدیریت
-                    </h3>
-
-                    @if (TempData["LoginError"] != null)
-                    {
-                        <div class="alert alert-danger">
-                            @TempData["LoginError"]
-                        </div>
-                    }
-
-                    <form asp-controller="AdminAccount"
-                          asp-action="Login"
-                          method="post">
-
-                        @Html.AntiForgeryToken()
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                شماره موبایل
-                            </label>
-
-                            <input type="text"
-                                   name="phoneNumber"
-                                   class="form-control"
-                                   placeholder="مثلاً 09123456789"
-                                   autocomplete="username" />
-
-                        </div>
-
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                رمز عبور
-                            </label>
-
-                            <input type="password"
-                                   name="password"
-                                   class="form-control"
-                                   autocomplete="current-password" />
-
-                        </div>
-
-
-                        <div class="form-check mb-3">
-
-                            <input type="checkbox"
-                                   name="rememberMe"
-                                   value="true"
-                                   class="form-check-input"
-                                   id="rememberMe" />
-
-                            <label class="form-check-label"
-                                   for="rememberMe">
-
-                                مرا به خاطر بسپار
-
-                            </label>
-
-                        </div>
-
-
-                        <button type="submit"
-                                class="btn btn-primary w-100">
-
-                            ورود به پنل مدیریت
-
-                        </button>
-
-                    </form>
-
-                </div>
-
+<div class="auth-shell">
+    <div class="auth-card">
+        <div class="auth-brand">
+            <div class="auth-brand-icon">
+                <i class="fa fa-cogs"></i>
             </div>
-
+            <div>
+                <div class="auth-brand-title">Ghafar Tajhiz</div>
+                <div class="auth-brand-subtitle">پنل مدیریت</div>
+            </div>
         </div>
 
-    </div>
+        <div class="auth-heading">
+            <h1>ورود به پنل مدیریت</h1>
+            <p>برای ادامه، اطلاعات حساب مدیر را وارد کنید.</p>
+        </div>
 
+        @if (TempData["LoginError"] != null)
+        {
+            <div class="auth-alert auth-alert-danger" role="alert">
+                <i class="fa fa-exclamation-circle"></i>
+                <span>@TempData["LoginError"]</span>
+            </div>
+        }
+
+        <form asp-controller="AdminAccount"
+              asp-action="Login"
+              method="post"
+              class="auth-form">
+
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label for="phoneNumber">شماره موبایل</label>
+                <div class="input-with-icon">
+                    <i class="fa fa-mobile"></i>
+                    <input id="phoneNumber"
+                           type="tel"
+                           name="phoneNumber"
+                           class="form-input"
+                           placeholder="مثلاً 09123456789"
+                           inputmode="numeric"
+                           autocomplete="username"
+                           dir="ltr" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">رمز عبور</label>
+                <div class="input-with-action">
+                    <i class="fa fa-lock input-leading-icon"></i>
+                    <input id="password"
+                           type="password"
+                           name="password"
+                           class="form-input"
+                           autocomplete="current-password" />
+                    <button type="button"
+                            class="password-toggle"
+                            data-password-toggle="password"
+                            aria-label="نمایش رمز عبور"
+                            title="نمایش رمز عبور">
+                        <i class="fa fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <label class="remember-row" for="rememberMe">
+                <input id="rememberMe"
+                       type="checkbox"
+                       name="rememberMe"
+                       value="true" />
+                <span>مرا به خاطر بسپار</span>
+            </label>
+
+            <button type="submit" class="admin-btn admin-btn-primary auth-submit">
+                <i class="fa fa-sign-in"></i>
+                ورود به پنل
+            </button>
+        </form>
+    </div>
 </div>
