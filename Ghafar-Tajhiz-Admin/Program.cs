@@ -7,6 +7,7 @@ using BusinessLogic.ProductServices;
 using BusinessLogic.ProfileServices;
 using DataAccess.Data;
 using DataAccess.Models;
+using Ghafar_Tajhiz_Admin.ExceptionHandling;
 using Ghafar_Tajhiz_Admin.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -112,6 +113,11 @@ builder.Services.ConfigureApplicationCookie(options =>
         "/AdminAccount/AccessDenied";
 });
 
+// =====================================================
+// Global Exception Handling
+// =====================================================
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 // =====================================================
 // Build
@@ -126,10 +132,10 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
 
     app.UseHsts();
 }
+    app.UseExceptionHandler("/Home/Error");
 
 app.UseHttpsRedirection();
 
@@ -140,7 +146,6 @@ app.UseRouting();
 app.UseAuthentication();
 
 app.UseAuthorization();
-
 
 // =====================================================
 // Routing

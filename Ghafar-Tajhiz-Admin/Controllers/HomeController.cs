@@ -1,5 +1,6 @@
 using Ghafar_Tajhiz_Admin.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -29,15 +30,24 @@ namespace Ghafar_Tajhiz_Admin.Controllers
         }
 
         [AllowAnonymous]
-        [ResponseCache(
-            Duration = 0,
-            Location = ResponseCacheLocation.None,
-            NoStore = true)]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
+            var exceptionFeature =
+                HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+
+            if (exceptionFeature?.Error != null)
+            {
+                _logger.LogError(
+                    exceptionFeature.Error,
+                    "Unhandled exception. TraceId: {TraceId}, Path: {Path}",
+                    HttpContext.TraceIdentifier,
+                    exceptionFeature.Path);
+            }
+
             return View(new ErrorViewModel
             {
-                RequestId =
+                TraceId =
                     Activity.Current?.Id ??
                     HttpContext.TraceIdentifier
             });

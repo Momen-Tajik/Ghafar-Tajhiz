@@ -2,8 +2,6 @@ namespace Ghafar_Tajhiz_Admin.Models
 {
     public class ErrorViewModel
     {
-        public string? RequestId { get; set; }
-
-        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+        public string? TraceId { get; set; }
     }
 }

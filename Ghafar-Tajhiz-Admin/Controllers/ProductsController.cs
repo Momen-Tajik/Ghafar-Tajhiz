@@ -206,5 +206,6 @@ namespace Ghafar_Tajhiz_Admin.Controllers
                     "CategoryName",
                     selectedCategoryId);
         }
+
     }
 }

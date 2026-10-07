@@ -1,0 +1,61 @@
+﻿@model Ghafar_Tajhiz_Admin.Models.ErrorViewModel
+
+@{
+    ViewData["Title"] = "خطا";
+}
+
+<div class="page-header">
+
+    <h1>
+        خطایی رخ داد
+    </h1>
+
+    <p>
+        متأسفانه در پردازش درخواست شما مشکلی پیش آمد.
+    </p>
+
+</div>
+
+
+<div class="admin-card">
+
+    <div class="empty-state">
+
+        <div style="font-size:48px; margin-bottom:15px;">
+            ⚠️
+        </div>
+
+        <h3 style="margin-bottom:10px;">
+            انجام عملیات امکان‌پذیر نیست
+        </h3>
+
+        <p>
+            لطفاً دوباره تلاش کنید.
+            اگر مشکل ادامه داشت، با مدیر سیستم تماس بگیرید.
+        </p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.TraceId))
+        {
+            <p style="margin-top:20px; font-size:12px; color:#777;">
+                کد پیگیری:
+                <strong>
+                    @Model.TraceId
+                </strong>
+            </p>
+        }
+
+        <div style="margin-top:20px;">
+
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="form-button">
+
+                بازگشت به داشبورد
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
