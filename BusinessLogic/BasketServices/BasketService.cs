@@ -540,84 +540,114 @@ namespace BusinessLogic.BasketServices
         // =========================================================
 
         public async Task<bool> ApprovePayment(
-            int basketId)
+    int basketId)
         {
-            var basket = await _context.Baskets
-                .Include(b => b.BasketItems)
-                .ThenInclude(i => i.Product)
-                .FirstOrDefaultAsync(b =>
-                    b.BasketId == basketId);
-
-            if (basket == null)
-                return false;
-
-            if (basket.Status !=
-                BasketStatus.AwaitingPaymentVerification)
-            {
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(
-                basket.ReceiptImage))
-            {
-                return false;
-            }
-
-            if (basket.BasketItems.Count == 0)
-                return false;
-
-            // =====================================================
-            // Check Stock
-            // =====================================================
-
-            foreach (var item in basket.BasketItems)
-            {
-                if (item.Product == null ||
-                    !item.Product.IsAvailable ||
-                    item.Qty <= 0 ||
-                    item.Qty > item.Product.StockQuantity)
-                {
-                    return false;
-                }
-            }
-
-            // =====================================================
-            // Decrease Stock
-            // =====================================================
-
-            foreach (var item in basket.BasketItems)
-            {
-                item.Product.StockQuantity -=
-                    item.Qty;
-
-                if (item.Product.StockQuantity == 0)
-                {
-                    item.Product.IsAvailable = false;
-                }
-            }
-
-            // =====================================================
-            // Update Payment Status
-            // =====================================================
-
-            basket.Status =
-                BasketStatus.PaymentApproved;
-
-            basket.PaidDate =
-                DateTime.Now;
-
-            basket.PaymentVerifiedAt =
-                DateTime.Now;
-
-            basket.PaymentRejectionReason =
-                null;
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync();
 
             try
             {
+                var basket = await _context.Baskets
+                    .Include(b => b.BasketItems)
+                    .ThenInclude(i => i.Product)
+                    .FirstOrDefaultAsync(b =>
+                        b.BasketId == basketId);
+
+                if (basket == null)
+                    return false;
+
+                if (basket.Status !=
+                    BasketStatus.AwaitingPaymentVerification)
+                {
+                    return false;
+                }
+
+                // سفارش منتظر بررسی باید رسید داشته باشد.
+                if (string.IsNullOrWhiteSpace(
+                    basket.ReceiptImage))
+                {
+                    return false;
+                }
+
+                if (basket.BasketItems.Count == 0)
+                    return false;
+
+                // بررسی اولیه
+                foreach (var item in basket.BasketItems)
+                {
+                    if (item.Product == null ||
+                        !item.Product.IsAvailable ||
+                        item.Qty <= 0)
+                    {
+                        return false;
+                    }
+                }
+
+                // =====================================================
+                // Atomic Stock Update
+                // =====================================================
+
+                foreach (var item in basket.BasketItems)
+                {
+                    var affectedRows =
+                        await _context.Products
+                            .Where(p =>
+                                p.ProductId == item.ProductId &&
+                                p.IsAvailable &&
+                                p.StockQuantity >= item.Qty)
+                            .ExecuteUpdateAsync(setters =>
+                                setters
+                                    .SetProperty(
+                                        p => p.StockQuantity,
+                                        p => p.StockQuantity - item.Qty)
+
+                                    .SetProperty(
+                                        p => p.IsAvailable,
+                                        p => p.StockQuantity - item.Qty > 0)
+                            );
+
+                    // اگر 0 باشد یعنی موجودی کافی نبوده
+                    // یا محصول دیگر قابل فروش نیست.
+                    if (affectedRows == 0)
+                    {
+                        await transaction.RollbackAsync();
+
+                        _logger.LogWarning(
+                            "Payment approval failed because there was not enough stock. BasketId: {BasketId}, ProductId: {ProductId}, RequestedQty: {Qty}",
+                            basketId,
+                            item.ProductId,
+                            item.Qty);
+
+                        return false;
+                    }
+                }
+
+                // =====================================================
+                // Update Payment Status
+                // =====================================================
+
+                basket.Status =
+                    BasketStatus.PaymentApproved;
+
+                basket.PaidDate =
+                    DateTime.Now;
+
+                basket.PaymentVerifiedAt =
+                    DateTime.Now;
+
+                basket.PaymentRejectionReason =
+                    null;
+
                 await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                return true;
             }
             catch (DbUpdateException ex)
             {
+                await transaction.RollbackAsync();
+
                 _logger.LogError(
                     ex,
                     "Failed to approve payment for basket {BasketId}",
@@ -625,10 +655,7 @@ namespace BusinessLogic.BasketServices
 
                 return false;
             }
-
-            return true;
         }
-
         // =========================================================
         // Reject Payment
         // =========================================================
