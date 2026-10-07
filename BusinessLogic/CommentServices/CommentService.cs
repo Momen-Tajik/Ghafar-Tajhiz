@@ -1,16 +1,21 @@
 ﻿using DataAccess.Data;
 using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BusinessLogic.CommentServices
 {
     public class CommentService
     {
         private readonly GhafarTajhizShopDbContext _context;
+        private readonly ILogger<CommentService> _logger;
 
-        public CommentService(GhafarTajhizShopDbContext context)
+        public CommentService(
+            GhafarTajhizShopDbContext context,
+            ILogger<CommentService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<bool> CreateComment(
@@ -36,7 +41,21 @@ namespace BusinessLogic.CommentServices
             };
 
             await _context.Comments.AddAsync(comment);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to create comment for product {ProductId} by user {UserId}",
+                    productId,
+                    userId);
+
+                return false;
+            }
 
             return true;
         }
@@ -55,7 +74,20 @@ namespace BusinessLogic.CommentServices
 
             _context.Comments.Remove(comment);
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to remove comment {CommentId} by user {UserId}",
+                    commentId,
+                    userId);
+
+                return false;
+            }
 
             return true;
         }

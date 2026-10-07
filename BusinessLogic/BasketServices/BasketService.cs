@@ -5,6 +5,7 @@ using DataAccess.Enums;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BusinessLogic.BasketServices
 {
@@ -12,15 +13,17 @@ namespace BusinessLogic.BasketServices
     {
         private readonly GhafarTajhizShopDbContext _context;
         private readonly IFileUploadService _fileUploadService;
+        private readonly ILogger<BasketService> _logger;
 
         public BasketService(
             GhafarTajhizShopDbContext context,
-            IFileUploadService fileUploadService)
+            IFileUploadService fileUploadService,
+            ILogger<BasketService> logger)
         {
             _context = context;
             _fileUploadService = fileUploadService;
+            _logger = logger;
         }
-
 
         // =========================================================
         // Add Product To Basket
@@ -92,16 +95,26 @@ namespace BusinessLogic.BasketServices
             else
             {
                 basketItem.Qty = newQuantity;
-
-                // UnitPrice باید قیمت هر واحد باشد.
                 basketItem.UnitPrice = product.Price;
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to add product {ProductId} to basket for user {UserId}",
+                    productId,
+                    userId);
+
+                return false;
+            }
 
             return true;
         }
-
 
         // =========================================================
         // Get Current Basket
@@ -120,18 +133,8 @@ namespace BusinessLogic.BasketServices
                 .ToListAsync();
         }
 
-
         // =========================================================
         // Submit Payment + Receipt
-        // =========================================================
-        //
-        // PendingPayment
-        //        +
-        // address/mobile/receipt
-        //        ↓
-        // AwaitingPaymentVerification
-        //
-        // همچنین PaymentRejected اجازه ارسال مجدد رسید دارد.
         // =========================================================
 
         public async Task<bool> Pay(
@@ -174,7 +177,6 @@ namespace BusinessLogic.BasketServices
                 return false;
             }
 
-
             // =====================================================
             // Check Stock
             // =====================================================
@@ -190,7 +192,6 @@ namespace BusinessLogic.BasketServices
                 }
             }
 
-
             // =====================================================
             // Upload Receipt
             // =====================================================
@@ -201,7 +202,6 @@ namespace BusinessLogic.BasketServices
 
             if (string.IsNullOrWhiteSpace(receiptFileName))
                 return false;
-
 
             // =====================================================
             // Update Order
@@ -219,24 +219,32 @@ namespace BusinessLogic.BasketServices
             basket.ReceiptUploadedAt =
                 DateTime.Now;
 
-            // هنوز پرداخت توسط Admin تأیید نشده.
             basket.PaymentVerifiedAt = null;
 
-            // اگر قبلاً رد شده بود، دلیل رد قبلی پاک می‌شود.
             basket.PaymentRejectionReason = null;
 
-            // PaidDate فقط بعد از تأیید پرداخت تنظیم می‌شود.
             basket.PaidDate = null;
 
             basket.Status =
                 BasketStatus.AwaitingPaymentVerification;
 
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to submit payment for basket {BasketId}, user {UserId}",
+                    basket.BasketId,
+                    userId);
 
-            await _context.SaveChangesAsync();
+                return false;
+            }
 
             return true;
         }
-
 
         // =========================================================
         // Get User Orders
@@ -256,11 +264,6 @@ namespace BusinessLogic.BasketServices
                 .ThenInclude(i => i.Product)
                 .AsQueryable();
 
-
-            // =====================================================
-            // Status Filter
-            // =====================================================
-
             if (status.HasValue)
             {
                 query = query.Where(b =>
@@ -268,16 +271,10 @@ namespace BusinessLogic.BasketServices
             }
             else
             {
-                // سبد موقت کاربر در لیست سفارش‌ها نمایش داده نشود.
                 query = query.Where(b =>
                     b.Status !=
                         BasketStatus.PendingPayment);
             }
-
-
-            // =====================================================
-            // Search
-            // =====================================================
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -329,11 +326,6 @@ namespace BusinessLogic.BasketServices
                     );
                 }
             }
-
-
-            // =====================================================
-            // Sort
-            // =====================================================
 
             query = sort.Trim()
                 .ToLowerInvariant() switch
@@ -351,10 +343,8 @@ namespace BusinessLogic.BasketServices
                         b => b.Created)
             };
 
-
             return await query.ToListAsync();
         }
-
 
         // =========================================================
         // Get Admin Orders
@@ -369,11 +359,6 @@ namespace BusinessLogic.BasketServices
                 .AsNoTracking()
                 .AsQueryable();
 
-
-            // =====================================================
-            // Status Filter
-            // =====================================================
-
             if (status.HasValue)
             {
                 query = query.Where(b =>
@@ -381,16 +366,10 @@ namespace BusinessLogic.BasketServices
             }
             else
             {
-                // سبدهای موقت در لیست Admin نمایش داده نشوند.
                 query = query.Where(b =>
                     b.Status !=
                         BasketStatus.PendingPayment);
             }
-
-
-            // =====================================================
-            // Search
-            // =====================================================
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -454,11 +433,6 @@ namespace BusinessLogic.BasketServices
                     );
                 }
             }
-
-
-            // =====================================================
-            // Projection
-            // =====================================================
 
             var resultQuery =
                 query.Select(b => new AdminOrderDto
@@ -505,11 +479,6 @@ namespace BusinessLogic.BasketServices
                         b.PaymentRejectionReason
                 });
 
-
-            // =====================================================
-            // Sort
-            // =====================================================
-
             resultQuery =
                 sort.Trim()
                     .ToLowerInvariant() switch
@@ -530,10 +499,8 @@ namespace BusinessLogic.BasketServices
                                 x => x.PaidDate)
                 };
 
-
             return await resultQuery.ToListAsync();
         }
-
 
         // =========================================================
         // Get Last User Order
@@ -553,7 +520,6 @@ namespace BusinessLogic.BasketServices
                 .FirstOrDefaultAsync();
         }
 
-
         // =========================================================
         // Basket Item Count
         // =========================================================
@@ -569,16 +535,8 @@ namespace BusinessLogic.BasketServices
                 .SumAsync(i => i.Qty);
         }
 
-
         // =========================================================
         // Approve Payment
-        // =========================================================
-        //
-        // AwaitingPaymentVerification
-        //              ↓
-        //       PaymentApproved
-        //
-        // موجودی فقط اینجا کم می‌شود.
         // =========================================================
 
         public async Task<bool> ApprovePayment(
@@ -593,25 +551,20 @@ namespace BusinessLogic.BasketServices
             if (basket == null)
                 return false;
 
-
             if (basket.Status !=
                 BasketStatus.AwaitingPaymentVerification)
             {
                 return false;
             }
 
-
-            // سفارش منتظر بررسی باید رسید داشته باشد.
             if (string.IsNullOrWhiteSpace(
                 basket.ReceiptImage))
             {
                 return false;
             }
 
-
             if (basket.BasketItems.Count == 0)
                 return false;
-
 
             // =====================================================
             // Check Stock
@@ -628,7 +581,6 @@ namespace BusinessLogic.BasketServices
                 }
             }
 
-
             // =====================================================
             // Decrease Stock
             // =====================================================
@@ -643,7 +595,6 @@ namespace BusinessLogic.BasketServices
                     item.Product.IsAvailable = false;
                 }
             }
-
 
             // =====================================================
             // Update Payment Status
@@ -661,20 +612,25 @@ namespace BusinessLogic.BasketServices
             basket.PaymentRejectionReason =
                 null;
 
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to approve payment for basket {BasketId}",
+                    basketId);
 
-            await _context.SaveChangesAsync();
+                return false;
+            }
 
             return true;
         }
 
-
         // =========================================================
         // Reject Payment
-        // =========================================================
-        //
-        // AwaitingPaymentVerification
-        //              ↓
-        //       PaymentRejected
         // =========================================================
 
         public async Task<bool> RejectPayment(
@@ -692,13 +648,11 @@ namespace BusinessLogic.BasketServices
             if (basket == null)
                 return false;
 
-
             if (basket.Status !=
                 BasketStatus.AwaitingPaymentVerification)
             {
                 return false;
             }
-
 
             basket.Status =
                 BasketStatus.PaymentRejected;
@@ -709,23 +663,27 @@ namespace BusinessLogic.BasketServices
             basket.PaymentVerifiedAt =
                 DateTime.Now;
 
-            // پرداخت تأیید نشده است.
             basket.PaidDate = null;
 
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to reject payment for basket {BasketId}",
+                    basketId);
 
-            await _context.SaveChangesAsync();
+                return false;
+            }
 
             return true;
         }
 
-
         // =========================================================
         // Ship Order
-        // =========================================================
-        //
-        // PaymentApproved
-        //       ↓
-        //    Shipped
         // =========================================================
 
         public async Task<bool> ShipOrder(
@@ -739,31 +697,34 @@ namespace BusinessLogic.BasketServices
             if (basket == null)
                 return false;
 
-
             if (basket.Status !=
                 BasketStatus.PaymentApproved)
             {
                 return false;
             }
 
-
             basket.Status =
                 BasketStatus.Shipped;
 
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to ship basket {BasketId}",
+                    basketId);
 
-            await _context.SaveChangesAsync();
+                return false;
+            }
 
             return true;
         }
 
-
         // =========================================================
         // Cancel Order
-        // =========================================================
-        //
-        // سفارشی که پرداخت آن تأیید شده یا ارسال شده،
-        // از این مسیر قابل لغو نیست؛ چون موجودی در Approval
-        // مصرف شده و Refund هم در سیستم فعلی وجود ندارد.
         // =========================================================
 
         public async Task<bool> CancelOrder(
@@ -777,7 +738,6 @@ namespace BusinessLogic.BasketServices
             if (basket == null)
                 return false;
 
-
             if (basket.Status !=
                     BasketStatus.PendingPayment &&
                 basket.Status !=
@@ -788,16 +748,25 @@ namespace BusinessLogic.BasketServices
                 return false;
             }
 
-
             basket.Status =
                 BasketStatus.Cancelled;
 
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to cancel basket {BasketId}",
+                    basketId);
 
-            await _context.SaveChangesAsync();
+                return false;
+            }
 
             return true;
         }
-
 
         // =========================================================
         // Get Admin Order Details
@@ -879,10 +848,14 @@ namespace BusinessLogic.BasketServices
                 .FirstOrDefaultAsync();
         }
 
+        // =========================================================
+        // Resubmit Receipt
+        // =========================================================
+
         public async Task<bool> ResubmitReceipt(
-    int basketId,
-    int userId,
-    IFormFile receipt)
+            int basketId,
+            int userId,
+            IFormFile receipt)
         {
             if (basketId <= 0)
                 return false;
@@ -890,25 +863,27 @@ namespace BusinessLogic.BasketServices
             if (receipt == null || receipt.Length == 0)
                 return false;
 
-
             var basket = await _context.Baskets
                 .FirstOrDefaultAsync(b =>
                     b.BasketId == basketId &&
                     b.UserId == userId &&
                     b.Status == BasketStatus.PaymentRejected);
 
-
             if (basket == null)
                 return false;
 
-
             var receiptFileName =
-                await _fileUploadService.UploadReceiptAsync(receipt);
+                await _fileUploadService
+                    .UploadReceiptAsync(receipt);
 
+            if (string.IsNullOrWhiteSpace(receiptFileName))
+                return false;
 
-            basket.ReceiptImage = receiptFileName;
+            basket.ReceiptImage =
+                receiptFileName;
 
-            basket.ReceiptUploadedAt = DateTime.Now;
+            basket.ReceiptUploadedAt =
+                DateTime.Now;
 
             basket.PaymentVerifiedAt = null;
 
@@ -919,8 +894,20 @@ namespace BusinessLogic.BasketServices
             basket.Status =
                 BasketStatus.AwaitingPaymentVerification;
 
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to resubmit receipt for basket {BasketId}, user {UserId}",
+                    basketId,
+                    userId);
 
-            await _context.SaveChangesAsync();
+                return false;
+            }
 
             return true;
         }
