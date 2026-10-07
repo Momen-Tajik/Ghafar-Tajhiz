@@ -4,12 +4,19 @@
     ViewData["Title"] = "حذف محصول";
 }
 
-<div class="page-header danger">
-    <h1>حذف محصول</h1>
-    <p>این عملیات غیرقابل بازگشت است</p>
+<div class="page-header">
+
+    <h1>
+        حذف محصول
+    </h1>
+
+    <p>
+        این عملیات غیرقابل بازگشت است
+    </p>
+
 </div>
 
-<div class="admin-card danger-card">
+<div class="admin-card">
 
     <div class="delete-warning">
         آیا از حذف این محصول مطمئن هستید؟
@@ -18,55 +25,101 @@
     <div class="details-grid">
 
         <div class="detail-item">
-            <span class="label">نام محصول</span>
+
+            <span class="label">
+                نام محصول
+            </span>
+
             <span class="value">
                 @Model.ProductName
             </span>
+
         </div>
 
+
         <div class="detail-item">
-            <span class="label">توضیحات</span>
+
+            <span class="label">
+                توضیحات
+            </span>
+
             <span class="value">
                 @(string.IsNullOrWhiteSpace(Model.ProductDescription)
                     ? "—"
                     : Model.ProductDescription)
             </span>
+
         </div>
 
+
         <div class="detail-item">
-            <span class="label">قیمت</span>
+
+            <span class="label">
+                قیمت
+            </span>
+
             <span class="value">
                 @Model.Price.ToString("N0") تومان
             </span>
+
         </div>
 
+
         <div class="detail-item">
-            <span class="label">موجودی</span>
+
+            <span class="label">
+                موجودی
+            </span>
+
             <span class="value">
                 @Model.StockQuantity
             </span>
+
         </div>
 
+
         <div class="detail-item">
-            <span class="label">دسته‌بندی</span>
+
+            <span class="label">
+                دسته‌بندی
+            </span>
+
             <span class="value">
                 @Model.Category?.CategoryName
             </span>
+
         </div>
 
+
         <div class="detail-item">
-            <span class="label">وضعیت</span>
-            <span class="value">
-                @(Model.IsAvailable ? "فعال" : "غیرفعال")
+
+            <span class="label">
+                وضعیت
             </span>
+
+            <span class="value">
+
+                @(Model.IsAvailable
+                    ? "فعال"
+                    : "غیرفعال")
+
+            </span>
+
         </div>
 
+
         <div class="detail-item">
-            <span class="label">تاریخ ایجاد</span>
+
+            <span class="label">
+                تاریخ ایجاد
+            </span>
+
             <span class="value">
                 @Model.CreateDate.ToString("yyyy/MM/dd")
             </span>
+
         </div>
+
 
         <div class="detail-item image-item">
 
@@ -80,7 +133,7 @@
                 {
                     <img src="/api/FileUpload/GetFile?fileName=@Uri.EscapeDataString(Model.ImageUrl)"
                          alt="@Model.ProductName"
-                         class="delete-image"
+                         class="details-image"
                          loading="lazy" />
                 }
                 else
@@ -96,10 +149,12 @@
 
     </div>
 
+
     <form asp-controller="Products"
           asp-action="DeleteConfirmed"
           method="post"
-          class="form-actions danger-actions">
+          class="form-actions danger-actions delete-product-form"
+          data-product-name="@Model.ProductName">
 
         @Html.AntiForgeryToken()
 
@@ -109,12 +164,18 @@
 
         <button type="submit"
                 class="form-button danger">
+
+            <i class="fa fa-trash"></i>
             حذف محصول
+
         </button>
+
 
         <a asp-action="Index"
            class="form-button secondary">
+
             انصراف
+
         </a>
 
     </form>

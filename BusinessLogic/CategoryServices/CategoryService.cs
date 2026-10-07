@@ -1,23 +1,31 @@
 ﻿using DataAccess.Data;
 using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BusinessLogic.CategoryServices
 {
     public class CategoryService
     {
         private readonly GhafarTajhizShopDbContext _context;
+        private readonly ILogger<CategoryService> _logger;
 
-        public CategoryService(GhafarTajhizShopDbContext context)
+        public CategoryService(
+            GhafarTajhizShopDbContext context,
+            ILogger<CategoryService> logger)
         {
             _context = context;
+            _logger = logger;
         }
+
 
         public async Task CreateCategory(Category category)
         {
             await _context.Categories.AddAsync(category);
+
             await _context.SaveChangesAsync();
         }
+
 
         public async Task<IReadOnlyList<Category>> GetCategories()
         {
@@ -27,43 +35,81 @@ namespace BusinessLogic.CategoryServices
                 .ToListAsync();
         }
 
+
         public async Task<Category?> GetCategoryById(int id)
         {
             return await _context.Categories
                 .FirstOrDefaultAsync(c => c.CategoryId == id);
         }
 
+
         public async Task<bool> EditCategory(Category category)
         {
-            var existing = await _context.Categories
-                .FirstOrDefaultAsync(c =>
-                    c.CategoryId == category.CategoryId);
+            var existing =
+                await _context.Categories
+                    .FirstOrDefaultAsync(c =>
+                        c.CategoryId == category.CategoryId);
 
             if (existing == null)
                 return false;
 
-            existing.CategoryName = category.CategoryName;
-            existing.CategoryDescription = category.CategoryDescription;
+            existing.CategoryName =
+                category.CategoryName;
+
+            existing.CategoryDescription =
+                category.CategoryDescription;
 
             await _context.SaveChangesAsync();
 
             return true;
         }
 
-        public async Task<bool> DeleteCategory(int id)
+
+        public async Task<CategoryDeleteResult> DeleteCategory(int id)
         {
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(c => c.CategoryId == id);
+            if (id <= 0)
+                return CategoryDeleteResult.NotFound;
+
+
+            var category =
+                await _context.Categories
+                    .FirstOrDefaultAsync(c =>
+                        c.CategoryId == id);
 
             if (category == null)
-                return false;
+                return CategoryDeleteResult.NotFound;
 
-            // اگر Product داشته باشد، FK Restrict از حذف جلوگیری می‌کند.
+
+            // اگر این دسته‌بندی محصول داشته باشد،
+            // حذف آن مجاز نیست.
+            var hasProducts =
+                await _context.Products
+                    .AnyAsync(p =>
+                        p.CategoryId == id);
+
+            if (hasProducts)
+                return CategoryDeleteResult.HasProducts;
+
+
             _context.Categories.Remove(category);
 
-            await _context.SaveChangesAsync();
 
-            return true;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to delete category {CategoryId}",
+                    id);
+
+                return CategoryDeleteResult.DatabaseError;
+            }
+
+
+            return CategoryDeleteResult.Success;
         }
     }
 }

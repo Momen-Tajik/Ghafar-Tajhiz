@@ -5,8 +5,15 @@
 }
 
 <div class="page-header">
-    <h1>جزئیات دسته‌بندی</h1>
-    <p>مشاهده اطلاعات ثبت‌شده دسته‌بندی</p>
+
+    <h1>
+        جزئیات دسته‌بندی
+    </h1>
+
+    <p>
+        مشاهده اطلاعات ثبت‌شده دسته‌بندی
+    </p>
+
 </div>
 
 <div class="admin-card">
@@ -14,32 +21,52 @@
     <div class="details-list">
 
         <div class="details-item">
-            <div class="details-label">نام دسته‌بندی:</div>
-            <div class="details-value">@Model.CategoryName</div>
+
+            <div class="details-label">
+                نام دسته‌بندی:
+            </div>
+
+            <div class="details-value">
+                @Model.CategoryName
+            </div>
+
         </div>
 
         <div class="details-item">
-            <div class="details-label">توضیحات:</div>
+
+            <div class="details-label">
+                توضیحات:
+            </div>
+
             <div class="details-value">
+
                 @(string.IsNullOrWhiteSpace(Model.CategoryDescription)
                     ? "—"
                     : Model.CategoryDescription)
+
             </div>
+
         </div>
 
     </div>
 
     <div class="form-actions">
+
         <a asp-action="Edit"
            asp-route-id="@Model.CategoryId"
            class="form-button">
+
             ویرایش
+
         </a>
 
         <a asp-action="Index"
            class="form-button secondary">
+
             بازگشت
+
         </a>
+
     </div>
 
 </div>

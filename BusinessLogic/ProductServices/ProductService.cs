@@ -2,6 +2,7 @@
 using DataAccess.Data;
 using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BusinessLogic.ProductServices
 {
@@ -9,13 +10,16 @@ namespace BusinessLogic.ProductServices
     {
         private readonly GhafarTajhizShopDbContext _context;
         private readonly IFileUploadService _fileUploadService;
+        private readonly ILogger<ProductService> _logger;
 
         public ProductService(
             GhafarTajhizShopDbContext context,
-            IFileUploadService fileUploadService)
+            IFileUploadService fileUploadService,
+            ILogger<ProductService> logger)
         {
             _context = context;
             _fileUploadService = fileUploadService;
+            _logger = logger;
         }
 
         public async Task<IReadOnlyList<Product>> GetProducts()
@@ -105,26 +109,76 @@ namespace BusinessLogic.ProductServices
             return true;
         }
 
-        public async Task<bool> DeleteProduct(int id)
+        public async Task<ProductDeleteResult> DeleteProduct(int id)
         {
+            if (id <= 0)
+                return ProductDeleteResult.NotFound;
+
             var product = await _context.Products
                 .FirstOrDefaultAsync(p => p.ProductId == id);
 
             if (product == null)
-                return false;
+                return ProductDeleteResult.NotFound;
+
+            /*
+             * A product that has already been used in an order
+             * should not be physically deleted.
+             *
+             * Otherwise BasketItems.ProductId would point to
+             * a non-existing Product.
+             */
+            var hasOrders = await _context.BasketItems
+                .AnyAsync(x => x.ProductId == id);
+
+            if (hasOrders)
+            {
+                return ProductDeleteResult.HasOrders;
+            }
 
             var imageName = product.ImageUrl;
 
             _context.Products.Remove(product);
 
-            await _context.SaveChangesAsync();
-
-            if (!string.IsNullOrWhiteSpace(imageName))
+            try
             {
-                _fileUploadService.DeleteFile(imageName);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to delete product {ProductId}",
+                    id);
+
+                return ProductDeleteResult.DatabaseError;
             }
 
-            return true;
+            /*
+             * Delete the physical image only after the database
+             * deletion has succeeded.
+             */
+            if (!string.IsNullOrWhiteSpace(imageName))
+            {
+                try
+                {
+                    _fileUploadService.DeleteFile(imageName);
+                }
+                catch (Exception ex)
+                {
+                    /*
+                     * Product has already been deleted from DB.
+                     * Therefore an image deletion failure should
+                     * not make the whole operation look failed.
+                     */
+                    _logger.LogWarning(
+                        ex,
+                        "Product {ProductId} was deleted, but its image {ImageName} could not be deleted.",
+                        id,
+                        imageName);
+                }
+            }
+
+            return ProductDeleteResult.Success;
         }
 
         public async Task<ProductDto?> GetProductDtoById(int id)

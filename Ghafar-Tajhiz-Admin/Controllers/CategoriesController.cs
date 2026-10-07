@@ -10,10 +10,12 @@ namespace Ghafar_Tajhiz_Admin.Controllers
     {
         private readonly CategoryService _categoryService;
 
-        public CategoriesController(CategoryService categoryService)
+        public CategoriesController(
+            CategoryService categoryService)
         {
             _categoryService = categoryService;
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -23,6 +25,7 @@ namespace Ghafar_Tajhiz_Admin.Controllers
 
             return View(categories);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Details(int id)
@@ -39,16 +42,19 @@ namespace Ghafar_Tajhiz_Admin.Controllers
             return View(category);
         }
 
+
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("CategoryName,CategoryDescription")] Category category)
+            [Bind("CategoryName,CategoryDescription")]
+            Category category)
         {
             if (!ModelState.IsValid)
                 return View(category);
@@ -60,6 +66,7 @@ namespace Ghafar_Tajhiz_Admin.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
@@ -76,11 +83,13 @@ namespace Ghafar_Tajhiz_Admin.Controllers
             return View(category);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("CategoryId,CategoryName,CategoryDescription")]
+            [Bind(
+                "CategoryId,CategoryName,CategoryDescription")]
             Category category)
         {
             if (id != category.CategoryId)
@@ -101,6 +110,7 @@ namespace Ghafar_Tajhiz_Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -116,21 +126,67 @@ namespace Ghafar_Tajhiz_Admin.Controllers
             return View(category);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (id <= 0)
-                return NotFound();
+            {
+                TempData["Error"] =
+                    "شناسه دسته‌بندی نامعتبر است.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
 
             var result =
                 await _categoryService.DeleteCategory(id);
 
-            if (!result)
-                return NotFound();
 
-            TempData["Success"] =
-                "دسته‌بندی با موفقیت حذف شد.";
+            switch (result)
+            {
+                case CategoryDeleteResult.Success:
+
+                    TempData["Success"] =
+                        "دسته‌بندی با موفقیت حذف شد.";
+
+                    break;
+
+
+                case CategoryDeleteResult.NotFound:
+
+                    TempData["Error"] =
+                        "دسته‌بندی مورد نظر پیدا نشد.";
+
+                    break;
+
+
+                case CategoryDeleteResult.HasProducts:
+
+                    TempData["Error"] =
+                        "این دسته‌بندی دارای محصول است و قابل حذف نیست. " +
+                        "ابتدا محصولات این دسته‌بندی را به دسته‌بندی دیگری منتقل کنید.";
+
+                    break;
+
+
+                case CategoryDeleteResult.DatabaseError:
+
+                    TempData["Error"] =
+                        "حذف دسته‌بندی انجام نشد. لطفاً دوباره تلاش کنید.";
+
+                    break;
+
+
+                default:
+
+                    TempData["Error"] =
+                        "خطایی هنگام حذف دسته‌بندی رخ داد.";
+
+                    break;
+            }
+
 
             return RedirectToAction(nameof(Index));
         }

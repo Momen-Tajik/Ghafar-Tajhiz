@@ -19,12 +19,13 @@
 <div class="admin-card admin-warning">
 
     <div class="admin-warning-title">
-        ⚠️ آیا از حذف این دسته‌بندی مطمئن هستید؟
+        ⚠️ حذف دسته‌بندی
     </div>
 
     <div class="admin-warning-text">
-        در صورتی که این دسته‌بندی محصول داشته باشد،
-        حذف آن توسط محدودیت دیتابیس جلوگیری خواهد شد.
+        آیا از حذف این دسته‌بندی مطمئن هستید؟
+        در صورتی که این دسته‌بندی دارای محصول باشد،
+        حذف آن انجام نخواهد شد.
     </div>
 
     <div class="details-list">
@@ -61,7 +62,8 @@
 
     <form asp-action="DeleteConfirmed"
           method="post"
-          class="form-actions">
+          class="form-actions delete-confirm-form"
+          data-item-name="@Model.CategoryName">
 
         @Html.AntiForgeryToken()
 
@@ -71,12 +73,17 @@
 
         <button type="submit"
                 class="form-button danger">
+
+            <i class="fa fa-trash"></i>
             حذف دسته‌بندی
+
         </button>
 
         <a asp-action="Index"
            class="form-button secondary">
+
             انصراف
+
         </a>
 
     </form>

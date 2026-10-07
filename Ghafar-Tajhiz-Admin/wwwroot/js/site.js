@@ -3,6 +3,7 @@
 ========================================================= */
 
 function getAntiForgeryToken() {
+
     const token = document.querySelector(
         'input[name="__RequestVerificationToken"]'
     );
@@ -16,10 +17,12 @@ function getAntiForgeryToken() {
 ========================================================= */
 
 async function handleApiResponse(response) {
+
     const contentType =
         response.headers.get('content-type') || '';
 
     if (!contentType.includes('application/json')) {
+
         throw new Error(
             'پاسخ نامعتبر از سرور دریافت شد.'
         );
@@ -28,6 +31,7 @@ async function handleApiResponse(response) {
     const data = await response.json();
 
     if (!response.ok || !data.res) {
+
         throw new Error(
             data.msg || 'عملیات انجام نشد.'
         );
@@ -38,12 +42,89 @@ async function handleApiResponse(response) {
 
 
 /* =========================================================
+   SUCCESS ALERT
+========================================================= */
+
+function showSuccessAlert(
+    title = 'موفق',
+    text = 'عملیات با موفقیت انجام شد.'
+) {
+
+    return Swal.fire({
+        title: title,
+        text: text,
+        icon: 'success',
+        confirmButtonText: 'باشه'
+    });
+}
+
+
+/* =========================================================
+   ERROR ALERT
+========================================================= */
+
+function showFailAlert(
+    title = 'خطا',
+    text = 'عملیات ناموفق بود.'
+) {
+
+    return Swal.fire({
+        title: title,
+        text: text,
+        icon: 'error',
+        confirmButtonText: 'باشه'
+    });
+}
+
+
+/* =========================================================
+   SUCCESS TOAST
+========================================================= */
+
+function showSuccessToast(
+    text = 'عملیات با موفقیت انجام شد.'
+) {
+
+    return Swal.fire({
+        toast: true,
+        position: 'top-start',
+        icon: 'success',
+        title: text,
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true
+    });
+}
+
+
+/* =========================================================
+   ERROR TOAST
+========================================================= */
+
+function showErrorToast(
+    text = 'عملیات ناموفق بود.'
+) {
+
+    return Swal.fire({
+        toast: true,
+        position: 'top-start',
+        icon: 'error',
+        title: text,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
+}
+
+
+/* =========================================================
    APPROVE PAYMENT
 ========================================================= */
 
 async function ApprovePayment(basketId) {
 
     if (!basketId || basketId <= 0) {
+
         showFailAlert(
             'خطا',
             'شناسه سفارش نامعتبر است.'
@@ -55,6 +136,7 @@ async function ApprovePayment(basketId) {
     const token = getAntiForgeryToken();
 
     if (!token) {
+
         showFailAlert(
             'خطا',
             'توکن امنیتی پیدا نشد.'
@@ -64,8 +146,12 @@ async function ApprovePayment(basketId) {
     }
 
     const result = await Swal.fire({
+
         title: 'تأیید پرداخت',
-        text: 'آیا از تأیید پرداخت این سفارش مطمئن هستید؟',
+
+        text:
+            'آیا از تأیید پرداخت این سفارش مطمئن هستید؟',
+
         icon: 'question',
 
         showCancelButton: true,
@@ -97,12 +183,10 @@ async function ApprovePayment(basketId) {
         const data =
             await handleApiResponse(response);
 
-        await Swal.fire({
-            title: 'موفق',
-            text: data.msg,
-            icon: 'success',
-            confirmButtonText: 'باشه'
-        });
+        await showSuccessAlert(
+            'پرداخت تأیید شد',
+            data.msg
+        );
 
         window.location.reload();
 
@@ -127,6 +211,7 @@ async function ApprovePayment(basketId) {
 async function RejectPayment(basketId) {
 
     if (!basketId || basketId <= 0) {
+
         showFailAlert(
             'خطا',
             'شناسه سفارش نامعتبر است.'
@@ -138,6 +223,7 @@ async function RejectPayment(basketId) {
     const token = getAntiForgeryToken();
 
     if (!token) {
+
         showFailAlert(
             'خطا',
             'توکن امنیتی پیدا نشد.'
@@ -147,6 +233,7 @@ async function RejectPayment(basketId) {
     }
 
     const result = await Swal.fire({
+
         title: 'رد پرداخت',
 
         input: 'textarea',
@@ -169,8 +256,7 @@ async function RejectPayment(basketId) {
 
         inputValidator: (value) => {
 
-            if (!value ||
-                !value.trim()) {
+            if (!value || !value.trim()) {
 
                 return 'وارد کردن دلیل رد پرداخت الزامی است.';
             }
@@ -214,12 +300,10 @@ async function RejectPayment(basketId) {
         const data =
             await handleApiResponse(response);
 
-        await Swal.fire({
-            title: 'موفق',
-            text: data.msg,
-            icon: 'success',
-            confirmButtonText: 'باشه'
-        });
+        await showSuccessAlert(
+            'پرداخت رد شد',
+            data.msg
+        );
 
         window.location.reload();
 
@@ -244,6 +328,7 @@ async function RejectPayment(basketId) {
 async function ShipOrder(basketId) {
 
     if (!basketId || basketId <= 0) {
+
         showFailAlert(
             'خطا',
             'شناسه سفارش نامعتبر است.'
@@ -255,6 +340,7 @@ async function ShipOrder(basketId) {
     const token = getAntiForgeryToken();
 
     if (!token) {
+
         showFailAlert(
             'خطا',
             'توکن امنیتی پیدا نشد.'
@@ -264,6 +350,7 @@ async function ShipOrder(basketId) {
     }
 
     const result = await Swal.fire({
+
         title: 'ارسال سفارش',
 
         text:
@@ -300,12 +387,10 @@ async function ShipOrder(basketId) {
         const data =
             await handleApiResponse(response);
 
-        await Swal.fire({
-            title: 'موفق',
-            text: data.msg,
-            icon: 'success',
-            confirmButtonText: 'باشه'
-        });
+        await showSuccessAlert(
+            'سفارش ارسال شد',
+            data.msg
+        );
 
         window.location.reload();
 
@@ -324,35 +409,68 @@ async function ShipOrder(basketId) {
 
 
 /* =========================================================
-   SWEET ALERT
+   DELETE CONFIRMATION
 ========================================================= */
 
-function showSuccessAlert(
-    title = '',
-    text = 'عملیات با موفقیت انجام شد.'
-) {
-    Swal.fire({
-        title: title,
-        text: text,
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1200
-    });
-}
+document.addEventListener(
+    'submit',
+    async function (event) {
 
+        const form =
+            event.target.closest('.delete-confirm-form');
 
-function showFailAlert(
-    title = 'خطا',
-    text = 'عملیات ناموفق بود.'
-) {
-    Swal.fire({
-        title: title,
-        text: text,
-        icon: 'error',
-        confirmButtonText: 'باشه'
-    });
-}
+        if (!form) {
+            return;
+        }
 
+        event.preventDefault();
+
+        const itemName =
+            form.dataset.itemName || 'این مورد';
+
+        const result = await Swal.fire({
+
+            title: 'حذف مورد',
+
+            text:
+                `آیا از حذف «${itemName}» مطمئن هستید؟`,
+
+            icon: 'warning',
+
+            showCancelButton: true,
+
+            confirmButtonText:
+                'بله، حذف کن',
+
+            cancelButtonText:
+                'انصراف',
+
+            reverseButtons: true,
+
+            focusCancel: true
+
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
+        const submitButton =
+            form.querySelector(
+                'button[type="submit"]'
+            );
+
+        if (submitButton) {
+
+            submitButton.disabled = true;
+
+            submitButton.innerHTML =
+                '<i class="fa fa-spinner fa-spin"></i> در حال حذف...';
+        }
+
+        form.submit();
+    }
+);
 
 /* =========================================================
    SHOW RECEIPT
@@ -361,6 +479,7 @@ function showFailAlert(
 function showReceipt(receiptUrl) {
 
     if (!receiptUrl) {
+
         showFailAlert(
             'خطا',
             'آدرس رسید موجود نیست.'

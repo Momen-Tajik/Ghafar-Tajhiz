@@ -140,20 +140,55 @@ namespace Ghafar_Tajhiz_Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(
-            int productId)
+        public async Task<IActionResult> DeleteConfirmed(int productId)
         {
             if (productId <= 0)
-                return NotFound();
+            {
+                TempData["Error"] = "شناسه محصول نامعتبر است.";
+                return RedirectToAction(nameof(Index));
+            }
 
             var result =
                 await _productService.DeleteProduct(productId);
 
-            if (!result)
-                return NotFound();
+            switch (result)
+            {
+                case ProductDeleteResult.Success:
 
-            TempData["Success"] =
-                "محصول با موفقیت حذف شد.";
+                    TempData["Success"] =
+                        "محصول با موفقیت حذف شد.";
+
+                    break;
+
+                case ProductDeleteResult.NotFound:
+
+                    TempData["Error"] =
+                        "محصول مورد نظر پیدا نشد.";
+
+                    break;
+
+                case ProductDeleteResult.HasOrders:
+
+                    TempData["Error"] =
+                        "این محصول در سفارش‌های قبلی استفاده شده است و قابل حذف نیست. " +
+                        "برای حفظ سابقه سفارش‌ها، محصول را غیرفعال کنید.";
+
+                    break;
+
+                case ProductDeleteResult.DatabaseError:
+
+                    TempData["Error"] =
+                        "حذف محصول انجام نشد. لطفاً دوباره تلاش کنید.";
+
+                    break;
+
+                default:
+
+                    TempData["Error"] =
+                        "خطایی هنگام حذف محصول رخ داد.";
+
+                    break;
+            }
 
             return RedirectToAction(nameof(Index));
         }
