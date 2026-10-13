@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 
 namespace BusinessLogic.FileUpload
 {
@@ -27,18 +26,11 @@ namespace BusinessLogic.FileUpload
             };
 
 
-        public FileUploadService(IConfiguration configuration)
+        public FileUploadService(FileStorageSettings settings)
         {
-            _storagePath =
-                configuration["FileUpload:StoragePath"]
-                ?? throw new InvalidOperationException(
-                    "FileUpload:StoragePath is not configured.");
+            _storagePath = settings.StoragePath;
         }
 
-
-        // =========================================================
-        // Product / General File Upload
-        // =========================================================
 
         public async Task<string> UploadFileAsync(IFormFile file)
         {
@@ -47,10 +39,6 @@ namespace BusinessLogic.FileUpload
                 _storagePath);
         }
 
-
-        // =========================================================
-        // Receipt Upload
-        // =========================================================
 
         public async Task<string> UploadReceiptAsync(IFormFile file)
         {
@@ -65,9 +53,58 @@ namespace BusinessLogic.FileUpload
         }
 
 
-        // =========================================================
-        // Common Upload Logic
-        // =========================================================
+        public string? GetPublicImagePath(string? fileName)
+        {
+            var safeFileName = GetSafeFileName(fileName);
+
+            if (safeFileName == null)
+                return null;
+
+            return GetExistingPathInsideStorage(safeFileName);
+        }
+
+
+        public string? GetAdminAccessibleFilePath(string? fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                return null;
+
+            var normalized =
+                fileName
+                    .Replace('\\', '/')
+                    .Trim();
+
+            if (normalized.Contains("..", StringComparison.Ordinal))
+                return null;
+
+            string relativePath;
+
+            if (normalized.StartsWith(
+                    "receipts/",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                var receiptName =
+                    Path.GetFileName(normalized);
+
+                if (string.IsNullOrWhiteSpace(receiptName))
+                    return null;
+
+                relativePath =
+                    Path.Combine("receipts", receiptName);
+            }
+            else
+            {
+                var safeFileName = GetSafeFileName(normalized);
+
+                if (safeFileName == null)
+                    return null;
+
+                relativePath = safeFileName;
+            }
+
+            return GetExistingPathInsideStorage(relativePath);
+        }
+
 
         private async Task<string> UploadInternalAsync(
             IFormFile file,
@@ -110,7 +147,6 @@ namespace BusinessLogic.FileUpload
                 targetDirectory);
 
 
-            // نام تصادفی برای جلوگیری از تداخل
             var fileName =
                 $"{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
 
@@ -138,10 +174,6 @@ namespace BusinessLogic.FileUpload
         }
 
 
-        // =========================================================
-        // Delete Product / General File
-        // =========================================================
-
         public bool DeleteFile(string fileName)
         {
             return DeleteInternal(
@@ -149,10 +181,6 @@ namespace BusinessLogic.FileUpload
                 _storagePath);
         }
 
-
-        // =========================================================
-        // Delete Receipt
-        // =========================================================
 
         public bool DeleteReceipt(string fileName)
         {
@@ -167,10 +195,6 @@ namespace BusinessLogic.FileUpload
         }
 
 
-        // =========================================================
-        // Common Delete Logic
-        // =========================================================
-
         private bool DeleteInternal(
             string fileName,
             string directory)
@@ -179,7 +203,6 @@ namespace BusinessLogic.FileUpload
                 return false;
 
 
-            // فقط نام فایل؛ بدون مسیر
             var safeFileName =
                 Path.GetFileName(fileName);
 
@@ -198,6 +221,13 @@ namespace BusinessLogic.FileUpload
                     directory,
                     safeFileName);
 
+            if (!FileStoragePath.IsInsideStorage(
+                    directory,
+                    fullPath))
+            {
+                return false;
+            }
+
 
             if (!File.Exists(fullPath))
                 return false;
@@ -206,6 +236,47 @@ namespace BusinessLogic.FileUpload
             File.Delete(fullPath);
 
             return true;
+        }
+
+
+        private static string? GetSafeFileName(string? fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                return null;
+
+            var safeFileName =
+                Path.GetFileName(fileName.Trim());
+
+            if (string.IsNullOrWhiteSpace(safeFileName) ||
+                !string.Equals(
+                    safeFileName,
+                    fileName.Trim().Replace('\\', '/'),
+                    StringComparison.Ordinal))
+            {
+                return null;
+            }
+
+            return safeFileName;
+        }
+
+
+        private string? GetExistingPathInsideStorage(string relativePath)
+        {
+            var fullPath =
+                Path.GetFullPath(
+                    Path.Combine(_storagePath, relativePath));
+
+            if (!FileStoragePath.IsInsideStorage(
+                    _storagePath,
+                    fullPath))
+            {
+                return null;
+            }
+
+            if (!File.Exists(fullPath))
+                return null;
+
+            return fullPath;
         }
     }
 }

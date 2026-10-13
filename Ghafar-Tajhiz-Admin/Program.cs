@@ -50,6 +50,19 @@ builder.Services.AddScoped<BasketService>();
 builder.Services.AddScoped<BasketItemService>();
 builder.Services.AddScoped<CommentService>();
 builder.Services.AddScoped<ProfileService>();
+
+var storagePath =
+    FileStoragePath.Resolve(
+        builder.Environment.ContentRootPath,
+        builder.Configuration["FileUpload:StoragePath"]);
+
+Directory.CreateDirectory(storagePath);
+Directory.CreateDirectory(
+    Path.Combine(storagePath, "receipts"));
+
+builder.Services.AddSingleton(
+    new FileStorageSettings(storagePath));
+
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 
 builder.Services.AddScoped<UserService>();
@@ -96,7 +109,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.HttpOnly = true;
 
     options.Cookie.SecurePolicy =
-        CookieSecurePolicy.Always;
+        CookieSecurePolicy.SameAsRequest;
 
     options.Cookie.SameSite =
         SameSiteMode.Lax;
@@ -188,6 +201,74 @@ using (var scope = app.Services.CreateScope())
                 throw new InvalidOperationException(
                     $"Could not create role '{roleName}'.");
             }
+        }
+    }
+
+    var userManager =
+        scope.ServiceProvider
+            .GetRequiredService<UserManager<User>>();
+
+    var existingAdmins =
+        await userManager.GetUsersInRoleAsync("Admin");
+
+    if (existingAdmins.Count == 0)
+    {
+        var phoneNumber =
+            app.Configuration["AdminSeed:PhoneNumber"]
+                ?.Trim();
+
+        var password =
+            app.Configuration["AdminSeed:Password"];
+
+        var fullName =
+            app.Configuration["AdminSeed:FullName"]
+                ?.Trim();
+
+        if (string.IsNullOrWhiteSpace(phoneNumber) ||
+            string.IsNullOrWhiteSpace(password))
+        {
+            throw new InvalidOperationException(
+                "No admin user exists. Set AdminSeed:PhoneNumber and AdminSeed:Password.");
+        }
+
+        var adminUser =
+            await userManager.FindByNameAsync(phoneNumber);
+
+        if (adminUser == null)
+        {
+            adminUser = new User
+            {
+                UserName = phoneNumber,
+                PhoneNumber = phoneNumber,
+                FullName = string.IsNullOrWhiteSpace(fullName)
+                    ? "Admin"
+                    : fullName
+            };
+
+            var createResult =
+                await userManager.CreateAsync(
+                    adminUser,
+                    password);
+
+            if (!createResult.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    "Could not create the seed admin user: " +
+                    string.Join(
+                        ", ",
+                        createResult.Errors.Select(e => e.Description)));
+            }
+        }
+
+        var addRoleResult =
+            await userManager.AddToRoleAsync(
+                adminUser,
+                "Admin");
+
+        if (!addRoleResult.Succeeded)
+        {
+            throw new InvalidOperationException(
+                "Could not assign the Admin role to the seed user.");
         }
     }
 }

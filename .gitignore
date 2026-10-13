@@ -367,6 +367,9 @@ FodyWeavers.xsd
 appsettings.Production.json
 appsettings.*.local.json
 
+# Shared uploaded product images and payment receipts
+shared-uploads/
+
 # Local secrets
 secrets.json
 *.secrets.json

@@ -37,17 +37,28 @@ namespace Ghafar_Tajhiz.Controllers
 
         [HttpGet]
         public async Task<IActionResult> ProductList(
-            int page = 1,
-            int pageSize = 8,
-            string? search = null,
-            string sort = "newest")
+     int page = 1,
+     string? search = null,
+     string sort = "newest")
         {
-            var data =
-                await _productService.GetProductPagination(
-                    page,
-                    pageSize,
+            const int pageSize = 16;
+
+            var data = await _productService.GetProductPagination(
+                page,
+                pageSize,
+                search,
+                sort);
+
+            // If the page is beyond the last one, go to the last page
+            if (data.TotalPage > 0 && data.Page > data.TotalPage)
+            {
+                return RedirectToAction(nameof(ProductList), new
+                {
+                    page = data.TotalPage,
                     search,
-                    sort);
+                    sort
+                });
+            }
 
             ViewBag.CurrentPage = data.Page;
             ViewBag.TotalPages = data.TotalPage;

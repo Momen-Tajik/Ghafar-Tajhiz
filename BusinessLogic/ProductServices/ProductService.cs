@@ -201,24 +201,26 @@ namespace BusinessLogic.ProductServices
                 .FirstOrDefaultAsync();
         }
 
+        private const int DefaultPageSize = 16;
+        private const int MaxPageSize = 100;
+
         public async Task<PagedProductDto> GetProductPagination(
             int page,
-            int pageSize,
-            string? search,
+            int pageSize = DefaultPageSize,
+            string? search = null,
             string sort = "newest")
         {
             if (page < 1)
                 page = 1;
 
             if (pageSize < 1)
-                pageSize = 12;
+                pageSize = DefaultPageSize;
 
-            if (pageSize > 100)
-                pageSize = 100;
+            if (pageSize > MaxPageSize)
+                pageSize = MaxPageSize;
 
             var query = _context.Products
                 .AsNoTracking()
-                .Include(p => p.Category)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -232,19 +234,12 @@ namespace BusinessLogic.ProductServices
                     p.Category!.CategoryName.Contains(term));
             }
 
-            query = sort.Trim().ToLowerInvariant() switch
+            query = (sort ?? "newest").Trim().ToLowerInvariant() switch
             {
-                "highestprice" =>
-                    query.OrderByDescending(p => p.Price),
-
-                "lowestprice" =>
-                    query.OrderBy(p => p.Price),
-
-                "bestselling" =>
-                    query.OrderByDescending(p => p.StockQuantity),
-
-                _ =>
-                    query.OrderByDescending(p => p.CreateDate)
+                "highestprice" => query.OrderByDescending(p => p.Price).ThenBy(p => p.ProductId),
+                "lowestprice" => query.OrderBy(p => p.Price).ThenBy(p => p.ProductId),
+                "bestselling" => query.OrderByDescending(p => p.StockQuantity).ThenBy(p => p.ProductId),
+                _ => query.OrderByDescending(p => p.CreateDate).ThenBy(p => p.ProductId)
             };
 
             var totalCount = await query.CountAsync();
@@ -266,8 +261,7 @@ namespace BusinessLogic.ProductServices
                 })
                 .ToListAsync();
 
-            var totalPages =
-                (int)Math.Ceiling(totalCount / (double)pageSize);
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
             return new PagedProductDto
             {

@@ -49,6 +49,19 @@ builder.Services.AddScoped<BasketService>();
 builder.Services.AddScoped<BasketItemService>();
 builder.Services.AddScoped<CommentService>();
 builder.Services.AddScoped<ProfileService>();
+
+var storagePath =
+    FileStoragePath.Resolve(
+        builder.Environment.ContentRootPath,
+        builder.Configuration["FileUpload:StoragePath"]);
+
+Directory.CreateDirectory(storagePath);
+Directory.CreateDirectory(
+    Path.Combine(storagePath, "receipts"));
+
+builder.Services.AddSingleton(
+    new FileStorageSettings(storagePath));
+
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 
 
@@ -92,7 +105,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.HttpOnly = true;
 
     options.Cookie.SecurePolicy =
-        CookieSecurePolicy.Always;
+        CookieSecurePolicy.SameAsRequest;
 
     options.Cookie.SameSite =
         SameSiteMode.Lax;

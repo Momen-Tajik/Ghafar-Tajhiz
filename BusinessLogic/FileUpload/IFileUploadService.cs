@@ -11,5 +11,9 @@ namespace BusinessLogic.FileUpload
         Task<string> UploadReceiptAsync(IFormFile file);
 
         bool DeleteReceipt(string fileName);
+
+        string? GetPublicImagePath(string? fileName);
+
+        string? GetAdminAccessibleFilePath(string? fileName);
     }
 }

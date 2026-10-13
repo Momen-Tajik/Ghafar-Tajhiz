@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BusinessLogic.FileUpload;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ghafar_Tajhiz_Admin.Controllers
@@ -8,14 +9,11 @@ namespace Ghafar_Tajhiz_Admin.Controllers
     [ApiController]
     public class FileUploadController : ControllerBase
     {
-        private readonly string _storagePath;
+        private readonly IFileUploadService _fileUploadService;
 
-        public FileUploadController(IConfiguration configuration)
+        public FileUploadController(IFileUploadService fileUploadService)
         {
-            _storagePath =
-                configuration["FileUpload:StoragePath"]
-                ?? throw new InvalidOperationException(
-                    "FileUpload:StoragePath is not configured.");
+            _fileUploadService = fileUploadService;
         }
 
         [HttpGet("GetFile")]
@@ -24,54 +22,31 @@ namespace Ghafar_Tajhiz_Admin.Controllers
             if (string.IsNullOrWhiteSpace(fileName))
                 return BadRequest("نام فایل ارسال نشده است.");
 
-            var fullPath = Path.Combine(_storagePath, fileName);
+            var fullPath =
+                _fileUploadService.GetAdminAccessibleFilePath(fileName);
 
-            if (!System.IO.File.Exists(fullPath))
+            if (fullPath == null)
                 return NotFound("File Not Found");
-
-            var extension =
-                Path.GetExtension(fullPath)
-                    .ToLowerInvariant();
-
-            var contentType = extension switch
-            {
-                ".jpg" or ".jpeg" => "image/jpeg",
-                ".png" => "image/png",
-                ".webp" => "image/webp",
-                _ => "application/octet-stream"
-            };
 
             return PhysicalFile(
                 fullPath,
-                contentType);
+                FileStoragePath.GetContentType(fullPath));
         }
 
         [HttpDelete("Delete")]
         public IActionResult DeleteFile(string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
-                return BadRequest(
-                    "نام فایل ارسال نشده است.");
-
-            var safeFileName =
-                Path.GetFileName(fileName);
-
-            if (!string.Equals(
-                    safeFileName,
-                    fileName,
-                    StringComparison.Ordinal))
             {
                 return BadRequest(
-                    "نام فایل نامعتبر است.");
+                    "نام فایل ارسال نشده است.");
             }
 
-            var fullPath =
-                Path.Combine(_storagePath, safeFileName);
+            var deleted =
+                _fileUploadService.DeleteFile(fileName);
 
-            if (!System.IO.File.Exists(fullPath))
+            if (!deleted)
                 return NotFound("File Not Found");
-
-            System.IO.File.Delete(fullPath);
 
             return Ok(new
             {
