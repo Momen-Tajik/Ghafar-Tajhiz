@@ -1,21 +1,106 @@
 ﻿@using DataAccess.Models
+@using System.Globalization
+@using System.Text.Json
+@using System.Collections.Generic
+
 @model Product
 
+@inject IConfiguration Configuration
+
 @{
-    ViewData["Title"] = Model.ProductName;
+    // ==========================================
+    // SEO Metadata
+    // ==========================================
+
+    ViewData["Title"] = $"{Model.ProductName}؛ قیمت و مشخصات";
+    ViewData["OgType"] = "product";
+
+    var seoOrigin = (
+        Configuration["Seo:SiteUrl"]
+        ?? $"{Context.Request.Scheme}://{Context.Request.Host}"
+    ).TrimEnd('/');
+
+    var seoProductPath = Url.Action(
+        "Index",
+        "Product",
+        new { id = Model.ProductId }
+    ) ?? $"/Product/Index/{Model.ProductId}";
+
+    var seoProductUrl = $"{seoOrigin}{seoProductPath}";
+
+    var seoProductDescription =
+        !string.IsNullOrWhiteSpace(Model.ProductDescription)
+            ? Model.ProductDescription.Trim()
+            : $"مشاهده قیمت، موجودی و مشخصات {Model.ProductName} در فروشگاه تجهیزات تاجیک.";
+
+    var seoMetaDescription = seoProductDescription.Length > 160
+        ? seoProductDescription[..157] + "..."
+        : seoProductDescription;
+
+    ViewData["MetaDescription"] = seoMetaDescription;
+    ViewData["CanonicalUrl"] = seoProductUrl;
+    ViewData["Robots"] = "index,follow";
+
+    // ==========================================
+    // Product Image
+    // ==========================================
+
+    var seoProductImage = string.IsNullOrWhiteSpace(Model.ImageUrl)
+        ? null
+        : $"{seoOrigin}/api/FileUpload/GetFile?filename={Uri.EscapeDataString(Model.ImageUrl)}";
+
+    // ==========================================
+    // Product Schema (JSON-LD)
+    // ==========================================
+
+    // فرض: قیمت ذخیره‌شده در دیتابیس به تومان است.
+    // برای Schema، قیمت به ریال تبدیل می‌شود.
+    // اگر قیمت دیتابیس از قبل ریال است، * 10m را حذف کن.
+    var seoPriceInRial = (Model.Price * 10m)
+        .ToString("0.##", CultureInfo.InvariantCulture);
+
+    var seoProductSchema = new Dictionary<string, object?>
+            {
+                ["@context"] = "https://schema.org",
+                ["@type"] = "Product",
+                ["name"] = Model.ProductName,
+                ["description"] = seoProductDescription,
+                ["sku"] = Model.ProductId.ToString(
+                    CultureInfo.InvariantCulture
+                ),
+                ["image"] = seoProductImage == null
+                    ? null
+                    : new[] { seoProductImage },
+                ["offers"] = new Dictionary<string, object?>
+                {
+                    ["@type"] = "Offer",
+                    ["url"] = seoProductUrl,
+                    ["priceCurrency"] = "IRR",
+                    ["price"] = seoPriceInRial,
+                    ["availability"] = Model.StockQuantity > 0
+                        ? "https://schema.org/InStock"
+                        : "https://schema.org/OutOfStock"
+                }
+            };
+
+    // ==========================================
+    // Product Page Data
+    // ==========================================
 
     var hasStock = Model.StockQuantity > 0;
+    var commentCount = Model.Comments?.Count() ?? 0;
 }
 
+<!-- Product ID -->
 <input id="productId"
        type="hidden"
        value="@Model.ProductId" />
 
 <main class="product-page">
 
-    <!-- =====================================================
+    <!-- ==========================================
          Breadcrumb
-         ===================================================== -->
+         ========================================== -->
 
     <nav class="product-breadcrumb"
          aria-label="مسیر صفحه">
@@ -25,31 +110,29 @@
             صفحه اصلی
         </a>
 
-        <i class="fa fa-angle-left"></i>
+        <i class="fa fa-angle-left" aria-hidden="true"></i>
 
         <a asp-controller="Product"
            asp-action="ProductList">
             محصولات
         </a>
 
-        <i class="fa fa-angle-left"></i>
+        <i class="fa fa-angle-left" aria-hidden="true"></i>
 
-        <span>
+        <span aria-current="page">
             @Model.ProductName
         </span>
 
     </nav>
 
 
-    <!-- =====================================================
+    <!-- ==========================================
          Product Details
-         ===================================================== -->
+         ========================================== -->
 
     <section class="product-main">
 
-        <!-- =================================================
-             Product Image
-             ================================================= -->
+        <!-- Product Image -->
 
         <div class="product-gallery">
 
@@ -57,7 +140,7 @@
 
                 @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
                 {
-                    <img src="/api/FileUpload/GetFile?filename=@Uri.EscapeDataString(Model.ImageUrl)"
+                    <img src="@($"/api/FileUpload/GetFile?filename={Uri.EscapeDataString(Model.ImageUrl)}")"
                          alt="@Model.ProductName"
                          class="product-main-image"
                          width="800"
@@ -68,7 +151,8 @@
                 {
                     <div class="product-image-empty">
 
-                        <i class="fa fa-image"></i>
+                        <i class="fa fa-image"
+                           aria-hidden="true"></i>
 
                         <span>
                             تصویری برای این محصول ثبت نشده است.
@@ -82,9 +166,7 @@
         </div>
 
 
-        <!-- =================================================
-             Product Information
-             ================================================= -->
+        <!-- Product Information -->
 
         <div class="product-information">
 
@@ -131,14 +213,16 @@
                     @if (hasStock)
                     {
                         <strong class="product-stock available">
-                            <i class="fa fa-check-circle"></i>
+                            <i class="fa fa-check-circle"
+                               aria-hidden="true"></i>
                             موجود
                         </strong>
                     }
                     else
                     {
                         <strong class="product-stock unavailable">
-                            <i class="fa fa-times-circle"></i>
+                            <i class="fa fa-times-circle"
+                               aria-hidden="true"></i>
                             ناموجود
                         </strong>
                     }
@@ -226,7 +310,8 @@
                             onclick="AddToBasket()"
                             class="product-add-btn">
 
-                        <i class="fa fa-shopping-cart"></i>
+                        <i class="fa fa-shopping-cart"
+                           aria-hidden="true"></i>
 
                         افزودن به سبد خرید
 
@@ -236,7 +321,8 @@
                 {
                     <div class="out-of-stock-message">
 
-                        <i class="fa fa-exclamation-circle"></i>
+                        <i class="fa fa-exclamation-circle"
+                           aria-hidden="true"></i>
 
                         <span>
                             این محصول در حال حاضر موجود نیست.
@@ -249,7 +335,8 @@
                             class="product-add-btn disabled"
                             disabled>
 
-                        <i class="fa fa-shopping-cart"></i>
+                        <i class="fa fa-shopping-cart"
+                           aria-hidden="true"></i>
 
                         محصول ناموجود است
 
@@ -263,9 +350,9 @@
     </section>
 
 
-    <!-- =====================================================
+    <!-- ==========================================
          Comments
-         ===================================================== -->
+         ========================================== -->
 
     <section class="comments-section">
 
@@ -286,9 +373,10 @@
 
             <span class="comments-count-badge">
 
-                <i class="fa fa-comments"></i>
+                <i class="fa fa-comments"
+                   aria-hidden="true"></i>
 
-                @Model.Comments.Count
+                @commentCount
                 نظر
 
             </span>
@@ -320,11 +408,13 @@
 
                 @Html.AntiForgeryToken()
 
+                <input type="hidden"
+                       name="ProductId"
+                       value="@Model.ProductId" />
 
                 <label for="commentText">
                     متن نظر
                 </label>
-
 
                 <textarea id="commentText"
                           name="Text"
@@ -340,12 +430,12 @@
                         حداکثر ۵۰۰ کاراکتر
                     </span>
 
-
                     <button type="button"
                             onclick="addComment()"
                             class="btn-submit">
 
-                        <i class="fa fa-paper-plane"></i>
+                        <i class="fa fa-paper-plane"
+                           aria-hidden="true"></i>
 
                         ثبت نظر
 
@@ -359,8 +449,7 @@
 
 
         <!-- Comments List -->
-        @if (Model.Comments != null &&
-        Model.Comments.Any())
+        @if (Model.Comments != null && Model.Comments.Any())
         {
             <div class="comments-list">
 
@@ -373,7 +462,8 @@
                             <div class="comment-user">
 
                                 <div class="comment-avatar">
-                                    <i class="fa fa-user"></i>
+                                    <i class="fa fa-user"
+                                       aria-hidden="true"></i>
                                 </div>
 
                                 <strong>
@@ -385,10 +475,10 @@
 
                             <time class="comment-date">
 
-                                <i class="fa fa-clock-o"></i>
+                                <i class="fa fa-clock-o"
+                                   aria-hidden="true"></i>
 
-                                @item.Created.ToString(
-                                         "yyyy/MM/dd - HH:mm")
+                                @item.Created.ToString("yyyy/MM/dd - HH:mm")
 
                             </time>
 
@@ -413,7 +503,8 @@
             <div class="comments-empty">
 
                 <div class="comments-empty-icon">
-                    <i class="fa fa-comments-o"></i>
+                    <i class="fa fa-comments-o"
+                       aria-hidden="true"></i>
                 </div>
 
                 <h3>
@@ -430,3 +521,13 @@
     </section>
 
 </main>
+
+
+<!-- ==========================================
+     Product Structured Data (JSON-LD)
+     ========================================== -->
+@section Scripts {
+    <script type="application/ld+json">
+        @Html.Raw(JsonSerializer.Serialize(seoProductSchema))
+    </script>
+}

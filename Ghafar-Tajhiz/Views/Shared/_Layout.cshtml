@@ -1,5 +1,6 @@
 ﻿@using DataAccess.Models
 @using Microsoft.AspNetCore.Identity
+@inject IConfiguration Configuration
 @inject SignInManager<User> SignInManager
 
 <!DOCTYPE html>
@@ -7,52 +8,78 @@
 <html lang="fa" dir="rtl">
 
 <head>
-
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0" />
+    @{
+        var seoSiteName = Configuration["Seo:SiteName"] ?? "تجهیزات تاجیک";
+        var configuredSiteUrl = Configuration["Seo:SiteUrl"]?.TrimEnd('/');
+        var requestOrigin = $"{Context.Request.Scheme}://{Context.Request.Host}";
+        var seoOrigin = configuredSiteUrl ?? requestOrigin;
+        var currentPath = $"{Context.Request.PathBase}{Context.Request.Path}";
 
-    <title>
-        @ViewData["Title"] - تجهیزات تاجیک
-    </title>
+        var rawPageTitle = ViewData["Title"]?.ToString();
+        var seoTitle = string.IsNullOrWhiteSpace(rawPageTitle)
+        ? "خرید تجهیزات آشپزخانه صنعتی"
+        : $"{rawPageTitle} | {seoSiteName}";
 
+        var seoDescription = ViewData["MetaDescription"]?.ToString();
+
+        if (string.IsNullOrWhiteSpace(seoDescription))
+        {
+            seoDescription = "تجهیزات تاجیک؛ بررسی و خرید تجهیزات آشپزخانه صنعتی، رستورانی، فست‌فود و هتلی. محصولات و مشخصات هر کالا را مشاهده کنید.";
+        }
+
+        var seoCanonical = ViewData["CanonicalUrl"]?.ToString();
+
+        if (string.IsNullOrWhiteSpace(seoCanonical))
+        {
+            seoCanonical = $"{seoOrigin}{currentPath}";
+        }
+
+        var seoRobots = ViewData["Robots"]?.ToString() ?? "index,follow";
+        var seoOgType = ViewData["OgType"]?.ToString() ?? "website";
+    }
+
+    <title>@seoTitle</title>
+
+    <meta name="description" content="@seoDescription" />
+    <meta name="robots" content="@seoRobots" />
+
+    <link rel="canonical" href="@seoCanonical" />
+
+    <meta property="og:locale" content="fa_IR" />
+    <meta property="og:site_name" content="@seoSiteName" />
+    <meta property="og:type" content="@seoOgType" />
+    <meta property="og:title" content="@seoTitle" />
+    <meta property="og:description" content="@seoDescription" />
+    <meta property="og:url" content="@seoCanonical" />
+
+    <meta name="twitter:card" content="summary" />
 
     <!-- Bootstrap -->
-
     <link rel="stylesheet"
           href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
-
     <!-- Main CSS -->
-
     <link rel="stylesheet"
           href="~/css/style.css"
           asp-append-version="true" />
 
-
     <!-- Razor Generated CSS -->
-
     <link rel="stylesheet"
           href="~/Ghafar_Tajhiz.styles.css"
           asp-append-version="true" />
 
-
     <!-- Font Awesome -->
-
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 
-
     <!-- SweetAlert -->
-
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
 
-
-    @await RenderSectionAsync(
-            "Styles",
-            required: false)
+    @await RenderSectionAsync("Styles", required: false)
 
 </head>
 

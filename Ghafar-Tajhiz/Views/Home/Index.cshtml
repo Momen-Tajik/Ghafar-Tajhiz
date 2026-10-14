@@ -1,9 +1,13 @@
 ﻿@using DataAccess.Models
 @model IReadOnlyList<Product>
+@inject IConfiguration Configuration
 
 @{
-    ViewData["Title"] = "صفحه اصلی";
+    ViewData["Title"] = "خرید تجهیزات آشپزخانه صنعتی و رستورانی";
+    ViewData["MetaDescription"] = "تجهیزات آشپزخانه صنعتی، رستورانی، فست‌فود و هتلی را در فروشگاه تجهیزات تاجیک بررسی کنید؛ مشخصات محصولات را ببینید و تجهیزات موردنیاز کسب‌وکار خود را انتخاب کنید.";
+    ViewData["CanonicalUrl"] = $"{(Configuration["Seo:SiteUrl"] ?? $"{Context.Request.Scheme}://{Context.Request.Host}").TrimEnd('/')}{Context.Request.PathBase}/";
 }
+
 
 <main class="home-page">
 

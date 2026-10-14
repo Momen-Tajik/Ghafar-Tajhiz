@@ -1,27 +1,55 @@
 ﻿@using BusinessLogic.ProductServices
 @model IEnumerable<ProductDto>
+@inject IConfiguration Configuration
+
 
 @{
-    ViewData["Title"] = "محصولات";
+    // اطلاعات صفحه‌بندی و فیلتر محصولات
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
 
-    int currentPage =
-        ViewBag.CurrentPage ?? 1;
+    string search = ViewBag.Search ?? string.Empty;
+    string currentSort = ViewBag.Sort ?? "newest";
 
-    int totalPages =
-        ViewBag.TotalPages ?? 1;
+    int startPage = Math.Max(1, currentPage - 2);
+    int endPage = Math.Min(totalPages, currentPage + 2);
 
-    string search =
-        ViewBag.Search ?? string.Empty;
+    // اطلاعات سئو
+    ViewData["Title"] = "خرید تجهیزات آشپزخانه صنعتی";
 
-    string currentSort =
-        ViewBag.Sort ?? "newest";
+    ViewData["MetaDescription"] =
+        "فهرست تجهیزات آشپزخانه صنعتی و رستورانی تجهیزات تاجیک را ببینید؛ محصولات را بررسی و بر اساس جدیدترین، پرفروش‌ترین یا قیمت مرتب کنید.";
 
-    int startPage =
-        Math.Max(1, currentPage - 2);
+    var seoOrigin = (
+        Configuration["Seo:SiteUrl"]
+        ?? $"{Context.Request.Scheme}://{Context.Request.Host}"
+    ).TrimEnd('/');
 
-    int endPage =
-        Math.Min(totalPages, currentPage + 2);
+    var canonicalPagePath = Url.Action(
+        "ProductList",
+        "Product",
+        new
+        {
+            page = currentPage > 1 ? currentPage : (int?)null
+        }
+    ) ?? "/Product/ProductList";
+
+    // جست‌وجو و مرتب‌سازی جایگزین نباید نسخه‌های موازی قابل ایندکس بسازند.
+    var hasSearchOrAlternativeSort =
+        !string.IsNullOrWhiteSpace(search) ||
+        !string.Equals(
+            currentSort,
+            "newest",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+    ViewData["CanonicalUrl"] = $"{seoOrigin}{canonicalPagePath}";
+
+    ViewData["Robots"] = hasSearchOrAlternativeSort
+        ? "noindex,follow"
+        : "index,follow";
 }
+
 
 <main class="product-list-page">
 
