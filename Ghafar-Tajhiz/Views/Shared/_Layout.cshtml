@@ -1,593 +1,365 @@
-﻿@using DataAccess.Models
+﻿@using System.Globalization
+@using System.Text.Json
+@using DataAccess.Models
 @using Microsoft.AspNetCore.Identity
 @inject IConfiguration Configuration
 @inject SignInManager<User> SignInManager
 
-<!DOCTYPE html>
+@{
+    // ------------------------------------------------------------------
+    // SEO settings
+    // appsettings.json -> "Seo": { "SiteName", "SiteUrl", "DefaultOgImage", "Phone" }
+    // ------------------------------------------------------------------
+    var seoSiteName = Configuration["Seo:SiteName"] ?? "غفار تجهیز";
+    var configuredSiteUrl = Configuration["Seo:SiteUrl"]?.TrimEnd('/');
+    var requestOrigin = $"{Context.Request.Scheme}://{Context.Request.Host}";
+    var seoOrigin = !string.IsNullOrWhiteSpace(configuredSiteUrl) ? configuredSiteUrl : requestOrigin;
 
+    // Canonical never includes the query string (avoids duplicate content)
+    var currentPath = $"{Context.Request.PathBase}{Context.Request.Path}";
+
+    // Title
+    var rawPageTitle = ViewData["Title"]?.ToString();
+    var seoTitle = string.IsNullOrWhiteSpace(rawPageTitle)
+        ? $"{seoSiteName} | تولید و فروش جوجه‌گردان، کباب ترکی، فر ساندویچ و فر پیتزا"
+        : $"{rawPageTitle} | {seoSiteName}";
+
+    // Description
+    var seoDescription = ViewData["MetaDescription"]?.ToString();
+    if (string.IsNullOrWhiteSpace(seoDescription))
+    {
+        seoDescription = "غفار تجهیز؛ تولیدکننده و فروشنده تجهیزات آشپزخانه صنعتی شامل جوجه‌گردان، دستگاه کباب ترکی، فر ساندویچ، فر پیتزا و سایر تجهیزات رستوران و فست‌فود. مشاهده مشخصات و خرید آنلاین.";
+    }
+
+    // Canonical
+    var seoCanonical = ViewData["CanonicalUrl"]?.ToString();
+    if (string.IsNullOrWhiteSpace(seoCanonical))
+    {
+        seoCanonical = $"{seoOrigin}{currentPath}";
+    }
+
+    // Robots: private/transactional pages are noindex by default
+    var routeController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var privateControllers = new[] { "Account", "Profile", "Order" };
+    var defaultRobots = privateControllers.Contains(routeController, StringComparer.OrdinalIgnoreCase)
+        ? "noindex,follow"
+        : "index,follow,max-image-preview:large";
+    var seoRobots = ViewData["Robots"]?.ToString() ?? defaultRobots;
+
+    // Open Graph
+    var seoOgType = ViewData["OgType"]?.ToString() ?? "website";
+    var seoOgImage = ViewData["OgImage"]?.ToString()
+                     ?? Configuration["Seo:DefaultOgImage"]
+                     ?? "/asstes/icon/og-default.png";
+    if (seoOgImage.StartsWith("/"))
+    {
+        seoOgImage = $"{seoOrigin}{seoOgImage}";
+    }
+
+    // Structured data (JSON-LD)
+    var logoUrl = $"{seoOrigin}/asstes/icon/Logo.svg";
+    var phone = Configuration["Seo:Phone"];
+
+    var organization = new Dictionary<string, object?>
+            {
+                ["@context"] = "https://schema.org",
+                ["@type"] = "Organization",
+                ["name"] = seoSiteName,
+                ["alternateName"] = "GhafarTajhiz",
+                ["url"] = seoOrigin,
+                ["logo"] = logoUrl,
+                ["description"] = "تولید و فروش تجهیزات آشپزخانه صنعتی: جوجه‌گردان، کباب ترکی، فر ساندویچ و فر پیتزا",
+                ["areaServed"] = "IR"
+            };
+    if (!string.IsNullOrWhiteSpace(phone))
+    {
+        organization["contactPoint"] = new Dictionary<string, object?>
+                {
+                    ["@type"] = "ContactPoint",
+                    ["telephone"] = phone,
+                    ["contactType"] = "customer service",
+                    ["availableLanguage"] = "fa"
+                };
+    }
+
+    var webSite = new Dictionary<string, object?>
+            {
+                ["@context"] = "https://schema.org",
+                ["@type"] = "WebSite",
+                ["name"] = seoSiteName,
+                ["url"] = seoOrigin,
+                ["inLanguage"] = "fa-IR"
+            };
+
+    // Footer year (Persian calendar)
+    var persianYear = new PersianCalendar().GetYear(DateTime.Now).ToString();
+    var persianDigits = new[] { '۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹' };
+    var footerYear = new string(persianYear.Select(c => persianDigits[c - '0']).ToArray());
+}
+
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    @{
-        var seoSiteName = Configuration["Seo:SiteName"] ?? "تجهیزات تاجیک";
-        var configuredSiteUrl = Configuration["Seo:SiteUrl"]?.TrimEnd('/');
-        var requestOrigin = $"{Context.Request.Scheme}://{Context.Request.Host}";
-        var seoOrigin = configuredSiteUrl ?? requestOrigin;
-        var currentPath = $"{Context.Request.PathBase}{Context.Request.Path}";
-
-        var rawPageTitle = ViewData["Title"]?.ToString();
-        var seoTitle = string.IsNullOrWhiteSpace(rawPageTitle)
-        ? "خرید تجهیزات آشپزخانه صنعتی"
-        : $"{rawPageTitle} | {seoSiteName}";
-
-        var seoDescription = ViewData["MetaDescription"]?.ToString();
-
-        if (string.IsNullOrWhiteSpace(seoDescription))
-        {
-            seoDescription = "تجهیزات تاجیک؛ بررسی و خرید تجهیزات آشپزخانه صنعتی، رستورانی، فست‌فود و هتلی. محصولات و مشخصات هر کالا را مشاهده کنید.";
-        }
-
-        var seoCanonical = ViewData["CanonicalUrl"]?.ToString();
-
-        if (string.IsNullOrWhiteSpace(seoCanonical))
-        {
-            seoCanonical = $"{seoOrigin}{currentPath}";
-        }
-
-        var seoRobots = ViewData["Robots"]?.ToString() ?? "index,follow";
-        var seoOgType = ViewData["OgType"]?.ToString() ?? "website";
-    }
+    <meta name="theme-color" content="#e8481c" />
 
     <title>@seoTitle</title>
-
     <meta name="description" content="@seoDescription" />
     <meta name="robots" content="@seoRobots" />
-
     <link rel="canonical" href="@seoCanonical" />
 
+    <!-- Favicon -->
+    <link rel="icon" href="~/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="~/asstes/icon/favicon.svg" />
+    <link rel="apple-touch-icon" href="~/asstes/icon/apple-touch-icon.png" />
+
+    <!-- Open Graph -->
     <meta property="og:locale" content="fa_IR" />
     <meta property="og:site_name" content="@seoSiteName" />
     <meta property="og:type" content="@seoOgType" />
     <meta property="og:title" content="@seoTitle" />
     <meta property="og:description" content="@seoDescription" />
     <meta property="og:url" content="@seoCanonical" />
+    <meta property="og:image" content="@seoOgImage" />
+    <meta property="og:image:alt" content="@seoSiteName" />
 
-    <meta name="twitter:card" content="summary" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="@seoTitle" />
+    <meta name="twitter:description" content="@seoDescription" />
+    <meta name="twitter:image" content="@seoOgImage" />
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet"
-          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Structured data -->
+    <script type="application/ld+json">@Html.Raw(JsonSerializer.Serialize(organization))</script>
+    <script type="application/ld+json">@Html.Raw(JsonSerializer.Serialize(webSite))</script>
 
-    <!-- Main CSS -->
-    <link rel="stylesheet"
-          href="~/css/style.css"
-          asp-append-version="true" />
+    <!-- Performance -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 
-    <!-- Razor Generated CSS -->
-    <link rel="stylesheet"
-          href="~/Ghafar_Tajhiz.styles.css"
-          asp-append-version="true" />
+    <!-- Styles -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Ghafar_Tajhiz.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-
-    <!-- SweetAlert -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
-
+    @await RenderSectionAsync("Head", required: false)
     @await RenderSectionAsync("Styles", required: false)
-
 </head>
-
 
 <body>
 
-    <!-- =====================================================
-         NAVBAR
-         ===================================================== -->
+    <a href="#main-content" class="visually-hidden-focusable">پرش به محتوای اصلی</a>
 
+    <!-- ===================== HEADER ===================== -->
     <header class="site-header">
-
-        <nav class="site-nav">
-
+        <nav class="site-nav" aria-label="منوی اصلی">
             <div class="nav-container">
 
-
-                <!-- =============================================
-                     Mobile Header
-                     ============================================= -->
-
+                <!-- Mobile header -->
                 <div class="mobile-navbar">
-
                     <button type="button"
                             id="mobileNavbarBtn"
                             class="mobile-menu-btn"
                             aria-label="باز کردن منو"
                             aria-controls="desktopnavbar"
                             aria-expanded="false">
-
-                        <i class="fa fa-bars"></i>
-
+                        <i class="fa fa-bars" aria-hidden="true"></i>
                     </button>
 
-
-                    <a asp-controller="Home"
-                       asp-action="Index"
-                       class="mobile-logo-link">
-
+                    <a asp-controller="Home" asp-action="Index" class="mobile-logo-link">
                         <img class="mobile-logo"
                              src="~/asstes/icon/Logo.svg"
-                             alt="تجهیزات تاجیک" />
-
+                             alt="@seoSiteName"
+                             height="40" />
                     </a>
-
                 </div>
 
+                <!-- Desktop / main navigation -->
+                <div class="desktopnavbar" id="desktopnavbar">
 
-                <!-- =============================================
-                     Desktop / Main Navigation
-                     ============================================= -->
-
-                <div class="desktopnavbar"
-                     id="desktopnavbar">
-
-
-                    <!-- Logo -->
-
-                    <a asp-controller="Home"
-                       asp-action="Index"
-                       class="nav-logo-link">
-
+                    <a asp-controller="Home" asp-action="Index" class="nav-logo-link">
                         <img class="logo"
                              src="~/asstes/icon/Logo.svg"
-                             alt="تجهیزات تاجیک" />
-
+                             alt="@seoSiteName"
+                             height="50" />
                     </a>
-
-
-                    <!-- Main Links -->
 
                     <div class="nav-links">
 
-                        <a asp-controller="Home"
-                           asp-action="Index"
-                           class="nav-item">
-
-                            <i class="fa fa-home"></i>
-
-                            <span>
-                                صفحه اصلی
-                            </span>
-
+                        <a asp-controller="Home" asp-action="Index" class="nav-item">
+                            <i class="fa fa-home" aria-hidden="true"></i>
+                            <span>صفحه اصلی</span>
                         </a>
 
-
-                        <a asp-controller="Product"
-                           asp-action="ProductList"
-                           class="nav-item">
-
-                            <i class="fa fa-th-large"></i>
-
-                            <span>
-                                محصولات
-                            </span>
-
+                        <a asp-controller="Product" asp-action="ProductList" class="nav-item">
+                            <i class="fa fa-th-large" aria-hidden="true"></i>
+                            <span>محصولات</span>
                         </a>
 
-
-                        <a asp-controller="Order"
-                           asp-action="Basket"
-                           class="nav-item nav-cart">
-
-                            <i class="fa fa-shopping-cart"></i>
-
-                            <span>
-                                سبد خرید
-                            </span>
-
-                            <span id="cart-badge-desktop"
-                                  class="cart-badge">
-
-                                0
-
-                            </span>
-
+                        <a asp-controller="Order" asp-action="Basket" class="nav-item nav-cart" rel="nofollow">
+                            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                            <span>سبد خرید</span>
+                            <span id="cart-badge-desktop" class="cart-badge">0</span>
                         </a>
-
 
                         @if (SignInManager.IsSignedIn(User))
                         {
-
-                            <a asp-controller="Profile"
-                               asp-action="Index"
-                               class="nav-item">
-
-                                <i class="fa fa-user"></i>
-
-                                <span>
-                                    پروفایل
-                                </span>
-
+                            <a asp-controller="Profile" asp-action="Index" class="nav-item" rel="nofollow">
+                                <i class="fa fa-user" aria-hidden="true"></i>
+                                <span>پروفایل</span>
                             </a>
-
 
                             <form asp-controller="Account"
                                   asp-action="Logout"
                                   method="post"
                                   class="logout-form">
-
-                                @Html.AntiForgeryToken()
-
-                                <button type="submit"
-                                        class="nav-item nav-logout">
-
-                                    <i class="fa fa-sign-out"></i>
-
-                                    <span>
-                                        خروج
-                                    </span>
-
+                                <button type="submit" class="nav-item nav-logout">
+                                    <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                    <span>خروج</span>
                                 </button>
-
                             </form>
-
                         }
                         else
                         {
-
-                            <a asp-controller="Account"
-                               asp-action="Login"
-                               class="nav-item">
-
-                                <i class="fa fa-sign-in"></i>
-
-                                <span>
-                                    ورود / ثبت نام
-                                </span>
-
+                            <a asp-controller="Account" asp-action="Login" class="nav-item" rel="nofollow">
+                                <i class="fa fa-sign-in" aria-hidden="true"></i>
+                                <span>ورود / ثبت نام</span>
                             </a>
-
                         }
 
-
-                        <a asp-controller="Home"
-                           asp-action="AboutUs"
-                           class="nav-item">
-
-                            <i class="fa fa-info-circle"></i>
-
-                            <span>
-                                درباره ما
-                            </span>
-
+                        <a asp-controller="Home" asp-action="AboutUs" class="nav-item">
+                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                            <span>درباره ما</span>
                         </a>
 
                     </div>
-
                 </div>
 
             </div>
-
         </nav>
-
     </header>
 
-
-    <!-- =====================================================
-         MAIN CONTENT
-         ===================================================== -->
-
-    <main role="main"
-          class="site-main">
-
+    <!-- ===================== MAIN ===================== -->
+    <main id="main-content" role="main" class="site-main">
         @RenderBody()
-
     </main>
 
-
-    <!-- =====================================================
-         FOOTER
-         ===================================================== -->
-
+    <!-- ===================== FOOTER ===================== -->
     <footer class="site-footer">
-
         <div class="footer-container">
 
-
-            <!-- =============================================
-                 About
-                 ============================================= -->
-
+            <!-- About -->
             <div class="footer-section footer-about">
-
-                <a asp-controller="Home"
-                   asp-action="Index"
-                   class="footer-logo">
-
+                <a asp-controller="Home" asp-action="Index" class="footer-logo">
                     <img src="~/asstes/icon/Logo.svg"
-                         alt="تجهیزات تاجیک" />
-
+                         alt="@seoSiteName"
+                         height="50"
+                         loading="lazy" />
                 </a>
 
-
                 <p>
-                    تجهیزات تاجیک با هدف تأمین تجهیزات مورد نیاز
-                    رستوران‌ها، فست‌فودها، هتل‌ها و مجموعه‌های صنعتی
-                    فعالیت می‌کند و تلاش دارد تجربه‌ای مطمئن
-                    برای انتخاب و خرید تجهیزات فراهم کند.
+                    @seoSiteName تولیدکننده و فروشنده تجهیزات آشپزخانه صنعتی است؛
+                    از جوجه‌گردان و دستگاه کباب ترکی تا فر ساندویچ و فر پیتزا.
+                    هدف ما تأمین تجهیزات باکیفیت رستوران‌ها، فست‌فودها و هتل‌ها
+                    و ایجاد تجربه‌ای مطمئن برای خرید است.
                 </p>
-
             </div>
 
-
-            <!-- =============================================
-                 Important Links
-                 ============================================= -->
-
+            <!-- Quick links -->
             <div class="footer-section">
-
-                <h3>
-                    دسترسی سریع
-                </h3>
-
+                <h2 class="footer-title">دسترسی سریع</h2>
 
                 <ul class="footer-links">
-
-                    <li>
-
-                        <a asp-controller="Home"
-                           asp-action="Index">
-
-                            صفحه اصلی
-
-                        </a>
-
-                    </li>
-
-
-                    <li>
-
-                        <a asp-controller="Product"
-                           asp-action="ProductList">
-
-                            محصولات
-
-                        </a>
-
-                    </li>
-
-
-                    <li>
-
-                        <a asp-controller="Home"
-                           asp-action="AboutUs">
-
-                            درباره ما
-
-                        </a>
-
-                    </li>
-
+                    <li><a asp-controller="Home" asp-action="Index">صفحه اصلی</a></li>
+                    <li><a asp-controller="Product" asp-action="ProductList">محصولات</a></li>
+                    <li><a asp-controller="Home" asp-action="AboutUs">درباره ما</a></li>
 
                     @if (SignInManager.IsSignedIn(User))
                     {
-                        <li>
-
-                            <a asp-controller="Profile"
-                               asp-action="Index">
-
-                                پروفایل
-
-                            </a>
-
-                        </li>
+                        <li><a asp-controller="Profile" asp-action="Index" rel="nofollow">پروفایل</a></li>
                     }
-
                 </ul>
-
             </div>
 
-
-            <!-- =============================================
-                 Customer Support
-                 ============================================= -->
-
+            <!-- Customer support -->
             <div class="footer-section">
-
-                <h3>
-                    خدمات مشتریان
-                </h3>
-
+                <h2 class="footer-title">خدمات مشتریان</h2>
 
                 <ul class="footer-links">
-
-                    <li>
-                        <span>
-                            پشتیبانی و راهنمایی خرید
-                        </span>
-                    </li>
-
-
-                    <li>
-                        <span>
-                            پیگیری سفارش‌ها
-                        </span>
-                    </li>
-
-
-                    <li>
-                        <span>
-                            تأمین تجهیزات مورد نیاز کسب‌وکار
-                        </span>
-                    </li>
-
+                    <li><span>پشتیبانی و راهنمایی خرید</span></li>
+                    <li><span>پیگیری سفارش‌ها</span></li>
+                    <li><span>تأمین تجهیزات مورد نیاز کسب‌وکار</span></li>
                 </ul>
-
             </div>
 
-
-            <!-- =============================================
-                 Social
-                 ============================================= -->
-
+            <!-- Social -->
             <div class="footer-section footer-social-section">
-
-                <h3>
-                    ما را دنبال کنید
-                </h3>
-
+                <h2 class="footer-title">ما را دنبال کنید</h2>
 
                 <p class="footer-social-description">
                     برای اطلاع از محصولات و فعالیت‌های مجموعه
                     ما را در شبکه‌های اجتماعی دنبال کنید.
                 </p>
 
-
                 <div class="social-icons">
-
-
-                    <a href="#"
-                       class="social-icon"
-                       aria-label="Facebook">
-
-                        <img src="~/asstes/icon/icons8-facebook.svg"
-                             alt="" />
-
+                    <a href="#" class="social-icon" aria-label="فیسبوک" rel="noopener noreferrer" target="_blank">
+                        <img src="~/asstes/icon/icons8-facebook.svg" alt="" width="32" height="32" loading="lazy" />
                     </a>
 
-
-                    <a href="#"
-                       class="social-icon"
-                       aria-label="WhatsApp">
-
-                        <img src="~/asstes/icon/icons8-whatsapp.svg"
-                             alt="" />
-
+                    <a href="#" class="social-icon" aria-label="واتساپ" rel="noopener noreferrer" target="_blank">
+                        <img src="~/asstes/icon/icons8-whatsapp.svg" alt="" width="32" height="32" loading="lazy" />
                     </a>
 
-
-                    <a href="#"
-                       class="social-icon"
-                       aria-label="Instagram">
-
-                        <img src="~/asstes/icon/icons8-instagram.svg"
-                             alt="" />
-
+                    <a href="#" class="social-icon" aria-label="اینستاگرام" rel="noopener noreferrer" target="_blank">
+                        <img src="~/asstes/icon/icons8-instagram.svg" alt="" width="32" height="32" loading="lazy" />
                     </a>
-
                 </div>
-
             </div>
 
         </div>
-
-
-        <!-- =============================================
-             Footer Bottom
-             ============================================= -->
 
         <div class="footer-bottom">
-
             <div class="footer-bottom-container">
-
-                <span>
-                    © ۱۴۰۴ تجهیزات تاجیک
-                </span>
-
-                <span>
-                    تمامی حقوق محفوظ است.
-                </span>
-
+                <span>© @footerYear @seoSiteName</span>
+                <span>تمامی حقوق محفوظ است.</span>
             </div>
-
         </div>
-
     </footer>
 
-
-    <!-- =====================================================
-         PRODUCT MODAL
-         ===================================================== -->
-
+    <!-- ===================== PRODUCT MODAL ===================== -->
     <div id="modal"
          class="modal"
          role="dialog"
          aria-modal="true"
          aria-hidden="true">
 
-
         <div class="modal-content">
-
-
-            <button type="button"
-                    id="closeModal"
-                    class="close"
-                    aria-label="بستن">
-
-                <span aria-hidden="true">
-                    &times;
-                </span>
-
+            <button type="button" id="closeModal" class="close" aria-label="بستن">
+                <span aria-hidden="true">&times;</span>
             </button>
 
-
-            <div id="modalBody">
-            </div>
-
+            <div id="modalBody"></div>
         </div>
-
     </div>
 
-
-    <!-- =====================================================
-         ANTI FORGERY TOKEN
-         ===================================================== -->
-
-    <form id="antiForgeryForm"
-          style="display:none;">
-
+    <!-- Anti-forgery token (used by AJAX calls) -->
+    <form id="antiForgeryForm" style="display:none;">
         @Html.AntiForgeryToken()
-
     </form>
 
+    <!-- ===================== SCRIPTS ===================== -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/script.js" asp-append-version="true"></script>
 
-    <!-- =====================================================
-         SCRIPTS
-         ===================================================== -->
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js">
-    </script>
-
-
-    <script src="~/lib/jquery/dist/jquery.min.js">
-    </script>
-
-
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js">
-    </script>
-
-
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js">
-    </script>
-
-
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js">
-    </script>
-
-
-    <script src="~/js/script.js"
-            asp-append-version="true">
-    </script>
-
-
-    @await RenderSectionAsync(
-            "Scripts",
-            required: false)
-
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 
 </html>
