@@ -4231,3 +4231,353 @@ textarea:focus-visible {
         transform: none;
     }
 }
+
+/* =====================================================
+    Owl Carousel Theme
+   ===================================================== */
+
+/* =========================
+   Container & category
+   ========================= */
+
+.home-products {
+    width: min(1200px, calc(100% - 40px)); /* فاصله از دیواره‌ها */
+    margin: 0 auto;
+    direction: rtl;
+}
+
+    .home-products .home-product-category {
+        width: 100%;
+        margin: 0 0 48px;
+        direction: rtl;
+    }
+
+    .home-products .home-products-heading {
+        position: relative;
+        display: flex;
+        align-items: center;
+        margin-bottom: 14px;
+        padding: 0 2px 14px;
+        border-bottom: 2px dotted var(--border);
+    }
+
+        .home-products .home-products-heading h2 {
+            margin: 0;
+            color: var(--text);
+            font-size: clamp(1.05rem, 2vw, 1.35rem);
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            line-height: 1.8;
+        }
+
+        .home-products .home-products-heading::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            bottom: -2px;
+            width: 64px;
+            height: 4px;
+            border-radius: var(--pill);
+            background: var(--brand);
+        }
+
+
+    /* =========================
+   Progress bar (بالای carousel)
+   ========================= */
+
+    .home-products .carousel-progress {
+        height: 5px;
+        margin: 0 0 16px;
+        overflow: hidden;
+        direction: ltr; /* هم‌جهت با حرکت اسلایدها */
+        background: var(--border);
+        border-radius: var(--pill);
+        transition: opacity 0.25s ease;
+    }
+
+        .home-products .carousel-progress.is-idle {
+            opacity: 0; /* وقتی چیزی برای اسکرول نیست */
+        }
+
+    .home-products .carousel-progress-bar {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--brand), var(--sun));
+        border-radius: var(--pill);
+        transform: scaleX(0);
+        transform-origin: left center;
+    }
+
+        .home-products .carousel-progress-bar.is-running {
+            animation: carouselProgress 6s linear forwards; /* مدت واقعی از JS تنظیم می‌شود */
+        }
+
+        .home-products .carousel-progress-bar.is-paused {
+            animation-play-state: paused;
+        }
+
+@keyframes carouselProgress {
+    from {
+        transform: scaleX(0);
+    }
+
+    to {
+        transform: scaleX(1);
+    }
+}
+
+
+/* =========================
+   Carousel layout
+   ========================= */
+
+.home-products .productsCarousel {
+    position: relative;
+    width: 100%;
+    direction: ltr;
+    padding: 0 30px;
+    box-sizing: border-box;
+}
+
+    .home-products .productsCarousel .owl-wrapper-outer {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        padding: 10px 0 26px; /* فضا برای hover و سایه کارت‌ها */
+        box-sizing: content-box;
+    }
+
+    .home-products .productsCarousel .owl-wrapper {
+        position: relative;
+    }
+
+    .home-products .productsCarousel .owl-item {
+        float: left;
+    }
+
+
+    /* =========================
+   Product cards
+   ========================= */
+
+    .home-products .productsCarousel .productsItems {
+        display: flex;
+        flex-direction: column;
+        direction: rtl;
+        min-width: 0;
+        min-height: 360px;
+        margin: 6px;
+        padding: 0;
+        overflow: hidden;
+        background: #fff;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.3s var(--ease), box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+        .home-products .productsCarousel .productsItems:hover {
+            transform: translateY(-6px) rotate(-0.4deg);
+            border-color: #ffd0c2;
+            box-shadow: var(--shadow-lift);
+        }
+
+    /* Image */
+
+    .home-products .productsCarousel .productsImage {
+        display: block;
+        width: calc(100% - 20px);
+        margin: 10px 10px 0;
+        aspect-ratio: 1 / 0.82;
+        object-fit: cover;
+        background: var(--tint);
+        border-radius: 16px;
+        transition: transform 0.35s ease;
+    }
+
+    .home-products .productsCarousel .productsItems:hover .productsImage {
+        transform: scale(1.03);
+    }
+
+    /* Info */
+
+    .home-products .productsCarousel .productsInfo {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        margin: 0;
+        padding: 14px 16px 16px;
+    }
+
+    .home-products .productsCarousel .productsInfoHeader {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+        min-height: 44px;
+        margin-bottom: 12px;
+    }
+
+        .home-products .productsCarousel .productsInfoHeader h5 {
+            flex: 1;
+            min-width: 0;
+            margin: 0;
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+    /* Info icon */
+
+    .home-products .productsCarousel .openModal {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        color: var(--brand);
+        background: #fff;
+        border: 1.5px solid var(--border);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.25s var(--ease);
+    }
+
+        .home-products .productsCarousel .openModal:hover {
+            background: var(--brand-soft);
+            border-color: #ffc2b1;
+            transform: scale(1.1);
+        }
+
+        .home-products .productsCarousel .openModal .infoBtn {
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+    /* Price */
+
+    .home-products .productsCarousel .productsInfo p {
+        margin: auto 0 14px;
+        padding-top: 13px;
+        color: var(--brand-dark);
+        font-size: 15px;
+        font-weight: 800;
+        line-height: 1.8;
+        border-top: 2px dotted var(--border);
+    }
+
+    /* دکمه "مشاهده محصول" ظاهر sticker را از قانون مشترک بخش 5 می‌گیرد */
+
+    .home-products .productsCarousel .btnProduct {
+        margin-top: 0;
+    }
+
+
+    /* =========================
+   Previous / next buttons
+   ========================= */
+
+    .home-products .productsCarousel .owl-controls {
+        margin: 0;
+    }
+
+        .home-products .productsCarousel .owl-controls .owl-buttons div {
+            position: absolute;
+            top: 40%;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            margin: 0;
+            padding: 0 0 3px;
+            color: var(--brand);
+            background: #fff;
+            border: 1.5px solid var(--border-dark);
+            border-radius: 50%;
+            font-size: 26px;
+            line-height: 1;
+            opacity: 1;
+            cursor: pointer;
+            box-shadow: 0 3px 0 var(--border-dark);
+            transition: transform 0.2s var(--ease), color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.15s ease;
+        }
+
+            .home-products .productsCarousel .owl-controls .owl-buttons div:hover {
+                color: #fff;
+                background: var(--brand);
+                border-color: var(--brand);
+                box-shadow: 0 3px 0 var(--brand-edge);
+                transform: translateY(-2px);
+            }
+
+            .home-products .productsCarousel .owl-controls .owl-buttons div:active {
+                transform: translateY(2px);
+                box-shadow: 0 1px 0 var(--brand-edge);
+            }
+
+        .home-products .productsCarousel .owl-controls .owl-buttons .owl-prev {
+            left: -8px;
+            right: auto;
+        }
+
+        .home-products .productsCarousel .owl-controls .owl-buttons .owl-next {
+            right: -8px;
+            left: auto;
+        }
+
+
+/* =========================
+   Responsive
+   ========================= */
+
+@media (max-width: 767px) {
+    .home-products {
+        width: calc(100% - 28px);
+    }
+
+        .home-products .home-product-category {
+            margin-bottom: 34px;
+        }
+
+        .home-products .productsCarousel {
+            padding: 0 22px;
+        }
+
+            .home-products .productsCarousel .productsItems {
+                min-height: 340px;
+            }
+
+            .home-products .productsCarousel .owl-controls .owl-buttons div {
+                width: 36px;
+                height: 36px;
+                font-size: 22px;
+            }
+
+            .home-products .productsCarousel .owl-controls .owl-buttons .owl-prev {
+                left: -6px;
+            }
+
+            .home-products .productsCarousel .owl-controls .owl-buttons .owl-next {
+                right: -6px;
+            }
+}
+
+@media (max-width: 380px) {
+    .home-products .productsCarousel {
+        padding: 0 18px;
+    }
+
+        .home-products .productsCarousel .productsInfoHeader h5 {
+            font-size: 13px;
+        }
+}

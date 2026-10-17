@@ -6,57 +6,67 @@
 @inject SignInManager<User> SignInManager
 
 @{
-    // ------------------------------------------------------------------
     // SEO settings
-    // appsettings.json -> "Seo": { "SiteName", "SiteUrl", "DefaultOgImage", "Phone" }
-    // ------------------------------------------------------------------
     var seoSiteName = Configuration["Seo:SiteName"] ?? "غفار تجهیز";
     var configuredSiteUrl = Configuration["Seo:SiteUrl"]?.TrimEnd('/');
     var requestOrigin = $"{Context.Request.Scheme}://{Context.Request.Host}";
-    var seoOrigin = !string.IsNullOrWhiteSpace(configuredSiteUrl) ? configuredSiteUrl : requestOrigin;
+    var seoOrigin = !string.IsNullOrWhiteSpace(configuredSiteUrl)
+        ? configuredSiteUrl
+        : requestOrigin;
 
-    // Canonical never includes the query string (avoids duplicate content)
     var currentPath = $"{Context.Request.PathBase}{Context.Request.Path}";
 
-    // Title
+    // Page title
     var rawPageTitle = ViewData["Title"]?.ToString();
+
     var seoTitle = string.IsNullOrWhiteSpace(rawPageTitle)
         ? $"{seoSiteName} | تولید و فروش جوجه‌گردان، کباب ترکی، فر ساندویچ و فر پیتزا"
         : $"{rawPageTitle} | {seoSiteName}";
 
-    // Description
+    // Meta description
     var seoDescription = ViewData["MetaDescription"]?.ToString();
+
     if (string.IsNullOrWhiteSpace(seoDescription))
     {
-        seoDescription = "غفار تجهیز؛ تولیدکننده و فروشنده تجهیزات آشپزخانه صنعتی شامل جوجه‌گردان، دستگاه کباب ترکی، فر ساندویچ، فر پیتزا و سایر تجهیزات رستوران و فست‌فود. مشاهده مشخصات و خرید آنلاین.";
+        seoDescription =
+            "غفار تجهیز؛ تولیدکننده و فروشنده تجهیزات آشپزخانه صنعتی شامل جوجه‌گردان، دستگاه کباب ترکی، فر ساندویچ، فر پیتزا و سایر تجهیزات رستوران و فست‌فود. مشاهده مشخصات و خرید آنلاین.";
     }
 
-    // Canonical
+    // Canonical URL
     var seoCanonical = ViewData["CanonicalUrl"]?.ToString();
+
     if (string.IsNullOrWhiteSpace(seoCanonical))
     {
         seoCanonical = $"{seoOrigin}{currentPath}";
     }
 
-    // Robots: private/transactional pages are noindex by default
-    var routeController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    // Robots
+    var routeController =
+        ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+
     var privateControllers = new[] { "Account", "Profile", "Order" };
-    var defaultRobots = privateControllers.Contains(routeController, StringComparer.OrdinalIgnoreCase)
-        ? "noindex,follow"
-        : "index,follow,max-image-preview:large";
+
+    var defaultRobots = privateControllers.Contains(
+        routeController,
+        StringComparer.OrdinalIgnoreCase)
+            ? "noindex,follow"
+            : "index,follow,max-image-preview:large";
+
     var seoRobots = ViewData["Robots"]?.ToString() ?? defaultRobots;
 
     // Open Graph
     var seoOgType = ViewData["OgType"]?.ToString() ?? "website";
+
     var seoOgImage = ViewData["OgImage"]?.ToString()
-                     ?? Configuration["Seo:DefaultOgImage"]
-                     ?? "/asstes/icon/og-default.png";
+        ?? Configuration["Seo:DefaultOgImage"]
+        ?? "/asstes/icon/og-default.png";
+
     if (seoOgImage.StartsWith("/"))
     {
         seoOgImage = $"{seoOrigin}{seoOgImage}";
     }
 
-    // Structured data (JSON-LD)
+    // Organization structured data
     var logoUrl = $"{seoOrigin}/asstes/icon/Logo.svg";
     var phone = Configuration["Seo:Phone"];
 
@@ -68,9 +78,11 @@
                 ["alternateName"] = "GhafarTajhiz",
                 ["url"] = seoOrigin,
                 ["logo"] = logoUrl,
-                ["description"] = "تولید و فروش تجهیزات آشپزخانه صنعتی: جوجه‌گردان، کباب ترکی، فر ساندویچ و فر پیتزا",
+                ["description"] =
+                    "تولید و فروش تجهیزات آشپزخانه صنعتی: جوجه‌گردان، کباب ترکی، فر ساندویچ و فر پیتزا",
                 ["areaServed"] = "IR"
             };
+
     if (!string.IsNullOrWhiteSpace(phone))
     {
         organization["contactPoint"] = new Dictionary<string, object?>
@@ -82,6 +94,7 @@
                 };
     }
 
+    // Website structured data
     var webSite = new Dictionary<string, object?>
             {
                 ["@context"] = "https://schema.org",
@@ -91,10 +104,19 @@
                 ["inLanguage"] = "fa-IR"
             };
 
-    // Footer year (Persian calendar)
-    var persianYear = new PersianCalendar().GetYear(DateTime.Now).ToString();
-    var persianDigits = new[] { '۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹' };
-    var footerYear = new string(persianYear.Select(c => persianDigits[c - '0']).ToArray());
+    // Persian calendar year
+    var persianYear = new PersianCalendar()
+        .GetYear(DateTime.Now)
+        .ToString();
+
+    var persianDigits = new[]
+    {
+        '۰', '۱', '۲', '۳', '۴',
+        '۵', '۶', '۷', '۸', '۹'
+    };
+
+    var footerYear = new string(
+        persianYear.Select(c => persianDigits[c - '0']).ToArray());
 }
 
 <!DOCTYPE html>
@@ -111,7 +133,7 @@
     <link rel="canonical" href="@seoCanonical" />
 
     <!-- Favicon -->
-    <link rel="icon" href="~/favicon.ico" sizes="any" />
+    <link rel="icon" href="~/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="~/asstes/icon/favicon.svg" />
     <link rel="apple-touch-icon" href="~/asstes/icon/apple-touch-icon.png" />
 
@@ -135,16 +157,41 @@
     <script type="application/ld+json">@Html.Raw(JsonSerializer.Serialize(organization))</script>
     <script type="application/ld+json">@Html.Raw(JsonSerializer.Serialize(webSite))</script>
 
-    <!-- Performance -->
+    <!-- Resource hints -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 
-    <!-- Styles -->
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Ghafar_Tajhiz.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+          asp-append-version="true" />
+
+    <!-- Owl Carousel CSS: load once -->
+    <link rel="stylesheet"
+          href="~/lib/owlcarousel/owl.carousel.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/lib/owlcarousel/owl.theme.css"
+          asp-append-version="true" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+
+    <!-- ASP.NET Core scoped CSS -->
+    <link rel="stylesheet"
+          href="~/Ghafar_Tajhiz.styles.css"
+          asp-append-version="true" />
+
+    <!-- Main site CSS and custom Owl Carousel styles -->
+    <link rel="stylesheet"
+          href="~/css/style.css"
+          asp-append-version="true" />
 
     @await RenderSectionAsync("Head", required: false)
     @await RenderSectionAsync("Styles", required: false)
@@ -152,15 +199,18 @@
 
 <body>
 
-    <a href="#main-content" class="visually-hidden-focusable">پرش به محتوای اصلی</a>
+    <a href="#main-content" class="visually-hidden-focusable">
+        پرش به محتوای اصلی
+    </a>
 
-    <!-- ===================== HEADER ===================== -->
+    <!-- HEADER -->
     <header class="site-header">
         <nav class="site-nav" aria-label="منوی اصلی">
             <div class="nav-container">
 
                 <!-- Mobile header -->
                 <div class="mobile-navbar">
+
                     <button type="button"
                             id="mobileNavbarBtn"
                             class="mobile-menu-btn"
@@ -170,18 +220,23 @@
                         <i class="fa fa-bars" aria-hidden="true"></i>
                     </button>
 
-                    <a asp-controller="Home" asp-action="Index" class="mobile-logo-link">
+                    <a asp-controller="Home"
+                       asp-action="Index"
+                       class="mobile-logo-link">
                         <img class="mobile-logo"
                              src="~/asstes/icon/Logo.svg"
                              alt="@seoSiteName"
                              height="40" />
                     </a>
+
                 </div>
 
-                <!-- Desktop / main navigation -->
+                <!-- Main navigation -->
                 <div class="desktopnavbar" id="desktopnavbar">
 
-                    <a asp-controller="Home" asp-action="Index" class="nav-logo-link">
+                    <a asp-controller="Home"
+                       asp-action="Index"
+                       class="nav-logo-link">
                         <img class="logo"
                              src="~/asstes/icon/Logo.svg"
                              alt="@seoSiteName"
@@ -190,17 +245,24 @@
 
                     <div class="nav-links">
 
-                        <a asp-controller="Home" asp-action="Index" class="nav-item">
+                        <a asp-controller="Home"
+                           asp-action="Index"
+                           class="nav-item">
                             <i class="fa fa-home" aria-hidden="true"></i>
                             <span>صفحه اصلی</span>
                         </a>
 
-                        <a asp-controller="Product" asp-action="ProductList" class="nav-item">
+                        <a asp-controller="Product"
+                           asp-action="ProductList"
+                           class="nav-item">
                             <i class="fa fa-th-large" aria-hidden="true"></i>
                             <span>محصولات</span>
                         </a>
 
-                        <a asp-controller="Order" asp-action="Basket" class="nav-item nav-cart" rel="nofollow">
+                        <a asp-controller="Order"
+                           asp-action="Basket"
+                           class="nav-item nav-cart"
+                           rel="nofollow">
                             <i class="fa fa-shopping-cart" aria-hidden="true"></i>
                             <span>سبد خرید</span>
                             <span id="cart-badge-desktop" class="cart-badge">0</span>
@@ -208,7 +270,10 @@
 
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <a asp-controller="Profile" asp-action="Index" class="nav-item" rel="nofollow">
+                            <a asp-controller="Profile"
+                               asp-action="Index"
+                               class="nav-item"
+                               rel="nofollow">
                                 <i class="fa fa-user" aria-hidden="true"></i>
                                 <span>پروفایل</span>
                             </a>
@@ -225,13 +290,18 @@
                         }
                         else
                         {
-                            <a asp-controller="Account" asp-action="Login" class="nav-item" rel="nofollow">
+                            <a asp-controller="Account"
+                               asp-action="Login"
+                               class="nav-item"
+                               rel="nofollow">
                                 <i class="fa fa-sign-in" aria-hidden="true"></i>
                                 <span>ورود / ثبت نام</span>
                             </a>
                         }
 
-                        <a asp-controller="Home" asp-action="AboutUs" class="nav-item">
+                        <a asp-controller="Home"
+                           asp-action="AboutUs"
+                           class="nav-item">
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
                             <span>درباره ما</span>
                         </a>
@@ -243,18 +313,21 @@
         </nav>
     </header>
 
-    <!-- ===================== MAIN ===================== -->
+    <!-- MAIN -->
     <main id="main-content" role="main" class="site-main">
         @RenderBody()
     </main>
 
-    <!-- ===================== FOOTER ===================== -->
+    <!-- FOOTER -->
     <footer class="site-footer">
         <div class="footer-container">
 
             <!-- About -->
             <div class="footer-section footer-about">
-                <a asp-controller="Home" asp-action="Index" class="footer-logo">
+
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="footer-logo">
                     <img src="~/asstes/icon/Logo.svg"
                          alt="@seoSiteName"
                          height="50"
@@ -267,6 +340,7 @@
                     هدف ما تأمین تجهیزات باکیفیت رستوران‌ها، فست‌فودها و هتل‌ها
                     و ایجاد تجربه‌ای مطمئن برای خرید است.
                 </p>
+
             </div>
 
             <!-- Quick links -->
@@ -274,13 +348,23 @@
                 <h2 class="footer-title">دسترسی سریع</h2>
 
                 <ul class="footer-links">
-                    <li><a asp-controller="Home" asp-action="Index">صفحه اصلی</a></li>
-                    <li><a asp-controller="Product" asp-action="ProductList">محصولات</a></li>
-                    <li><a asp-controller="Home" asp-action="AboutUs">درباره ما</a></li>
+                    <li>
+                        <a asp-controller="Home" asp-action="Index">صفحه اصلی</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Product" asp-action="ProductList">محصولات</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="AboutUs">درباره ما</a>
+                    </li>
 
                     @if (SignInManager.IsSignedIn(User))
                     {
-                        <li><a asp-controller="Profile" asp-action="Index" rel="nofollow">پروفایل</a></li>
+                        <li>
+                            <a asp-controller="Profile"
+                               asp-action="Index"
+                               rel="nofollow">پروفایل</a>
+                        </li>
                     }
                 </ul>
             </div>
@@ -296,7 +380,7 @@
                 </ul>
             </div>
 
-            <!-- Social -->
+            <!-- Social media -->
             <div class="footer-section footer-social-section">
                 <h2 class="footer-title">ما را دنبال کنید</h2>
 
@@ -306,17 +390,43 @@
                 </p>
 
                 <div class="social-icons">
-                    <a href="#" class="social-icon" aria-label="فیسبوک" rel="noopener noreferrer" target="_blank">
-                        <img src="~/asstes/icon/icons8-facebook.svg" alt="" width="32" height="32" loading="lazy" />
+
+                    <a href="#"
+                       class="social-icon"
+                       aria-label="فیسبوک"
+                       rel="noopener noreferrer"
+                       target="_blank">
+                        <img src="~/asstes/icon/icons8-facebook.svg"
+                             alt=""
+                             width="32"
+                             height="32"
+                             loading="lazy" />
                     </a>
 
-                    <a href="#" class="social-icon" aria-label="واتساپ" rel="noopener noreferrer" target="_blank">
-                        <img src="~/asstes/icon/icons8-whatsapp.svg" alt="" width="32" height="32" loading="lazy" />
+                    <a href="#"
+                       class="social-icon"
+                       aria-label="واتساپ"
+                       rel="noopener noreferrer"
+                       target="_blank">
+                        <img src="~/asstes/icon/icons8-whatsapp.svg"
+                             alt=""
+                             width="32"
+                             height="32"
+                             loading="lazy" />
                     </a>
 
-                    <a href="#" class="social-icon" aria-label="اینستاگرام" rel="noopener noreferrer" target="_blank">
-                        <img src="~/asstes/icon/icons8-instagram.svg" alt="" width="32" height="32" loading="lazy" />
+                    <a href="#"
+                       class="social-icon"
+                       aria-label="اینستاگرام"
+                       rel="noopener noreferrer"
+                       target="_blank">
+                        <img src="~/asstes/icon/icons8-instagram.svg"
+                             alt=""
+                             width="32"
+                             height="32"
+                             loading="lazy" />
                     </a>
+
                 </div>
             </div>
 
@@ -330,7 +440,7 @@
         </div>
     </footer>
 
-    <!-- ===================== PRODUCT MODAL ===================== -->
+    <!-- PRODUCT MODAL -->
     <div id="modal"
          class="modal"
          role="dialog"
@@ -338,28 +448,51 @@
          aria-hidden="true">
 
         <div class="modal-content">
-            <button type="button" id="closeModal" class="close" aria-label="بستن">
+
+            <button type="button"
+                    id="closeModal"
+                    class="close"
+                    aria-label="بستن">
                 <span aria-hidden="true">&times;</span>
             </button>
 
             <div id="modalBody"></div>
+
         </div>
     </div>
 
-    <!-- Anti-forgery token (used by AJAX calls) -->
+    <!-- Anti-forgery token for AJAX requests -->
     <form id="antiForgeryForm" style="display:none;">
         @Html.AntiForgeryToken()
     </form>
 
-    <!-- ===================== SCRIPTS ===================== -->
+    <!-- SCRIPTS -->
+    <!-- jQuery: load only once -->
+    <script src="~/lib/jquery/dist/jquery.min.js"
+            asp-append-version="true"></script>
+
+    <!-- Third-party libraries -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-    <script src="~/js/script.js" asp-append-version="true"></script>
 
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
+            asp-append-version="true"></script>
+
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"
+            asp-append-version="true"></script>
+
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"
+            asp-append-version="true"></script>
+
+    <!-- Owl Carousel: must load after jQuery -->
+    <script src="~/lib/owlcarousel/owl.carousel.js"
+            asp-append-version="true"></script>
+
+    <!-- Your existing custom JavaScript -->
+    <script src="~/js/script.js"
+            asp-append-version="true"></script>
+
+    <!-- Page-specific JavaScript sections -->
     @await RenderSectionAsync("Scripts", required: false)
-</body>
 
+</body>
 </html>

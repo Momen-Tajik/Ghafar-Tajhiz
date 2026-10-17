@@ -9,7 +9,7 @@
 }
 
 
-<main class="home-page">
+<div class="home-page">
 
     <!-- =====================================================
          HERO
@@ -170,4 +170,128 @@
 
     </section>
 
-</main>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(function () {
+
+            if (typeof $.fn.owlCarousel !== "function") {
+                console.error("Owl Carousel بارگذاری نشده است. مسیر فایل JS را بررسی کنید.");
+                return;
+            }
+
+            // مدت نمایش هر اسلاید (میلی‌ثانیه) — هر عددی که می‌خواهید
+            var AUTO_SLIDE_MS = 6000;
+
+            var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            var canHover = window.matchMedia("(hover: hover)").matches;
+
+            $(".productsCarousel").each(function () {
+
+                var $carousel = $(this);
+                var $category = $carousel.closest(".home-product-category");
+                var $progress = $category.find(".carousel-progress");
+                var bar = $progress.find(".carousel-progress-bar")[0];
+
+                var hovering = false;
+
+                function getOwl() {
+                    return $carousel.data("owlCarousel");
+                }
+
+                // آخرین جایگاهی که carousel می‌تواند برود (۰ یا کمتر = چیزی برای اسکرول نیست)
+                function getMax(owl) {
+                    return typeof owl.maximumItem === "number"
+                        ? owl.maximumItem
+                        : owl.itemsAmount - owl.options.items;
+                }
+
+                function getCurrent(owl) {
+                    return typeof owl.currentItem === "number"
+                        ? owl.currentItem
+                        : owl.owl.currentItem;
+                }
+
+                function applyPause() {
+                    if (!bar) return;
+                    bar.classList.toggle("is-paused", hovering || document.hidden);
+                }
+
+                // نوار را از صفر شروع می‌کند
+                function startProgress() {
+                    var owl = getOwl();
+                    if (!owl || !bar) return;
+
+                    var canScroll = getMax(owl) > 0 && !reduceMotion;
+
+                    $progress.toggleClass("is-idle", !canScroll);
+                    bar.classList.remove("is-running");
+
+                    if (!canScroll) return;
+
+                    void bar.offsetWidth; // ری‌استارت انیمیشن CSS
+                    bar.style.animationDuration = AUTO_SLIDE_MS + "ms";
+                    bar.classList.add("is-running");
+                    applyPause();
+                }
+
+                $carousel.owlCarousel({
+                    items: 4,
+
+                    navigation: true,
+                    navigationText: ["‹", "›"],
+
+                    pagination: false,
+                    autoPlay: false,          // حرکت خودکار را نوار پیشرفت کنترل می‌کند
+
+                    responsive: true,
+                    itemsDesktop: [1199, 3],
+                    itemsDesktopSmall: [979, 2],
+                    itemsTablet: [768, 2],
+                    itemsMobile: [479, 1],
+
+                    slideSpeed: 400,
+
+                    // بعد از هر جابه‌جایی (خودکار، دکمه‌ها یا درگ) نوار از نو شروع می‌شود
+                    afterAction: startProgress
+                });
+
+                if (!bar) return;
+
+                // وقتی نوار پر شد: اسلاید بعدی، و اگر به آخر رسیده بود برگرد به اول
+                bar.addEventListener("animationend", function () {
+                    var owl = getOwl();
+                    if (!owl) return;
+
+                    if (getCurrent(owl) >= getMax(owl)) {
+                        owl.goTo(0);
+                    } else {
+                        owl.next();
+                    }
+
+                    startProgress();
+                });
+
+                // توقف هنگام hover (فقط دستگاه‌هایی که ماوس دارند)
+                if (canHover) {
+                    $category.on("mouseenter focusin", function () {
+                        hovering = true;
+                        applyPause();
+                    });
+
+                    $category.on("mouseleave focusout", function () {
+                        hovering = false;
+                        applyPause();
+                    });
+                }
+
+                // توقف وقتی تب مرورگر در پس‌زمینه است
+                document.addEventListener("visibilitychange", applyPause);
+
+                startProgress();
+            });
+        });
+    </script>
+}
