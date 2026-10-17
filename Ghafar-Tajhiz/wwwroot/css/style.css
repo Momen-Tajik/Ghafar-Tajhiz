@@ -783,39 +783,23 @@ summary:focus-visible {
     }
 
 /* Home — closing call to action */
+/* Place the image at: wwwroot/images/home-cta-bg.webp */
 
 .home-cta {
     position: relative;
+    isolation: isolate;
     padding: 56px 24px;
     overflow: hidden;
     text-align: center;
     color: #fff;
-    background: linear-gradient(135deg, #2b2340 0%, #3a3052 100%);
+    background-color: var(--dark);
+    background-image: linear-gradient( rgba(43, 35, 64, 0.5), rgba(43, 35, 64, 0.5) ), url("../asstes/img/home-cta-bg.webp");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
     border-radius: 34px 34px 34px 12px;
     box-shadow: 0 6px 0 rgba(221, 214, 234, 0.7), 0 24px 50px rgba(60, 40, 110, 0.16);
 }
-
-    .home-cta::before {
-        content: "";
-        position: absolute;
-        width: 280px;
-        height: 280px;
-        top: -150px;
-        right: -80px;
-        border-radius: 58% 42% 55% 45% / 50% 55% 45% 50%;
-        background: rgba(255, 107, 74, 0.22);
-    }
-
-    .home-cta::after {
-        content: "";
-        position: absolute;
-        width: 230px;
-        height: 230px;
-        bottom: -120px;
-        left: -70px;
-        border-radius: 45% 55% 40% 60% / 55% 45% 55% 45%;
-        background: rgba(255, 211, 92, 0.14);
-    }
 
     .home-cta > * {
         position: relative;
@@ -833,7 +817,7 @@ summary:focus-visible {
     .home-cta p {
         margin: 0 auto 24px;
         max-width: 520px;
-        color: #d9d4e8;
+        color: #f0edf6;
         font-size: 15px;
         line-height: 2;
     }
