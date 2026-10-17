@@ -6,6 +6,12 @@ namespace BusinessLogic.FileUpload
     {
         private readonly string _storagePath;
 
+        // ساختار پوشه‌ها داخل StoragePath (uploads):
+        //   uploads/product-images  -> عکس محصولات (عمومی)
+        //   uploads/receipts        -> رسیدهای پرداخت (خصوصی، فقط ادمین)
+        private const string ProductImagesFolder = "product-images";
+        private const string ReceiptsFolder = "receipts";
+
         private const long MaxFileSize = 5 * 1024 * 1024;
 
         private static readonly HashSet<string> AllowedExtensions =
@@ -32,27 +38,41 @@ namespace BusinessLogic.FileUpload
         }
 
 
+        private string ProductImagesPath =>
+            Path.Combine(_storagePath, ProductImagesFolder);
+
+        private string ReceiptsPath =>
+            Path.Combine(_storagePath, ReceiptsFolder);
+
+
+        // =====================================================
+        // Upload
+        // =====================================================
+
         public async Task<string> UploadFileAsync(IFormFile file)
         {
             return await UploadInternalAsync(
                 file,
-                _storagePath);
+                ProductImagesPath);
         }
 
 
         public async Task<string> UploadReceiptAsync(IFormFile file)
         {
-            var receiptPath =
-                Path.Combine(
-                    _storagePath,
-                    "receipts");
-
             return await UploadInternalAsync(
                 file,
-                receiptPath);
+                ReceiptsPath);
         }
 
 
+        // =====================================================
+        // Read
+        // =====================================================
+
+        /// <summary>
+        /// فقط عکس محصول را برمی‌گرداند (عمومی).
+        /// رسیدها از این متد هرگز در دسترس نیستند.
+        /// </summary>
         public string? GetPublicImagePath(string? fileName)
         {
             var safeFileName = GetSafeFileName(fileName);
@@ -60,10 +80,16 @@ namespace BusinessLogic.FileUpload
             if (safeFileName == null)
                 return null;
 
-            return GetExistingPathInsideStorage(safeFileName);
+            return GetExistingPathInsideStorage(
+                Path.Combine(ProductImagesFolder, safeFileName));
         }
 
 
+        /// <summary>
+        /// برای پنل ادمین:
+        /// "receipts/xxx.jpg" -> رسید
+        /// "xxx.jpg"          -> عکس محصول
+        /// </summary>
         public string? GetAdminAccessibleFilePath(string? fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
@@ -80,7 +106,7 @@ namespace BusinessLogic.FileUpload
             string relativePath;
 
             if (normalized.StartsWith(
-                    "receipts/",
+                    ReceiptsFolder + "/",
                     StringComparison.OrdinalIgnoreCase))
             {
                 var receiptName =
@@ -90,7 +116,7 @@ namespace BusinessLogic.FileUpload
                     return null;
 
                 relativePath =
-                    Path.Combine("receipts", receiptName);
+                    Path.Combine(ReceiptsFolder, receiptName);
             }
             else
             {
@@ -99,12 +125,37 @@ namespace BusinessLogic.FileUpload
                 if (safeFileName == null)
                     return null;
 
-                relativePath = safeFileName;
+                relativePath =
+                    Path.Combine(ProductImagesFolder, safeFileName);
             }
 
             return GetExistingPathInsideStorage(relativePath);
         }
 
+
+        // =====================================================
+        // Delete
+        // =====================================================
+
+        public bool DeleteFile(string fileName)
+        {
+            return DeleteInternal(
+                fileName,
+                ProductImagesPath);
+        }
+
+
+        public bool DeleteReceipt(string fileName)
+        {
+            return DeleteInternal(
+                fileName,
+                ReceiptsPath);
+        }
+
+
+        // =====================================================
+        // Internals
+        // =====================================================
 
         private async Task<string> UploadInternalAsync(
             IFormFile file,
@@ -171,27 +222,6 @@ namespace BusinessLogic.FileUpload
 
 
             return fileName;
-        }
-
-
-        public bool DeleteFile(string fileName)
-        {
-            return DeleteInternal(
-                fileName,
-                _storagePath);
-        }
-
-
-        public bool DeleteReceipt(string fileName)
-        {
-            var receiptPath =
-                Path.Combine(
-                    _storagePath,
-                    "receipts");
-
-            return DeleteInternal(
-                fileName,
-                receiptPath);
         }
 
 

@@ -56,8 +56,8 @@ var storagePath =
         builder.Configuration["FileUpload:StoragePath"]);
 
 Directory.CreateDirectory(storagePath);
-Directory.CreateDirectory(
-    Path.Combine(storagePath, "receipts"));
+Directory.CreateDirectory(Path.Combine(storagePath, "product-images"));
+Directory.CreateDirectory(Path.Combine(storagePath, "receipts"));
 
 builder.Services.AddSingleton(
     new FileStorageSettings(storagePath));
