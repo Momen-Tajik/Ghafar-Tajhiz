@@ -4,174 +4,268 @@
 
 @{
     ViewData["Title"] = "خرید تجهیزات آشپزخانه صنعتی و رستورانی";
-    ViewData["MetaDescription"] = "تجهیزات آشپزخانه صنعتی، رستورانی، فست‌فود و هتلی را در فروشگاه تجهیزات تاجیک بررسی کنید؛ مشخصات محصولات را ببینید و تجهیزات موردنیاز کسب‌وکار خود را انتخاب کنید.";
-    ViewData["CanonicalUrl"] = $"{(Configuration["Seo:SiteUrl"] ?? $"{Context.Request.Scheme}://{Context.Request.Host}").TrimEnd('/')}{Context.Request.PathBase}/";
+    ViewData["MetaDescription"] = "تجهیزات آشپزخانه صنعتی، رستورانی، فست‌فود و هتلی را از غفار تجهیز ببینید؛ مشخصات کامل محصولات، ثبت سفارش آنلاین و پیگیری وضعیت سفارش.";
+
+    var siteUrl = (Configuration["Seo:SiteUrl"] ?? $"{Context.Request.Scheme}://{Context.Request.Host}").TrimEnd('/');
+    ViewData["CanonicalUrl"] = $"{siteUrl}{Context.Request.PathBase}/";
+
+    var productListUrl = Url.Action("ProductList", "Product") ?? "";
+    var aboutUrl = Url.Action("AboutUs", "Home") ?? "";
+
+    var banners = new[]
+    {
+        new
+        {
+            Src = "~/asstes/img/banner-first.webp",
+            Alt = "تجهیزات آشپزخانه صنعتی غفار تجهیز",
+            Badge = "غفار تجهیز",
+            Title = "تجهیزات آشپزخانه صنعتی با کیفیت",
+            Text = "از جوجه‌گردان تا فر پیتزا؛ همه‌چیز برای رستوران و فست‌فود شما.",
+            Link = productListUrl,
+            LinkText = "مشاهده محصولات"
+        },
+        new
+        {
+            Src = "~/asstes/img/banner-second.webp",
+            Alt = "درباره مجموعه غفار تجهیز",
+            Badge = "درباره ما",
+            Title = "همراه مطمئن کسب‌وکار شما",
+            Text = "با ما بیشتر آشنا شوید و ببینید چرا مشتریان به ما اعتماد می‌کنند.",
+            Link = aboutUrl,
+            LinkText = "درباره ما"
+        },
+        new
+        {
+            Src = "~/asstes/img/banner-third.webp",
+            Alt = "نمونه تجهیزات و آشپزخانه صنعتی",
+            Badge = "",
+            Title = "",
+            Text = "",
+            Link = "",
+            LinkText = ""
+        }
+    };
+
+    var steps = new[]
+    {
+        new { Icon = "fa-search", Title = "محصول را انتخاب کنید", Text = "از میان دسته‌بندی‌ها یا با جست‌وجو، تجهیز مناسب را پیدا کنید و مشخصات و موجودی آن را ببینید." },
+        new { Icon = "fa-shopping-cart", Title = "سفارش را ثبت کنید", Text = "محصول را به سبد خرید اضافه کنید و اطلاعات تحویل سفارش را تکمیل کنید." },
+        new { Icon = "fa-list-alt", Title = "سفارش را پیگیری کنید", Text = "وضعیت سفارش و پرداخت خود را هر زمان در بخش پروفایل ببینید." }
+    };
+
+    var faqs = new[]
+    {
+        new
+        {
+            Q = "برای انتخاب تجهیزات آشپزخانه صنعتی به چه نکاتی باید توجه کنم؟",
+            A = "ظرفیت تولید، فضای موجود، نوع انرژی مصرفی (برق یا گاز)، جنس بدنه و سهولت نظافت از مهم‌ترین معیارها هستند. مشخصات هر محصول را در صفحه همان محصول بررسی کنید و در صورت نیاز پیش از خرید مشورت بگیرید."
+        },
+        new
+        {
+            Q = "از غفار تجهیز چه تجهیزاتی می‌توان خرید؟",
+            A = "تجهیزات آشپزخانه صنعتی، رستورانی، فست‌فود و هتلی. فهرست کامل محصولات در صفحه محصولات قابل مشاهده است."
+        },
+        new
+        {
+            Q = "چطور سفارش خود را ثبت و پیگیری کنم؟",
+            A = "محصول موردنظر را به سبد خرید اضافه کنید، اطلاعات سفارش را تکمیل کنید و پس از ثبت، وضعیت سفارش را از بخش پروفایل پیگیری کنید."
+        }
+    };
+
+    var faqSchema = new Dictionary<string, object>
+            {
+                ["@context"] = "https://schema.org",
+                ["@type"] = "FAQPage",
+                ["mainEntity"] = faqs.Select(f => new Dictionary<string, object>
+                {
+                    ["@type"] = "Question",
+                    ["name"] = f.Q,
+                    ["acceptedAnswer"] = new Dictionary<string, object>
+                    {
+                        ["@type"] = "Answer",
+                        ["text"] = f.A
+                    }
+                }).ToArray()
+            };
+
+    var jsonOptions = new System.Text.Json.JsonSerializerOptions
+            {
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
 }
 
+<script type="application/ld+json">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(faqSchema, jsonOptions))</script>
 
 <div class="home-page">
 
-    <!-- =====================================================
-         HERO
-         ===================================================== -->
-
-    <section class="home-hero">
-
+    <section class="home-hero" aria-labelledby="home-title">
         <div class="home-hero-container">
 
-            <!-- =================================================
-                 Hero Content
-                 ================================================= -->
-
             <div class="home-hero-content">
+                <span class="home-hero-badge">غفار تجهیز</span>
 
-                <span class="home-hero-badge">
-                    تجهیزات تاجیک
-                </span>
-
-
-                <h1>
-                    آشپزخانه صنعتی‌ات را
-                    حرفه‌ای‌تر بساز
-                </h1>
-
+                <h1 id="home-title">خرید تجهیزات آشپزخانه صنعتی و رستورانی</h1>
 
                 <p>
-                    تجهیزات مناسب، یکی از مهم‌ترین بخش‌های
-                    یک کسب‌وکار حرفه‌ای است.
-                    ما مجموعه‌ای از تجهیزات آشپزخانه صنعتی،
-                    رستورانی، فست‌فود و هتلی را برای شما فراهم کرده‌ایم
-                    تا انتخاب و تأمین تجهیزات ساده‌تر و مطمئن‌تر باشد.
+                    تجهیزات مناسب، پایه‌ی یک کسب‌وکار حرفه‌ای است.
+                    مجموعه‌ای از تجهیزات آشپزخانه صنعتی، رستورانی، فست‌فود و هتلی را
+                    در یک‌جا فراهم کرده‌ایم تا انتخاب و تأمین تجهیزات ساده‌تر و مطمئن‌تر باشد.
                 </p>
 
 
-                <div class="home-hero-actions">
-
-                    <a asp-controller="Product"
-                       asp-action="ProductList"
-                       class="home-primary-btn">
-
-                        مشاهده محصولات
-
-                        <i class="fa fa-arrow-left"></i>
-
-                    </a>
-
-                    <a asp-controller="Home"
-                       asp-action="AboutUs"
-                       class="home-secondary-btn">
-
-                        درباره ما
-
-                    </a>
-
-                </div>
-
-
-                <!-- =============================================
-                     Trust Features
-                     ============================================= -->
-
-                <div class="home-hero-features">
-
-                    <div class="home-feature">
-
-                        <div class="home-feature-icon">
-                            <i class="fa fa-check"></i>
-                        </div>
-
-                        <span>
-                            تجهیزات متنوع
-                        </span>
-
-                    </div>
-
-
-                    <div class="home-feature">
-
-                        <div class="home-feature-icon">
-                            <i class="fa fa-headphones"></i>
-                        </div>
-
-                        <span>
-                            پشتیبانی مشتری
-                        </span>
-
-                    </div>
-
-
-                    <div class="home-feature">
-
-                        <div class="home-feature-icon">
-                            <i class="fa fa-handshake-o"></i>
-                        </div>
-
-                        <span>
-                            خرید مطمئن
-                        </span>
-
-                    </div>
-
-                </div>
-
+                <ul class="home-hero-features">
+                    <li class="home-feature">
+                        <span class="home-feature-icon"><i class="fa fa-check" aria-hidden="true"></i></span>
+                        تجهیزات متنوع
+                    </li>
+                    <li class="home-feature">
+                        <span class="home-feature-icon"><i class="fa fa-industry" aria-hidden="true"></i></span>
+                        خرید از کارخانه
+                    </li>
+                    <li class="home-feature">
+                        <span class="home-feature-icon"><i class="fa fa-headphones" aria-hidden="true"></i></span>
+                        پشتیبانی مشتری
+                    </li>
+                    <li class="home-feature">
+                        <span class="home-feature-icon"><i class="fa fa-handshake-o" aria-hidden="true"></i></span>
+                        خرید مطمئن
+                    </li>
+                    
+                </ul>
             </div>
 
-
-            <!-- =================================================
-                 Hero Image
-                 ================================================= -->
-
-            <div class="home-hero-visual">
-
-                <div class="home-hero-image-wrapper">
-
-                    <img class="home-hero-image"
-                         src="~/asstes/img/ChatGPT Image Oct 12, 2025, 09_56_41 PM.png"
-                         alt="تجهیزات و آشپزخانه صنعتی"
-                         width="900"
-                         height="650"
-                         fetchpriority="high" />
-
-                </div>
-
-
-                <div class="home-image-badge">
-
-                    <i class="fa fa-star"></i>
-
-                    <div>
-
-                        <strong>
-                            تجهیزات حرفه‌ای
-                        </strong>
-
-                        <span>
-                            برای کسب‌وکار شما
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
 
         </div>
-
     </section>
 
+    <section class="home-banner-section" aria-label="معرفی غفار تجهیز">
+        <div class="home-banner">
+            <div class="owl-carousel owl-theme homeBanner">
 
-    <!-- =====================================================
-         PRODUCTS
-         ===================================================== -->
+                @for (var i = 0; i < banners.Length; i++)
+                {
+                    var b = banners[i];
+                    var hasCaption = !string.IsNullOrWhiteSpace(b.Title);
 
-    <section class="home-products-section">
+                    <div class="banner-slide @(hasCaption ? "has-caption" : "")">
+
+                        <img src="@Url.Content(b.Src)"
+                             alt="@b.Alt"
+                             width="1200"
+                             height="500"
+                             loading="@(i == 0 ? "eager" : "lazy")"
+                             fetchpriority="@(i == 0 ? "high" : "auto")"
+                             decoding="async" />
+
+                        @if (hasCaption)
+                        {
+                            <div class="banner-caption">
+
+                                @if (!string.IsNullOrWhiteSpace(b.Badge))
+                                {
+                                    <span class="banner-badge">@b.Badge</span>
+                                }
+
+                                <h2>@b.Title</h2>
+
+                                @if (!string.IsNullOrWhiteSpace(b.Text))
+                                {
+                                    <p>@b.Text</p>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(b.Link))
+                                {
+                                    <a href="@b.Link" class="home-primary-btn banner-btn">
+                                        @b.LinkText
+                                        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                                    </a>
+                                }
+
+                            </div>
+                        }
+
+                    </div>
+                }
+
+            </div>
+        </div>
+    </section>
+
+    <section class="home-products-section" aria-labelledby="home-products-title">
+        <div class="home-container">
+            <header class="home-section-head home-section-head--split">
+                <div>
+                    <span class="home-eyebrow">فروشگاه</span>
+                    <h2 id="home-products-title">محصولات غفار تجهیز</h2>
+                    <p>محصولات را بر اساس دسته‌بندی ببینید و مشخصات هر کدام را بررسی کنید.</p>
+                </div>
+                <a asp-controller="Product" asp-action="ProductList" class="home-text-link">
+                    مشاهده همه محصولات
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                </a>
+            </header>
+        </div>
 
         @await Component.InvokeAsync("HomeProducts")
+    </section>
 
+    <section class="home-section" aria-labelledby="home-steps-title">
+        <div class="home-container">
+            <header class="home-section-head">
+                <span class="home-eyebrow">راهنمای خرید</span>
+                <h2 id="home-steps-title">خرید از غفار تجهیز در سه قدم</h2>
+            </header>
+
+            <ol class="home-steps">
+                @for (var i = 0; i < steps.Length; i++)
+                {
+                    <li class="home-step">
+                        <span class="home-step-number">@(i + 1)</span>
+                        <span class="home-step-icon"><i class="fa @steps[i].Icon" aria-hidden="true"></i></span>
+                        <h3>@steps[i].Title</h3>
+                        <p>@steps[i].Text</p>
+                    </li>
+                }
+            </ol>
+        </div>
+    </section>
+
+    <section class="home-section home-section--tint" aria-labelledby="home-faq-title">
+        <div class="home-container home-container--narrow">
+            <header class="home-section-head">
+                <span class="home-eyebrow">سؤالات متداول</span>
+                <h2 id="home-faq-title">پیش از خرید بخوانید</h2>
+            </header>
+
+            <div class="home-faq">
+                @for (var i = 0; i < faqs.Length; i++)
+                {
+                    <details class="home-faq-item" @(i == 0 ? "open" : "")>
+                        <summary>@faqs[i].Q</summary>
+                        <p>@faqs[i].A</p>
+                    </details>
+                }
+            </div>
+        </div>
+    </section>
+
+    <section class="home-section" aria-labelledby="home-cta-title">
+        <div class="home-container">
+            <div class="home-cta">
+                <h2 id="home-cta-title">تجهیزات مناسب کسب‌وکارتان را پیدا کنید</h2>
+                <p>فهرست کامل محصولات را ببینید و سفارش خود را آنلاین ثبت کنید.</p>
+                <div class="home-cta-actions">
+                    <a asp-controller="Product" asp-action="ProductList" class="home-primary-btn">
+                        مشاهده محصولات
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                    </a>
+                    <a asp-controller="Home" asp-action="AboutUs" class="home-secondary-btn">درباره ما</a>
+                </div>
+            </div>
+        </div>
     </section>
 
 </div>
-
 
 @section Scripts {
     <script>
@@ -182,9 +276,7 @@
                 return;
             }
 
-            // مدت نمایش هر اسلاید (میلی‌ثانیه) — هر عددی که می‌خواهید
             var AUTO_SLIDE_MS = 6000;
-
             var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
             var canHover = window.matchMedia("(hover: hover)").matches;
 
@@ -194,14 +286,12 @@
                 var $category = $carousel.closest(".home-product-category");
                 var $progress = $category.find(".carousel-progress");
                 var bar = $progress.find(".carousel-progress-bar")[0];
-
                 var hovering = false;
 
                 function getOwl() {
                     return $carousel.data("owlCarousel");
                 }
 
-                // آخرین جایگاهی که carousel می‌تواند برود (۰ یا کمتر = چیزی برای اسکرول نیست)
                 function getMax(owl) {
                     return typeof owl.maximumItem === "number"
                         ? owl.maximumItem
@@ -219,7 +309,6 @@
                     bar.classList.toggle("is-paused", hovering || document.hidden);
                 }
 
-                // نوار را از صفر شروع می‌کند
                 function startProgress() {
                     var owl = getOwl();
                     if (!owl || !bar) return;
@@ -231,7 +320,7 @@
 
                     if (!canScroll) return;
 
-                    void bar.offsetWidth; // ری‌استارت انیمیشن CSS
+                    void bar.offsetWidth;
                     bar.style.animationDuration = AUTO_SLIDE_MS + "ms";
                     bar.classList.add("is-running");
                     applyPause();
@@ -239,28 +328,21 @@
 
                 $carousel.owlCarousel({
                     items: 4,
-
                     navigation: true,
                     navigationText: ["‹", "›"],
-
                     pagination: false,
-                    autoPlay: false,          // حرکت خودکار را نوار پیشرفت کنترل می‌کند
-
+                    autoPlay: false,
                     responsive: true,
                     itemsDesktop: [1199, 3],
                     itemsDesktopSmall: [979, 2],
                     itemsTablet: [768, 2],
                     itemsMobile: [479, 1],
-
                     slideSpeed: 400,
-
-                    // بعد از هر جابه‌جایی (خودکار، دکمه‌ها یا درگ) نوار از نو شروع می‌شود
                     afterAction: startProgress
                 });
 
                 if (!bar) return;
 
-                // وقتی نوار پر شد: اسلاید بعدی، و اگر به آخر رسیده بود برگرد به اول
                 bar.addEventListener("animationend", function () {
                     var owl = getOwl();
                     if (!owl) return;
@@ -274,7 +356,6 @@
                     startProgress();
                 });
 
-                // توقف هنگام hover (فقط دستگاه‌هایی که ماوس دارند)
                 if (canHover) {
                     $category.on("mouseenter focusin", function () {
                         hovering = true;
@@ -287,11 +368,25 @@
                     });
                 }
 
-                // توقف وقتی تب مرورگر در پس‌زمینه است
                 document.addEventListener("visibilitychange", applyPause);
 
                 startProgress();
             });
+
+            var $banner = $(".homeBanner");
+
+            if ($banner.length) {
+                $banner.owlCarousel({
+                    singleItem: true,
+                    navigation: false,
+                    pagination: true,
+                    autoPlay: reduceMotion ? false : 5000,
+                    stopOnHover: true,
+                    slideSpeed: 500,
+                    paginationSpeed: 500,
+                    rewindSpeed: 700
+                });
+            }
         });
     </script>
 }
